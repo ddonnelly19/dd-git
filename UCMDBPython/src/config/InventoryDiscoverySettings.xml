@@ -1,0 +1,1 @@
+<InventorySettings parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.platform.scanners.InventoryDiscoveryByScannerConfigurationFile">    <property name="ShouldDeleteDownloadableFileAfterParsing">false</property>    </InventorySettings>

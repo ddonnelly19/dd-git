@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+ 	<plugins>
+        <plugin id="websphere_server_win_by_powershell">
+            <name>Websphere Server on Windows by PowerShell</name>
+            <description>Sets key attributes for Websphere server discovered by PowerShell</description>
+            <module>plugins_websphere_server</module>
+            <class>WebsphereServerPluginWindows</class>
+            <qualifiers>
+                <qualifier type="application">WebSphere on Windows</qualifier>
+                <qualifier type="protocol">powershell</qualifier>
+            </qualifiers>
+        </plugin>
+	</plugins>
+</package>

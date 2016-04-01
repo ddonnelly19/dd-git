@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="ntcmd_microsoft_dhcp_version_information">
+            <name>Microsoft DHCP Server Version Information by NTCMD</name>
+            <description>Sets DHCP Server version information by Windows shell</description>
+            <module>plugin_msdhcp_server_by_ntcmd</module>
+            <class>MicrosoftDHCPVersionPluginByNTCMD</class>
+            <qualifiers>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+				<qualifier type="os">Windows</qualifier>
+				<qualifier type="application">Microsoft DHCP Server</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="wmi_microsoft_dhcp_version_information">
+            <name>Microsoft DHCP Server Version Information by WMI</name>
+            <description>Sets DHCP Server version information by WMI</description>
+            <module>plugin_msdhcp_server_by_wmi</module>
+            <class>MicrosoftDHCPVersionPluginByWMI</class>
+            <qualifiers>
+                <qualifier type="protocol">wmi</qualifier>
+				<qualifier type="os">Windows</qualifier>
+				<qualifier type="application">Microsoft DHCP Server</qualifier>
+            </qualifiers>
+        </plugin>
+    </plugins>
+</package>
+        

@@ -1,0 +1,134 @@
+<agents-support-matrix parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.platform.versioning.PlatformVersionConfigurationFile" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./../discoveryResources/AgentSupportMatrix.xsd">
+
+	<operating-system name="windows" display-name="Windows">
+		<version-identification-commands>
+			<command>ver</command>
+		</version-identification-commands>
+		<architecture name="x86">
+            <!--Uncomment to install on any version-->
+            <!--<version name="any" display-name="Any">.*</version>-->
+			<version name="Microsoft Windows XP" display-name="Microsoft Windows XP">.*[Ww]indows.*5\.1.*</version>
+			<version name="Windows Server 2003" display-name="Windows Server 2003">.*[Ww]indows.*5\.2.*</version>
+			<version name="Windows Server 2008/Windows Vista" display-name="Windows Server 2008/Windows Vista">.*[Ww]indows.*6\.0.*</version>
+			<version name="Windows Server 2008 R2/Windows 7" display-name="Windows Server 2008 R2/Windows 7">.*[Ww]indows.*6\.1.*</version>
+            <version name="Windows Server 2012/Windows 8" display-name="Windows Server 2012/Windows 8">.*[Ww]indows.*6\.2.*</version>
+            <version name="Windows Server 2012 R2/Windows 8.1" display-name="Windows Server 2012 R2/Windows 8.1">.*[Ww]indows.*6\.3.*</version>
+            <version name="Windows 10" display-name="Windows 10">.*[Ww]indows.*10.0.*</version>
+		</architecture>
+		<architecture name="amd64">
+            <!--Uncomment to install on any version-->
+            <!--<version name="any" display-name="Any">.*</version>-->
+			<version name="Windows XP 64-Bit Edition/Windows Server 2003" display-name="Windows XP 64-Bit Edition/Windows Server 2003">.*[Ww]indows.*5\.2.*</version>
+			<version name="Windows Server 2008/Windows Vista" display-name="Windows Server 2008/Windows Vista">.*[Ww]indows.*6\.0.*</version>
+			<version name="Windows Server 2008 R2/Windows 7" display-name="Windows Server 2008 R2/Windows 7">.*[Ww]indows.*6\.1.*</version>
+            <version name="Windows Server 2012/Windows 8" display-name="Windows Server 2012/Windows 8">.*[Ww]indows.*6\.2.*</version>
+            <version name="Windows Server 2012 R2/Windows 8.1" display-name="Windows Server 2012 R2/Windows 8.1">.*[Ww]indows.*6\.3.*</version>
+            <version name="Windows 10" display-name="Windows 10">.*[Ww]indows.*10.0.*</version>
+		</architecture>
+	</operating-system>
+	<operating-system name="linux" display-name="Linux">
+		<version-identification-commands>
+			<command>uname -a</command>
+			<command>cat /etc/enterprise-release /etc/oracle-release /etc/redhat-release /etc/lsb-release /etc/SuSE-release</command>
+		</version-identification-commands>
+		<architecture name="x86,x86_64">
+            <!--Uncomment to install on any version-->
+            <!--<version name="any" display-name="Any">.*</version>-->
+			<version name="Red Hat 3" display-name="Red Hat Enterprise Linux AS/ES/WS 3">.*Red Hat[^0-9]*3.*</version>
+			<version name="Red Hat 4" display-name="Red Hat Enterprise Linux AS/ES/WS 4">.*Red Hat[^0-9]*4.*</version>
+			<version name="Red Hat 5" display-name="Red Hat Enterprise Linux 5 Server/Desktop">.*Red Hat[^0-9]*5.*</version>
+			<version name="Red Hat 6" display-name="Red Hat Enterprise Linux 6 Server/Workstation">.*Red Hat[^0-9]*6.*</version>
+			<version name="Red Hat 7" display-name="Red Hat Enterprise Linux 7 Server/Workstation">.*Red Hat[^0-9]*7.*</version>
+			<version name="SUSE 9" display-name="Novell SUSE Linux Enterprise Server/Desktop 9">.*SUSE L(inux|INUX)[^0-9]*9.*</version>
+			<version name="SUSE 10" display-name="Novell SUSE Linux Enterprise Server/Desktop 10">.*SUSE Linux[^0-9]*10.*</version>
+			<version name="SUSE 11" display-name="Novell SUSE Linux Enterprise Server/Desktop 11">.*SUSE Linux[^0-9]*11.*</version>
+			<version name="SUSE 12" display-name="Novell SUSE Linux Enterprise Server/Desktop 12">.*SUSE Linux[^0-9]*12.*</version>
+			<version name="Oracle Linux 4" display-name="Oracle Linux 4">.*Enterprise Linux Enterprise Linux[^0-9]*4.*</version>
+			<version name="Oracle Linux 5" display-name="Oracle Linux 5">.*Enterprise Linux Enterprise Linux[^0-9]*5.*</version>
+			<version name="Oracle Linux 6" display-name="Oracle Linux 6">.*Oracle Linux Server[^0-9]*6.*</version>
+			<version name="Oracle Linux 7" display-name="Oracle Linux 7">.*Oracle Linux Server[^0-9]*7.*</version>
+			<version name="CentOS 5" display-name="CentOS 5">.*CentOS [^0-9]*5.*</version>
+			<version name="CentOS 6" display-name="CentOS 6">.*CentOS [^0-9]*6.*</version>
+			<version name="CentOS 7" display-name="CentOS 7">.*CentOS [^0-9]*7.*</version>
+		</architecture>
+	</operating-system>
+    
+    <operating-system name="ubuntu" display-name="Ubuntu">
+        <version-identification-commands>
+            <command>cat /etc/lsb-release</command>
+        </version-identification-commands>
+        <architecture name="x86,x86_64">
+            <version name="Ubuntu Linux Server/Desktop 10" display-name="Ubuntu Linux Server/Desktop 10">.*DISTRIB_DESCRIPTION="Ubuntu 10.*</version>
+            <version name="Ubuntu Linux Server/Desktop 11" display-name="Ubuntu Linux Server/Desktop 11">.*DISTRIB_DESCRIPTION="Ubuntu 11.*</version>
+			<version name="Ubuntu Linux Server/Desktop 12" display-name="Ubuntu Linux Server/Desktop 12">.*DISTRIB_DESCRIPTION="Ubuntu 12.*</version>
+			<version name="Ubuntu Linux Server/Desktop 13" display-name="Ubuntu Linux Server/Desktop 13">.*DISTRIB_DESCRIPTION="Ubuntu 13.*</version>
+			<version name="Ubuntu Linux Server/Desktop 14" display-name="Ubuntu Linux Server/Desktop 14">.*DISTRIB_DESCRIPTION="Ubuntu 14.*</version>
+			<version name="Ubuntu Linux Server/Desktop 15" display-name="Ubuntu Linux Server/Desktop 15">.*DISTRIB_DESCRIPTION="Ubuntu 15.*</version>
+        </architecture>
+    </operating-system>
+    
+	<operating-system name="aix" display-name="AIX">
+        <version-identification-commands>
+            <command>oslevel</command>
+        </version-identification-commands>
+		<architecture name="power">
+            <!--Uncomment to install on any version-->
+            <!--<version name="any" display-name="Any">.*</version>-->
+			<version name="AIX 5.3" display-name="IBM AIX 5.3">5\.3.*</version>
+			<version name="AIX 6.1" display-name="IBM AIX 6.1">6\.1.*</version>
+			<version name="AIX 7.1" display-name="IBM AIX 7.1">7\.1.*</version>
+		</architecture>
+	</operating-system>
+	<operating-system name="solaris" display-name="Oracle Solaris">
+        <version-identification-commands>
+            <command>uname -r</command>
+        </version-identification-commands>
+		<architecture name="sparc">
+            <!--Uncomment to install on any version-->
+            <!--<version name="any" display-name="Any">.*</version>-->
+			<version name="Solaris 9" display-name="Oracle Solaris 9">5\.9.*</version>
+			<version name="Solaris 10" display-name="Oracle Solaris 10">5\.10.*</version>
+			<version name="Solaris 11" display-name="Oracle Solaris 11">5\.11.*</version>
+		</architecture>
+		<architecture name="i86pc">
+            <!--Uncomment to install on any version-->
+            <!--<version name="any" display-name="Any">.*</version>-->
+			<version name="Solaris 10" display-name="Oracle Solaris 10">5\.10.*</version>
+			<version name="Solaris 11" display-name="Oracle Solaris 11">5\.11.*</version>
+		</architecture>
+	</operating-system>
+	<operating-system name="hpux" display-name="HP HP-UX 11.11 (11i)">
+        <version-identification-commands>
+            <command>uname -r</command>
+        </version-identification-commands>
+		<architecture name="hppa">
+            <!--Uncomment to install on any version-->
+            <!--<version name="any" display-name="Any">.*</version>-->
+			<version name="HP-UX 11.11" display-name="HP HP-UX 11.11 (11i)">[^0-9]*11\.11.*</version>
+			<version name="HP-UX 11.23" display-name="HP HP-UX 11.23 (11i v2)">[^0-9]*11\.23.*</version>
+			<version name="HP-UX 11.31" display-name="HP HP-UX 11.31 (11i v3)">[^0-9]*11\.31.*</version>
+		</architecture>
+		<architecture name="ia64">
+            <!--Uncomment to install on any version-->
+            <!--<version name="any" display-name="Any">.*</version>-->
+            <version name="HP-UX 11.23" display-name="HP HP-UX 11.23 (11i v2)">[^0-9]*11\.23.*</version>
+            <version name="HP-UX 11.31" display-name="HP HP-UX 11.31 (11i v3)">[^0-9]*11\.31.*</version>
+        </architecture>
+	</operating-system>
+	<operating-system name="macosx" display-name="Apple Mac OS">
+        <version-identification-commands>
+            <command>sw_vers -productVersion</command>
+        </version-identification-commands>
+		<architecture name="i386">
+            <!--Uncomment to install on any version-->
+            <!--<version name="any" display-name="Any">.*</version>-->
+			<version name="Mac OS X 10.5" display-name="Apple Mac OS X 10.5">10\.5.*</version>
+			<version name="Mac OS X 10.6" display-name="Apple Mac OS X 10.6">10\.6.*</version>
+			<version name="Mac OS X 10.7" display-name="Apple Mac OS X 10.7">10\.7.*</version>
+			<version name="Mac OS X 10.8" display-name="Apple Mac OS X 10.8">10\.8.*</version>
+            <version name="Mac OS X 10.9" display-name="Apple Mac OS X 10.9">10\.9.*</version>
+			<version name="Mac OS X 10.10" display-name="Apple Mac OS X 10.10">10\.10.*</version>
+			<version name="Mac OS X 10.11" display-name="Apple Mac OS X 10.11">10\.11.*</version>
+		</architecture>
+	</operating-system>
+</agents-support-matrix>

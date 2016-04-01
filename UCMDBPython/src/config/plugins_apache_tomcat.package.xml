@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+     <plugins>
+        <plugin id="apache_tomcat_by_shell_or_wmi">
+            <name>Apache Tomcat By Shell or WMI</name>
+            <description>Sets Apache Tomcat version and configuration file</description>
+            <module>plugin_apache_tomcat</module>
+            <class>ApacheTomcatPlugin</class>
+            <qualifiers>
+                <qualifier type="application">Apache Tomcat by tomcat process</qualifier>
+                <qualifier type="application">Apache Tomcat by java process</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+                <qualifier type="protocol">snmp</qualifier>
+                <qualifier type="protocol">wmi</qualifier>
+            </qualifiers>
+        </plugin>
+     </plugins>
+</package>

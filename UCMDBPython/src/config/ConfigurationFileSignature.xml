@@ -1,0 +1,903 @@
+<?xml version="1.0"?>
+<ConfigurationFileSignature xmlns="http://www.hp.com/ucmdb/1-0-0/ConfigurationFileSignature">
+    <Application name="HP Data Flow Probe">
+        <PropertyFile name="DataFlowProbe.properties">
+            <FileLocations>
+                <Path os='win'>${process.discovery_probe.path}/../../../conf</Path>
+            </FileLocations>
+            <PropertyVariable name="hostname" key="serverName"/>
+            <PropertyVariable name="port" key="serverPort"/>
+            <Property key="appilog.agent.probe.jdbc.uri">
+                <!-- jdbc:postgresql://localhost/dataflowprobe -->
+                <Regex expr="jdbc:postgresql://([\w.]*):?(\d*)/(\w+)" ignoreCase="true">
+                    <Variable name="postgres.host" group="1" defaultValue="localhost"/>
+                    <Variable name="postgres.port" group="2" defaultValue="5432"/>
+                    <Variable name="postgres.name" group="3"/>
+                </Regex>
+            </Property>
+        </PropertyFile>
+        <Output>
+            <SCP type="ucmdb" host="${hostname}" port="${port}"/>
+            <SCP type="postgres" host="${postgres.host}" port="${postgres.port}" context="${postgres.name}"/>
+        </Output>
+    </Application>
+    <Application name="HP UCMDB Server 9_10 on Windows">
+        <PropertyFile name="cmdb.conf">
+            <FileLocations>
+                <Path>${process.ucmdb_server.path}/../../../conf/</Path>
+            </FileLocations>
+            <PropertyVariable name="db.host" key="dal.datamodel.host.name"/>
+            <PropertyVariable name="db.port" key="dal.datamodel.port"/>
+            <PropertyVariable name="db.type" key="dal.datamodel.db.type"/>
+            <PropertyVariable name="db.name" key="dal.datamodel.db.name"/>
+        </PropertyFile>
+        <Output>
+            <SCP type="${db.type}" host="${db.host}" port="${db.port}" context="${db.name}"/>
+        </Output>
+    </Application>
+
+    <!-- WebSphere AS-->
+    <Application name="Websphere AS" productName="websphere_application_server">
+        <CommandLine>
+            <Regex expr='com.ibm.ws.runtime.WsServer\s+("([\S\s]+)"|(\S+))\s+(\S+)\s+(\S+)\s+(\S+)'>
+                <Variable name="config_root_path" group="2"/>
+                <Variable name="config_root_path" group="3"/>
+                <Variable name="cell_name" group="4"/>
+                <Variable name="node_name" group="5"/>
+                <Variable name="server_name" group="6"/>
+            </Regex>
+            <SystemVariable name="oracle_home" environmentName="ORACLE_HOME"/>
+            <SystemVariable name="tns_home" environmentName="TNS_ADMIN"/>
+        </CommandLine>
+        <XmlFile name="resources.xml">
+            <FileLocations>
+                <Path>${config_root_path}/cells/${cell_name}</Path>
+                <Path includeSub="true">${config_root_path}/cells/${cell_name}/clusters</Path>
+                <Path>${config_root_path}/cells/${cell_name}/nodes/${node_name}</Path>
+                <Path>${config_root_path}/cells/${cell_name}/nodes/${node_name}/servers/${server_name}</Path>
+            </FileLocations>
+            <!-- resolve ip and port for Database -->
+            <XPath xpath="//factories/propertySet[resourceProperties[matches(@name, 'serverName', 'i') and (@value != '')]]">
+                <Variable name="db_host" relativePath="./resourceProperties[matches(@name, 'serverName', 'i')]/@value" defaultValue="localhost"/>
+                <Variable name="db_port" relativePath="./resourceProperties[matches(@name, 'portNumber', 'i')]/@value"/>
+                <Variable name="db_name" relativePath="./resourceProperties[matches(@name, '(databaseName|SID)', 'i') and (@value != '')]/@value"/>
+            </XPath>
+            <XPath xpath="//factories/propertySet/resourceProperties[matches(@name, 'URL', 'i') and (@value != '')]">
+                <!--
+                    Support the following oracle jdbc connection string:
+                        jdbc:oracle:thin:@hostname:1521:SampleDB
+                        jdbc:oracle:thin:@:1521:SampleDB
+                        jdbc:oracle:thin:@//1.1.1.1:1521/SampleDB
+                        jdbc:oracle:thin:@//:1521/SampleDB
+                        jdbc:oracle:thin:@//hostname/SampleDB
+                        jdbc:oracle:thin:@///SampleDB
+                        jdbc:oracle:thin:@1.1.1.1:1521:SampleDB
+                        jdbc:oracle:oci:@1.1.1.1:1521:SampleDB
+                        jdbc:oracle:oci:@//1.1.1.1:1521:SampleDB
+                        jdbc:oracle:oci:@//1.1.1.1:1521/SampleDB
+                -->
+                <Regex relativePath="./@value" expr='jdbc:oracle:(thin|oci):(@//|@|//)([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="oracle_host" group="3" defaultValue="localhost"/>
+                    <Variable name="oracle_port" group="4" defaultValue="1521"/>
+                    <Variable name="oracle_name" group="6"/>
+                </Regex>
+                <!--
+                    Support the following sqlserver jdbc connection string:
+                        jdbc:sqlserver://hostname;user=MyUser;password=*****;
+                        jdbc:sqlserver://hostname;integratedSecurity=true;
+                        jdbc:sqlserver://hostname;databaseName=SampleDB;integratedSecurity=true;
+                        jdbc:sqlserver://hostname:1433;databaseName=SampleDB;integratedSecurity=true;
+                        jdbc:sqlserver://hostname;databaseName=SampleDB;integratedSecurity=true;applicationName=MyApp;
+                        jdbc:sqlserver://hostname:1433;integratedSecurity=true;<more properties as required>;
+                        jdbc:sqlserver://hostname;instanceName=SampleInstance;integratedSecurity=true;
+                        jdbc:jtds:sqlserver://hostname;instanceName=SampleInstance;integratedSecurity=true;
+                -->
+                <Regex relativePath="./@value" expr='jdbc:(jtds:)?sqlserver://([\w.]*):?(\d*);((databaseName|instanceName)=([\w.]+))?' ignoreCase="true">
+                    <Variable name="sqlserver_host" group="2" defaultValue="localhost"/>
+                    <Variable name="sqlserver_port" group="3" defaultValue="1433"/>
+                    <Variable name="sqlserver_name" group="6"/>
+                </Regex>
+                <!--
+                    Support the following sqlserver jdbc connection string:
+                        jdbc:sqlserver://hostname:1433/SampleDB
+                        jdbc:sqlserver://hostname/SampleDB
+                -->
+                <Regex expr='jdbc:(jtds:)?sqlserver://([\w.]*):?(\d*)/(\w+)' ignoreCase="true">
+                    <Variable name="sqlserver_host" group="2" defaultValue="localhost"/>
+                    <Variable name="sqlserver_port" group="3" defaultValue="1433"/>
+                    <Variable name="sqlserver_name" group="4"/>
+                </Regex>
+                <!--
+                    Support the following mysql jdbc connection string:
+                        jdbc:mysql://127.0.0.1/SampleDB
+                        jdbc:mysql://127.0.0.1:3306/SampleDB
+                -->
+                <Regex expr='jdbc:mysql://([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="mysql_host" group="1" defaultValue="localhost"/>
+                    <Variable name="mysql_port" group="2" defaultValue="3306"/>
+                    <Variable name="mysql_name" group="4"/>
+                </Regex>
+                <!--
+                    Support the following postgresql jdbc connection string:
+                        jdbc:postgresql://127.0.0.1/SampleDB
+                        jdbc:postgresql://127.0.0.1:5432/SampleDB
+                -->
+                <Regex expr='jdbc:postgresql://([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="postgres_host" group="1" defaultValue="localhost"/>
+                    <Variable name="postgres_port" group="2" defaultValue="5432"/>
+                    <Variable name="postgres_name" group="4"/>
+                </Regex>
+                <!--
+                    Support the following db2 jdbc connection string:
+                        jdbc:db2://127.0.0.1/SampleDB
+                        jdbc:db2://127.0.0.1:50000/SampleDB
+                -->
+                <Regex relativePath="./@value" expr='jdbc:db2://([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="db2_host" group="1" defaultValue="localhost"/>
+                    <Variable name="db2_port" group="2" defaultValue="50000"/>
+                    <Variable name="db2_name" group="4"/>
+                </Regex>
+                <!--
+                    Support the following oracle jdbc connection string:
+                        jdbc:oracle:thin:@(description=(address_list=(address=(protocol=tcp)(host=hostname)(port=1521)))
+                        (connect_data=(INSTANCE_NAME=ORCL)))
+                -->
+                <Regex relativePath="./@value" expr='jdbc:oracle:thin:@\(\s*DESCRIPTION\s*=\s*(\(\s*\w+\s*=\s*?(\w+)?\s*\)?\s*)?\s*\(\s*ADDRESS\s*=\s*\([^\)]*\)\s*\(\s*HOST\s*=\s*(\S+)\s*\)\s*\(\s*PORT\s*=\s*(\d+)\s*\)\s*\)\s*\)?\s*\(\s*CONNECT_DATA\s*=\s*\(\s*(INSTANCE_NAME|SERVICE_NAME|SID)\s*=\s*(\S+)\s*\)\s*\)\s*\)' ignoreCase="true">
+                    <Variable name="oracle_host" group="3" defaultValue="localhost"/>
+                    <Variable name="oracle_port" group="4"/>
+                    <Variable name="oracle_name" group="6"/>
+                </Regex>
+                <Regex relativePath="./@value" expr='jdbc:oracle:oci:@([\w.]+)'>
+                    <Variable name="tns_name" group="1"/>
+                </Regex>
+            </XPath>
+            <!-- resolve ip and port for MQ -->
+            <XPath xpath="//factories[@host != '']">
+                <Variable name="mq_host" relativePath="./@host"/>
+                <Variable name="mq_port" relativePath="./@port"/>
+                <Variable name="mq_queue_name" relativePath="./@baseQueueName"/>
+            </XPath>
+            <XPath xpath="//factories[@baseQueueName != '']">
+                <Variable name="mq_host" relativePath="./@queueManagerHost"/>
+                <Variable name="mq_port" relativePath="./@queueManagerPort"/>
+                <Variable name="mq_queue_name" relativePath="./@baseQueueName"/>
+            </XPath>
+        </XmlFile>
+        <!-- resolve the real ip and port from tnsnames.ora if the jdbc connection string is using tnsname-->
+        <TextFile name="tnsnames.ora">
+            <FileLocations>
+                <Path>${oracle_home}/network/admin</Path>
+                <Path>${tns_home}</Path>
+            </FileLocations>
+            <!--
+                Support the following TNS configuration:
+                ORA_TEST =
+                 (DESCRIPTION =
+                   (ADDRESS_LIST =
+                     (LOAD_BALANCE=on)(ADDRESS = (PROTOCOL = TCP)(HOST = 1.1.1.1)(PORT = 1521))
+                   )
+                 (CONNECT_DATA =
+                   (SERVICE_NAME = ORCL)
+                 )
+                )
+            -->
+            <Regex expr="${tns_name}\s*=\s*\(\s*DESCRIPTION\s*=\s*(\(\s*\w+\s*=\s*?(\w+)?\s*\)?\s*)?\s*\(\s*ADDRESS\s*=\s*\([^\)]*\)\s*\(\s*HOST\s*=\s*(\S+)\s*\)\s*\(\s*PORT\s*=\s*(\d+)\s*\)\s*\)\s*\)?\s*\(\s*CONNECT_DATA\s*=\s*\(\s*(INSTANCE_NAME|SERVICE_NAME|SID)\s*=\s*(\S+)\s*\)\s*\)\s*\)" ignoreCase="true">
+                <Variable name="oracle_host" group="3"/>
+                <Variable name="oracle_port" group="4"/>
+                <Variable name="oracle_name" group="6"/>
+            </Regex>
+        </TextFile>
+        <Output>
+            <SCP type="mq" host="${mq_host}" port="${mq_port}" context="${mq_queue_name}"/>
+            <SCP type="db" host="${db_host}" port="${db_port}" context="${db_name}"/>
+            <SCP type="oracle" host="${oracle_host}" port="${oracle_port}" context="${oracle_name}"/>
+            <SCP type="sqlserver" host="${sqlserver_host}" port="${sqlserver_port}" context="${sqlserver_name}"/>
+            <SCP type="db2" host="${db2_host}" port="${db2_port}" context="${db2_name}"/>
+            <SCP type="mysql" host="${mysql_host}" port="${mysql_port}" context="${mysql_name}"/>
+            <SCP type="postgres" host="${postgres_host}" port="${postgres_port}" context="${postgres_name}"/>
+        </Output>
+    </Application>
+
+    <!--Jboss-->
+    <Application name="JBoss AS" productName="jboss_application_server" cit="jbossas">
+        <CommandLine>
+            <!-- for JBoss version 4-6 -->
+            <Regex expr='-(classpath|cp)\s(\"([\S\s]+;)?([\S\s]+)[\\/]bin[\\/]run.jar\"|(\S+:)?(\S+)[\\/]bin[\\/]run.jar)' os="both">
+                <Variable name="home" group="4"/>
+                <Variable name="home" group="6"/>
+            </Regex>
+            <Regex expr="-(server|c)\s*([\w.]*)\s+">
+                <Variable name="profile_folder" group="2" defaultValue="default"/>
+            </Regex>
+            <!-- for JBoss version 7 domain mode -->
+            <Regex expr="-D\[Server:\S+\].*-Djboss.(domain).default.config\s*=\s*(\S+).*">
+                <Variable name="deployment_type" group="1"/>
+                <Variable name="config_file" group="2"/>
+            </Regex>
+            <!-- for JBoss version 7 standalone mode -->
+            <Regex expr=".*-Djboss.home.dir\s*=\s*(\S+)\s*">
+                <Variable name="jboss7_home" group="1"/>
+            </Regex>
+            <Regex expr=".*-Dprogram.name=(standalone).bat.*-Djboss.server.default.config\s*=\s*(\S+).*">
+                <Variable name="deployment_type" group="1"/>
+                <Variable name="config_file" group="2"/>
+            </Regex>
+            <SystemVariable name="oracle_home" environmentName="ORACLE_HOME"/>
+            <SystemVariable name="tns_home" environmentName="TNS_ADMIN"/>
+        </CommandLine>
+        <!--for JBoss version 4-6 *-ds.xml to get the datasource and jms configration -->
+        <XmlFile name="*-ds.xml">
+            <FileLocations>
+                <Path>${home}/server/${profile_folder}/deploy/</Path>
+            </FileLocations>
+            <XPath xpath="//datasources/local-tx-datasource/connection-url">
+                <Regex expr='jdbc:oracle:(thin|oci):(@//|@|//)([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="oracle_host" group="3" defaultValue="localhost"/>
+                    <Variable name="oracle_port" group="4" defaultValue="1521"/>
+                    <Variable name="oracle_name" group="6"/>
+                </Regex>
+                <Regex expr='jdbc:(jtds:)?sqlserver://([\w.]*):?(\d*);((databaseName|instanceName)=([\w.]+))?' ignoreCase="true">
+                    <Variable name="sqlserver_host" group="2" defaultValue="localhost"/>
+                    <Variable name="sqlserver_port" group="3" defaultValue="1433"/>
+                    <Variable name="sqlserver_name" group="6"/>
+                </Regex>
+                <Regex expr='jdbc:(jtds:)?sqlserver://([\w.]*):?(\d*)/(\w+)' ignoreCase="true">
+                    <Variable name="sqlserver_host" group="2" defaultValue="localhost"/>
+                    <Variable name="sqlserver_port" group="3" defaultValue="1433"/>
+                    <Variable name="sqlserver_name" group="4"/>
+                </Regex>
+                <Regex expr='jdbc:db2://([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="db2_host" group="1" defaultValue="localhost"/>
+                    <Variable name="db2_port" group="2" defaultValue="50000"/>
+                    <Variable name="db2_name" group="4"/>
+                </Regex>
+                <!--
+                    Support the following mysql jdbc connection string:
+                        jdbc:mysql://127.0.0.1/SampleDB
+                        jdbc:mysql://127.0.0.1:3306/SampleDB
+                -->
+                <Regex expr='jdbc:mysql://([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="mysql_host" group="1" defaultValue="localhost"/>
+                    <Variable name="mysql_port" group="2" defaultValue="3306"/>
+                    <Variable name="mysql_name" group="4"/>
+                </Regex>
+                <!--
+                    Support the following postgresql jdbc connection string:
+                        jdbc:postgresql://127.0.0.1/SampleDB
+                        jdbc:postgresql://127.0.0.1:5432/SampleDB
+                -->
+                <Regex expr='jdbc:postgresql://([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="postgres_host" group="1" defaultValue="localhost"/>
+                    <Variable name="postgres_port" group="2" defaultValue="5432"/>
+                    <Variable name="postgres_name" group="4"/>
+                </Regex>
+                <Regex expr='jdbc:oracle:thin:@\(\s*DESCRIPTION\s*=\s*(\(\s*\w+\s*=\s*?(\w+)?\s*\)?\s*)?\s*\(\s*ADDRESS\s*=\s*\([^\)]*\)\s*\(\s*HOST\s*=\s*(\S+)\s*\)\s*\(\s*PORT\s*=\s*(\d+)\s*\)\s*\)\s*\)?\s*\(\s*CONNECT_DATA\s*=\s*\(\s*(INSTANCE_NAME|SERVICE_NAME|SID)\s*=\s*(\S+)\s*\)\s*\)\s*\)' ignoreCase="true">
+                    <Variable name="oracle_host" group="3" defaultValue="localhost"/>
+                    <Variable name="oracle_port" group="4"/>
+                    <Variable name="oracle_name" group="6"/>
+                </Regex>
+                <Regex expr='jdbc:oracle:oci:@([\w.]+)'>
+                    <Variable name="tns_name" group="1"/>
+                </Regex>
+            </XPath>
+            <!--
+                for JBoss 4.x-6.x jms
+                examples:
+                <mbean code="org.jboss.jms.jndi.JMSProviderLoader"
+                       name="jboss.mq:service=JMSProviderLoader,name=RemoteJBossMQProvider">
+                    <attribute name="ProviderName">RemoteJMSProvider</attribute>
+                    <attribute name="ProviderUrl"></attribute>
+                    <attribute name="ProviderAdapterClass">
+                        org.jboss.jms.jndi.JBossMQProvider
+                    </attribute>
+                    <attribute name="FactoryRef">XAConnectionFactory</attribute>
+                    <attribute name="QueueFactoryRef">XAConnectionFactory</attribute>
+                    <attribute name="TopicFactoryRef">XAConnectionFactory</attribute>
+                    <attribute name="Properties>
+                        java.naming.factory.initial=org.jnp.interfaces.NamingContextFactory
+                        java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces
+                        java.naming.provider.url=jnp://remotehost:remoteport
+                    </attribute>
+                </mbean>
+            -->
+            <XPath xpath="//connection-factories/mbean/attribute[matches(@name,'Properties')]">
+                <Regex expr="(\s+.*\s+)*java.naming.provider.url=(jnp://)?(\S+):(\d+)(\s+.*)*">
+                    <Variable name="jms_ip" group="3"/>
+                    <Variable name="jms_port" group="4"/>
+                </Regex>
+            </XPath>
+        </XmlFile>
+        <!--for JBoss version 7 domain.xml and standalone.xml to get the datasource and jms configration -->
+        <XmlFile name="${config_file}">
+            <FileLocations>
+                <Path>${jboss7_home}/${deployment_type}/configuration/</Path>
+            </FileLocations>
+            <XPath xpath="//datasource/connection-url">
+                <Regex expr='jdbc:oracle:(thin|oci):(@//|@|//)([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="oracle_host" group="3" defaultValue="localhost"/>
+                    <Variable name="oracle_port" group="4" defaultValue="1521"/>
+                    <Variable name="oracle_name" group="6"/>
+                </Regex>
+                <Regex expr='jdbc:(jtds:)?sqlserver://([\w.]*):?(\d*);((databaseName|instanceName)=([\w.]+))?' ignoreCase="true">
+                    <Variable name="sqlserver_host" group="2" defaultValue="localhost"/>
+                    <Variable name="sqlserver_port" group="3" defaultValue="1433"/>
+                    <Variable name="sqlserver_name" group="6"/>
+                </Regex>
+                <Regex expr='jdbc:(jtds:)?sqlserver://([\w.]*):?(\d*)/(\w+)' ignoreCase="true">
+                    <Variable name="sqlserver_host" group="2" defaultValue="localhost"/>
+                    <Variable name="sqlserver_port" group="3" defaultValue="1433"/>
+                    <Variable name="sqlserver_name" group="4"/>
+                </Regex>
+                <Regex expr='jdbc:db2://([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="db2_host" group="1" defaultValue="localhost"/>
+                    <Variable name="db2_port" group="2" defaultValue="50000"/>
+                    <Variable name="db2_name" group="4"/>
+                </Regex>
+                <!--
+                    Support the following mysql jdbc connection string:
+                        jdbc:mysql://127.0.0.1/SampleDB
+                        jdbc:mysql://127.0.0.1:3306/SampleDB
+                -->
+                <Regex expr='jdbc:mysql://([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="mysql_host" group="1" defaultValue="localhost"/>
+                    <Variable name="mysql_port" group="2" defaultValue="3306"/>
+                    <Variable name="mysql_name" group="4"/>
+                </Regex>
+                <!--
+                    Support the following postgresql jdbc connection string:
+                        jdbc:postgresql://127.0.0.1/SampleDB
+                        jdbc:postgresql://127.0.0.1:5432/SampleDB
+                -->
+                <Regex expr='jdbc:postgresql://([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="postgres_host" group="1" defaultValue="localhost"/>
+                    <Variable name="postgres_port" group="2" defaultValue="5432"/>
+                    <Variable name="postgres_name" group="4"/>
+                </Regex>
+                <Regex expr='jdbc:oracle:thin:@\(\s*DESCRIPTION\s*=\s*(\(\s*\w+\s*=\s*?(\w+)?\s*\)?\s*)?\s*\(\s*ADDRESS\s*=\s*\([^\)]*\)\s*\(\s*HOST\s*=\s*(\S+)\s*\)\s*\(\s*PORT\s*=\s*(\d+)\s*\)\s*\)\s*\)?\s*\(\s*CONNECT_DATA\s*=\s*\(\s*(INSTANCE_NAME|SERVICE_NAME|SID)\s*=\s*(\S+)\s*\)\s*\)\s*\)' ignoreCase="true">
+                    <Variable name="oracle_host" group="3" defaultValue="localhost"/>
+                    <Variable name="oracle_port" group="4"/>
+                    <Variable name="oracle_name" group="6"/>
+                </Regex>
+                <Regex expr='jdbc:oracle:oci:@([\w.]+)'>
+                    <Variable name="tns_name" group="1"/>
+                </Regex>
+            </XPath>
+            <!--
+                for JBoss 7 jms
+                examples:
+                <hornetq-server>
+                   ...
+                   <connectors>
+                      <connector name="remote-jms-nonmgmt">
+                         <factory-class>org.hornetq.core.remoting.impl.netty.NettyConnectorFactory</factory-class>
+                         <param key="host" value="jms_ip"/>
+                         <param key="port" value="jms_port"/>
+                      </connector>
+                      <netty-connector name="remote-jms-mgmt" socket-binding="remote-jms-binding"/>
+                   </connectors>
+                </hornetq-server>
+            -->
+            <XPath xpath="//hornetq-server/connectors/connector[param[@key='host']][param[@key='port']]">
+                <Variable name="jms_ip" relativePath="./param[@key='host']/@value"/>
+                <Variable name="jms_port" relativePath="./param[@key='port']/@value"/>
+            </XPath>
+        </XmlFile>
+        <!-- resolve the real ip and port from tnsnames.ora if the jdbc connection string is using tnsname-->
+        <TextFile name="tnsnames.ora">
+            <FileLocations>
+                <Path>${oracle_home}/network/admin</Path>
+                <Path>${tns_home}</Path>
+            </FileLocations>
+            <!--
+                Support the following TNS configuration:
+                ORA_TEST =
+                 (DESCRIPTION =
+                   (ADDRESS_LIST =
+                     (ADDRESS = (PROTOCOL = TCP)(HOST = 1.1.1.1)(PORT = 1522))
+                   )
+                 (CONNECT_DATA =
+                   (SERVICE_NAME = ORCL11)
+                 )
+                )
+            -->
+            <Regex expr="${tns_name}\s*=\s*\(\s*DESCRIPTION\s*=\s*(\(\s*\w+\s*=\s*?(\w+)?\s*\)?\s*)?\s*\(\s*ADDRESS\s*=\s*\([^\)]*\)\s*\(\s*HOST\s*=\s*(\S+)\s*\)\s*\(\s*PORT\s*=\s*(\d+)\s*\)\s*\)\s*\)?\s*\(\s*CONNECT_DATA\s*=\s*\(\s*(INSTANCE_NAME|SERVICE_NAME|SID)\s*=\s*(\S+)\s*\)\s*\)\s*\)" ignoreCase="true">
+                <Variable name="oracle_host" group="3"/>
+                <Variable name="oracle_port" group="4"/>
+                <Variable name="oracle_name" group="6"/>
+            </Regex>
+        </TextFile>
+        <Output>
+            <SCP type="oracle" host="${oracle_host}" port="${oracle_port}" context="${oracle_name}"/>
+            <SCP type="sqlserver" host="${sqlserver_host}" port="${sqlserver_port}" context="${sqlserver_name}"/>
+            <SCP type="db2" host="${db2_host}" port="${db2_port}" context="${db2_name}"/>
+            <SCP type="mysql" host="${mysql_host}" port="${mysql_port}" context="${mysql_name}"/>
+            <SCP type="postgres" host="${postgres_host}" port="${postgres_port}" context="${postgres_name}"/>
+            <SCP type="jms" host="${jms_ip}" port="${jms_port}"/>
+        </Output>
+    </Application>
+
+    <!--Apache Tomcat-->
+    <Application name="Apache Tomcat" productName="tomcat_web_server" cit="tomcat">
+        <CommandLine>
+            <Regex expr='\s*-Dcatalina.home="?(.*?)"?\s+'>
+                <Variable name="home" group="1"/>
+            </Regex>
+            <Regex expr='.*[";](.*?)[/\\]s?bin[/\\]tomcat' ignoreCase="true">
+                <Variable name="home" group="1"/>
+            </Regex>
+        </CommandLine>
+        <XmlFile name="context.xml">
+            <FileLocations>
+                <Path>${home}/conf</Path>
+            </FileLocations>
+            <XPath xpath="//Context/Resource/@url">
+                <!--
+                    Support the following oracle jdbc connection string:
+                        jdbc:oracle:thin:@hostname:1521:SampleDB
+                        jdbc:oracle:thin:@:1521:SampleDB
+                        jdbc:oracle:thin:@//1.1.1.1:1521/SampleDB
+                        jdbc:oracle:thin:@//:1521/SampleDB
+                        jdbc:oracle:thin:@//hostname/SampleDB
+                        jdbc:oracle:thin:@///SampleDB
+                -->
+                <Regex expr='jdbc:oracle:(thin|oci):(@//|@|//)([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="oracle_host" group="3" defaultValue="localhost"/>
+                    <Variable name="oracle_port" group="4" defaultValue="1521"/>
+                    <Variable name="oracle_name" group="6"/>
+                </Regex>
+                <!--
+                    Support the following sqlserver jdbc connection string:
+                        jdbc:sqlserver://hostname;user=MyUserName;password=*****;
+                        jdbc:sqlserver://hostname;integratedSecurity=true;
+                        jdbc:sqlserver://hostname;databaseName=SampleDB;integratedSecurity=true;
+                        jdbc:sqlserver://hostname:1433;databaseName=SampleDB;integratedSecurity=true;
+                        jdbc:sqlserver://hostname;databaseName=SampleDB;integratedSecurity=true;applicationName=MyApp;
+                        jdbc:sqlserver://hostname:1433;integratedSecurity=true;<more properties as required>;
+                        jdbc:sqlserver://hostname;instanceName=SampleInstance;integratedSecurity=true;
+                        jdbc:jtds:sqlserver://hostname;instanceName=SampleInstance;integratedSecurity=true;
+                -->
+                <Regex expr='jdbc:(jtds:)?sqlserver://([\w.]*):?(\d*);((databaseName|instanceName)=([\w.]+))?' ignoreCase="true">
+                    <Variable name="sqlserver_host" group="2" defaultValue="localhost"/>
+                    <Variable name="sqlserver_port" group="3" defaultValue="1433"/>
+                    <Variable name="sqlserver_name" group="6"/>
+                </Regex>
+                <!--
+                    Support the following sqlserver jdbc connection string:
+                        jdbc:sqlserver://hostname:1433/SampleDB
+                        jdbc:sqlserver://hostname/SampleDB
+                -->
+                <Regex expr='jdbc:(jtds:)?sqlserver://([\w.]*):?(\d*)/(\w+)' ignoreCase="true">
+                    <Variable name="sqlserver_host" group="2" defaultValue="localhost"/>
+                    <Variable name="sqlserver_port" group="3" defaultValue="1433"/>
+                    <Variable name="sqlserver_name" group="4"/>
+                </Regex>
+                <!--
+                    Support the following db2 jdbc connection string:
+                        jdbc:db2://127.0.0.1/SampleDB
+                        jdbc:db2://127.0.0.1:50000/SampleDB
+                -->
+                <Regex expr='jdbc:db2://([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="db2_host" group="1" defaultValue="localhost"/>
+                    <Variable name="db2_port" group="2" defaultValue="50000"/>
+                    <Variable name="db2_name" group="4"/>
+                </Regex>
+                <!--
+                    Support the following mysql jdbc connection string:
+                        jdbc:mysql://127.0.0.1/SampleDB
+                        jdbc:mysql://127.0.0.1:3306/SampleDB
+                -->
+                <Regex expr='jdbc:mysql://([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="mysql_host" group="1" defaultValue="localhost"/>
+                    <Variable name="mysql_port" group="2" defaultValue="3306"/>
+                    <Variable name="mysql_name" group="4"/>
+                </Regex>
+                <!--
+                    Support the following postgresql jdbc connection string:
+                        jdbc:postgresql://127.0.0.1/SampleDB
+                        jdbc:postgresql://127.0.0.1:5432/SampleDB
+                -->
+                <Regex expr='jdbc:postgresql://([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="postgres_host" group="1" defaultValue="localhost"/>
+                    <Variable name="postgres_port" group="2" defaultValue="5432"/>
+                    <Variable name="postgres_name" group="4"/>
+                </Regex>
+                <!--
+                    Support the following oracle jdbc connection string:
+                        jdbc:oracle:thin:@(description=(address_list=(address=(protocol=tcp)(host=hostname)(port=1521)))
+                        (connect_data=(INSTANCE_NAME=ORCL)))
+                -->
+                <Regex expr='jdbc:oracle:thin:@\(\s*DESCRIPTION\s*=\s*(\(\s*\w+\s*=\s*?(\w+)?\s*\)?\s*)?\s*\(\s*ADDRESS\s*=\s*\([^\)]*\)\s*\(\s*HOST\s*=\s*(\S+)\s*\)\s*\(\s*PORT\s*=\s*(\d+)\s*\)\s*\)\s*\)?\s*\(\s*CONNECT_DATA\s*=\s*\(\s*(INSTANCE_NAME|SERVICE_NAME|SID)\s*=\s*(\S+)\s*\)\s*\)\s*\)' ignoreCase="true">
+                    <Variable name="oracle_host" group="3" defaultValue="localhost"/>
+                    <Variable name="oracle_port" group="4"/>
+                    <Variable name="oracle_name" group="6"/>
+                </Regex>
+            </XPath>
+        </XmlFile>
+        <Output>
+            <SCP type="oracle" host="${oracle_host}" port="${oracle_port}" context="${oracle_name}"/>
+            <SCP type="sqlserver" host="${sqlserver_host}" port="${sqlserver_port}" context="${sqlserver_name}"/>
+            <SCP type="db2" host="${db2_host}" port="${db2_port}" context="${db2_name}"/>
+            <SCP type="mysql" host="${mysql_host}" port="${mysql_port}" context="${mysql_name}"/>
+            <SCP type="postgres" host="${postgres_host}" port="${postgres_port}" context="${postgres_name}"/>
+        </Output>
+    </Application>
+
+    <!--WebLogic AS-->
+    <Application name="WebLogic AS" productName='weblogic_application_server' cit="weblogic">
+        <CommandLine includeParentProcesses="true">
+            <Regex expr="-Dplatform.home=(\S*)">
+                <Variable name="home" group="1"/>
+            </Regex>
+            <Regex expr="-Dlog4j.configuration=file:(\S*)\\LOG">
+                <Variable name="log4j" group="1"/>
+            </Regex>
+            <Regex expr='\s*"?(\S+)[/\\]s?bin[/\\]startWebLogic.(cmd|sh)' ignoreCase="true">
+                <Variable name="weblogic_home" group="1"/>
+            </Regex>
+            <Regex expr="-Dweblogic.Name=\s*(\S+)">
+                <Variable name="weblogic_name" group="1"/>
+            </Regex>
+            <SystemVariable name="oracle_home" environmentName="ORACLE_HOME"/>
+            <SystemVariable name="tns_home" environmentName="TNS_ADMIN"/>
+        </CommandLine>
+        <XmlFile name="config.xml">
+            <FileLocations>
+                <Path>${weblogic_home}/config</Path>
+                <Path>${log4j}/config/</Path>
+            </FileLocations>
+            <XPath xpath="//server[name[matches(., '${weblogic_name}', 'i')]]/listen-port">
+                <Variable name="listen_port" relativePath="./text()"/>
+            </XPath>
+            <XPath xpath="//cluster[frontend-http-port[matches(.,'${listen_port}') or frontend-https-port[matches(.,'${listen_port}')]]]/cluster-address/text()">
+                <Regex expr="([\w.]*):(\d*)">
+                    <Variable name="weblogic_host" group="1"/>
+                    <Variable name="weblogic_port" group="2"/>
+                </Regex>
+            </XPath>
+            <XPath xpath="//jdbc-system-resource/descriptor-file-name">
+                <Regex expr="\/([\S]*)" relativePath="./text()">
+                    <Variable name="jdbc_config_file" group="1"/>
+                </Regex>
+            </XPath>
+            <XPath xpath="//jms-system-resource/descriptor-file-name">
+                <Regex expr="\/([\S]*)" relativePath="./text()">
+                    <Variable name="jms_config_file" group="1"/>
+                </Regex>
+            </XPath>
+        </XmlFile>
+        <XmlFile name="${jdbc_config_file}">
+            <FileLocations>
+                <Path>${weblogic_home}/config/jdbc/</Path>
+                <Path>${log4j}/config/jdbc/</Path>
+            </FileLocations>
+            <XPath xpath="//jdbc-driver-params/properties[property[name[matches(.,'serverName')] and value[text() != '']]]">
+                <Variable name="db_host" relativePath="./property[name[matches(text(), 'serverName', 'i')]]/value/text()"/>
+                <Variable name="db_port" relativePath="./property[name[matches(text(), 'portNumber', 'i')]]/value/text()"/>
+                <Variable name="db_name" relativePath="./property[name[matches(text(), 'databaseName', 'i')]]/value/text()"/>
+            </XPath>
+
+            <XPath xpath="//jdbc-driver-params[properties[property[name[matches(.,'databaseName')] and value[text() != '']]]]">
+                <Regex relativePath="./url/text()" expr="jdbc:(jtds:)?sqlserver://([\w.]*):?(\d*)">
+                    <Variable name="sqlserver_host" group="2" defaultValue="localhost"/>
+                    <Variable name="sqlserver_port" group="3" defaultValue="1433"/>
+                </Regex>
+                <Regex expr="./properties/property[name[matches(.,'databaseName')]]/value/text()">
+                    <Variable name="sqlserver_name" group="1"/>
+                </Regex>
+            </XPath>
+
+
+            <XPath xpath="//jdbc-driver-params/url/text()">
+                <Regex expr='jdbc:oracle:(thin|oci):(@//|@|//)([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="oracle_host" group="3" defaultValue="localhost"/>
+                    <Variable name="oracle_port" group="4" defaultValue="1521"/>
+                    <Variable name="oracle_name" group="6"/>
+                </Regex>
+                <!--jdbc:bea:oracle://hostname:1521-->
+                <Regex expr='jdbc:bea:(\w+):(@//|@|//)([\w.]*)(:(\d+))?(:|/)?(\w+)?' ignoreCase="true">
+                    <Variable name="bea_db_type" group="1"/>
+                    <Variable name="bea_db_host" group="3" defaultValue="localhost"/>
+                    <Variable name="bea_db_port" group="5"/>
+                    <Variable name="bea_db_name" group="7"/>
+                </Regex>
+                <Regex expr='jdbc:(jtds:)?sqlserver://([\w.]*):?(\d*);((databaseName|instanceName)=([\w.]+))?'
+                       ignoreCase="true">
+                    <Variable name="sqlserver_host" group="2" defaultValue="localhost"/>
+                    <Variable name="sqlserver_port" group="3" defaultValue="1433"/>
+                    <Variable name="sqlserver_name" group="6"/>
+                </Regex>
+                <Regex expr='jdbc:(jtds:)?sqlserver://([\w.]*):?(\d*)/(\w+)' ignoreCase="true">
+                    <Variable name="sqlserver_host" group="2" defaultValue="localhost"/>
+                    <Variable name="sqlserver_port" group="3" defaultValue="1433"/>
+                    <Variable name="sqlserver_name" group="4"/>
+                </Regex>
+                <Regex expr='jdbc:db2://([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="db2_host" group="1" defaultValue="localhost"/>
+                    <Variable name="db2_port" group="2" defaultValue="50000"/>
+                    <Variable name="db2_name" group="4"/>
+                </Regex>
+                <Regex expr='jdbc:oracle:thin:@\(\s*DESCRIPTION\s*=\s*(\(\s*\w+\s*=\s*?(\w+)?\s*\)?\s*)?\s*\(\s*ADDRESS\s*=\s*\([^\)]*\)\s*\(\s*HOST\s*=\s*(\S+)\s*\)\s*\(\s*PORT\s*=\s*(\d+)\s*\)\s*\)\s*\)?\s*\(\s*CONNECT_DATA\s*=\s*\(\s*(INSTANCE_NAME|SERVICE_NAME|SID)\s*=\s*(\S+)\s*\)\s*\)\s*\)'
+                       ignoreCase="true">
+                    <Variable name="oracle_host" group="3" defaultValue="localhost"/>
+                    <Variable name="oracle_port" group="4"/>
+                    <Variable name="oracle_name" group="6"/>
+                </Regex>
+                <Regex expr='jdbc:oracle:oci:@([\w.]+)'>
+                    <Variable name="tns_name" group="1"/>
+                </Regex>
+                <!--
+                    Support the following mysql jdbc connection string:
+                        jdbc:mysql://127.0.0.1/SampleDB
+                        jdbc:mysql://127.0.0.1:3306/SampleDB
+                -->
+                <Regex expr='jdbc:mysql://([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="mysql_host" group="1" defaultValue="localhost"/>
+                    <Variable name="mysql_port" group="2" defaultValue="3306"/>
+                    <Variable name="mysql_name" group="4"/>
+                </Regex>
+                <!--
+                    Support the following postgresql jdbc connection string:
+                        jdbc:postgresql://127.0.0.1/SampleDB
+                        jdbc:postgresql://127.0.0.1:5432/SampleDB
+                -->
+                <Regex expr='jdbc:postgresql://([\w.]*):?(\d*)(:|/)([\w.]+)' ignoreCase="true">
+                    <Variable name="postgres_host" group="1" defaultValue="localhost"/>
+                    <Variable name="postgres_port" group="2" defaultValue="5432"/>
+                    <Variable name="postgres_name" group="4"/>
+                </Regex>
+            </XPath>
+        </XmlFile>
+        <XmlFile name="${jms_config_file}">
+            <FileLocations>
+                <Path>${weblogic_home}/config/jms/</Path>
+                <Path>${log4j}/config/jms/</Path>
+            </FileLocations>
+            <XPath xpath="//foreign-server/connection-url">
+                <!-- for connection url on windows -->
+                <Regex expr='file:/([a-zA-Z]:.*)' ignoreCase="true">
+                    <Variable name="jms_connection_url" group="1"/>
+                </Regex>
+                <!-- for connection url on linux or unix -->
+                <Regex expr='file:(.*)' ignoreCase="true">
+                    <Variable name="jms_connection_url" group="1"/>
+                </Regex>
+            </XPath>
+            <XPath xpath="//foreign-connection-factory/remote-jndi-name">
+                <Variable name="jms_jndi_name" relativePath="./text()"/>
+            </XPath>
+        </XmlFile>
+        <!-- WebLogic Server with IBM WebSphere MQ as a Foreign JMS Server in Two Different Machines-->
+        <!-- .bindings file contains the information on how to connect to the remote JMS server (the MQ server) -->
+        <TextFile name=".bindings">
+            <FileLocations>
+                <Path>${jms_connection_url}</Path>
+            </FileLocations>
+            <!--MQSenderQCF/RefAddr/35/Content=1.1.1.1(1414)-->
+            <Regex expr='${jms_jndi_name}/RefAddr/(\d*)/Content=([\w.]*)\((\d*)\)'>
+                <Variable name="mq_host" group="2"/>
+                <Variable name="mq_port" group="3"/>
+            </Regex>
+        </TextFile>
+        <!-- resolve the real ip and port from tnsnames.ora if the jdbc connection string is using tnsname-->
+        <TextFile name="tnsnames.ora">
+            <FileLocations>
+                <Path>${oracle_home}/network/admin</Path>
+                <Path>${tns_home}</Path>
+            </FileLocations>
+            <!--
+                Support the following TNS configuration:
+                ORA_TEST =
+                 (DESCRIPTION =
+                   (ADDRESS_LIST =
+                     (ADDRESS = (PROTOCOL = TCP)(HOST = 1.1.1.1)(PORT = 1522))
+                   )
+                 (CONNECT_DATA =
+                   (SERVICE_NAME = ORCL11)
+                 )
+                )
+            -->
+            <Regex expr="${tns_name}\s*=\s*\(\s*DESCRIPTION\s*=\s*(\(\s*\w+\s*=\s*?(\w+)?\s*\)?\s*)?\s*\(\s*ADDRESS\s*=\s*\([^\)]*\)\s*\(\s*HOST\s*=\s*(\S+)\s*\)\s*\(\s*PORT\s*=\s*(\d+)\s*\)\s*\)\s*\)?\s*\(\s*CONNECT_DATA\s*=\s*\(\s*(INSTANCE_NAME|SERVICE_NAME|SID)\s*=\s*(\S+)\s*\)\s*\)\s*\)" ignoreCase="true">
+                <Variable name="oracle_host" group="3"/>
+                <Variable name="oracle_port" group="4"/>
+                <Variable name="oracle_name" group="6"/>
+            </Regex>
+        </TextFile>
+        <Output>
+            <SCP type="weblogic" host="${weblogic_host}" port="${weblogic_port}"/>
+			<SCP type="mq" host="${mq_host}" port="${mq_port}"/>
+            <SCP type="db" host="${db_host}" port="${db_port}" context="${db_name}"/>
+            <SCP type="${bea_db_type}" host="${bea_db_host}" port="${bea_db_port}" context="${bea_db_name}"/>
+            <SCP type="oracle" host="${oracle_host}" port="${oracle_port}" context="${oracle_name}"/>
+            <SCP type="sqlserver" host="${sqlserver_host}" port="${sqlserver_port}" context="${sqlserver_name}"/>
+            <SCP type="db2" host="${db2_host}" port="${db2_port}" context="${db2_name}"/>
+            <SCP type="mysql" host="${mysql_host}" port="${mysql_port}" context="${mysql_name}"/>
+            <SCP type="postgres" host="${postgres_host}" port="${postgres_port}" context="${postgres_name}"/>
+        </Output>
+    </Application>
+
+    <!-- IIS -->
+    <Application name="Microsoft IIS WebServer" productName="iis_web_server" cit="iis">
+        <!-- IIS application -->
+        <CommandLine>
+            <Execute cmdline="%windir%\system32\inetsrv\appcmd.exe list site /text" os="win">
+                <Regex expr='SITE\s+"(.*?)"\s+(\S+${scp.type}/(\*|${scp.ip}):${scp.port}\S+,state:Started)'>
+                    <Variable name="siteName" group="1"/>
+                </Regex>
+            </Execute>
+        </CommandLine>
+        <CustomFile name="temp" plugin="iis_plugin">
+            <FileContent>${siteName}</FileContent>
+            <!-- Return variable "physicalPath", "sePluginsPath" and "tomcatPluginPath" -->
+        </CustomFile>
+        <XmlFile name="Web.config" collect="true">
+            <FileLocations>
+                <Path>${physicalPath}</Path>
+            </FileLocations>
+            <XPath xpath="//configuration/system.serviceModel/client/endpoint/@address">
+                <Regex expr='(\S+)://([\w.]+):?(\d+)?(\S*)' ignoreCase="true">
+                    <Variable name="client_protocol" group="1"/>
+                    <Variable name="client_host" group="2"/>
+                    <Variable name="client_port" group="3" defaultValue="80"/>
+                    <Variable name="client_context" group="4" defaultValue="/"/>
+                </Regex>
+            </XPath>
+            <XPath xpath="//configuration/connectionStrings/add/@connectionString">
+                <!-- SQL Server -->
+                <!--
+                    Sample:
+                    server=hostname,port;database=SampleDB;user id=MyUser;password=Password1;min pool size=10;max pool size=50;Connection Timeout=60;
+                -->
+                <Regex expr='(server|Data Source)\s*=\s*([.\w]+)(\\SQLExpress)?,?(\d+)?;.*?database=(.*?);' ignoreCase="true">
+                    <Variable name="sqlserver_host" group="2"/>
+                    <Variable name="sqlserver_port" group="4" defaultValue="1433"/>
+                    <Variable name="sqlserver_database" group="5"/>
+                </Regex>
+                <!-- DB2 -->
+                <!--
+                    Sample:
+                    Network Transport Library=TCPIP;Network Address=1.1.1.1;Initial Catalog=MyDatabase;Package Collection=MyDatabase;Default Schema=Schema;User ID=user;Password=pwd;network port=50000;Units of Work=RUW; Connection Pooling=True;defer prepare=false;
+                -->
+                <Regex expr='Network Address\s*=\s*([.\w]+);.*?Initial Catalog=(.*?);.*?network port\s*=\s*(\d+)\s*;' ignoreCase="true">
+                    <Variable name="db2_host" group="1"/>
+                    <Variable name="db2_database" group="2"/>
+                    <Variable name="db2_port" group="3" defaultValue="50000"/>
+                </Regex>
+                <!-- Oracle -->
+                <!--
+                    Sample:
+                    Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=1.1.1.1)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=SampleDB)));user id=MyUser;password=Password1;min pool size=10;max pool size=10;enlist=dynamic;
+                -->
+                <Regex expr='\(\s*DESCRIPTION\s*=\s*(\(\s*\w+\s*=\s*?(\w+)?\s*\)?\s*)?\s*\(\s*ADDRESS\s*=\s*\([^\)]*\)\s*\(\s*HOST\s*=\s*(\S+)\s*\)\s*\(\s*PORT\s*=\s*(\d+)\s*\)\s*\)\s*\)?\s*\(\s*CONNECT_DATA\s*=\s*\(\s*(INSTANCE_NAME|SERVICE_NAME|SID)\s*=\s*(\S+)\s*\)\s*\)\s*\)' ignoreCase="true">
+                    <Variable name="oracle_host" group="3"/>
+                    <Variable name="oracle_port" group="4" defaultValue="1521"/>
+                    <Variable name="oracle_database" group="6"/>
+                </Regex>
+                <Regex expr="Data Source\s*=\s*([.\w]+):?(\d+)?/?(\S+)?;" ignoreCase="true">
+                    <Variable name="oracle_host" group="1"/>
+                    <Variable name="oracle_port" group="2" defaultValue="1521"/>
+                    <Variable name="oracle_database" group="3"/>
+                </Regex>
+                <!-- mysql -->
+                <!--
+                    Sample:
+                    Server=myServerAddress;Port=1234;Database=myDataBase;Uid=myUsername;Pwd=myPassword;
+                -->
+                <Regex expr='(server|Data Source)\s*=\s*([.\w]+);(Port\s*=\s*(\d+);)?.*?Database=([^;]+);' ignoreCase="true">
+                    <Variable name="mysql_host" group="2"/>
+                    <Variable name="mysql_port" group="4" defaultValue="3306"/>
+                    <Variable name="mysql_name" group="5"/>
+                </Regex>
+                <!-- Postgresql -->
+                <!--
+                    Sample:
+                    Server=myServerAddress;Port=5432;Database=myDataBase;User Id=myUsername;Password=myPassword;
+                -->
+                <Regex expr='(server|Data Source)\s*=\s*([.\w]+);(Port\s*=\s*(\d+);)?.*?Database=([^;]+);.*?(User Id|Userid|Integrated Security)=' ignoreCase="true">
+                    <Variable name="postgres_host" group="2"/>
+                    <Variable name="postgres_port" group="4" defaultValue="5432"/>
+                    <Variable name="postgres_name" group="5"/>
+                </Regex>
+            </XPath>
+        </XmlFile>
+
+        <!-- IIS plug-ins for WebSphere -->
+        <TextFile name="plugin-cfg.loc">
+            <FileLocations>
+                <Path>${sePluginsPath}</Path>
+            </FileLocations>
+            <Regex expr='(.*)\plugin-cfg.xml'>
+                <Variable name="pluginHome" group="1"/>
+            </Regex>
+        </TextFile>
+        <XmlFile name="plugin-cfg.xml" collect="true">
+            <FileLocations>
+                <Path>${pluginHome}</Path>
+            </FileLocations>
+            <XPath xpath="//ServerCluster/Server">
+                <Variable name="websphere_host" relativePath="./Transport/@Hostname"/>
+                <Variable name="websphere_port" relativePath="./Transport/@Port"/>
+            </XPath>
+        </XmlFile>
+
+        <!-- IIS plug-ins for Tomcat -->
+        <CommandLine>
+            <Execute cmdline='REG QUERY "HKLM\SOFTWARE\Apache Software Foundation\Jakarta Isapi Redirector\1.0" /v worker_mount_file' os="win">
+                <Regex expr="worker_mount_file\s+REG_\w+\s+(\S*)\\(\S*?)$">
+                    <Variable name="worker_mount_file_loc" group="1"/>
+                    <Variable name="worker_mount_file_name" group="2"/>
+                </Regex>
+            </Execute>
+            <Execute cmdline='REG QUERY "HKLM\SOFTWARE\Apache Software Foundation\Jakarta Isapi Redirector\1.0" /v worker_file' os="win">
+                <Regex expr="worker_file\s+REG_\w+\s+(\S*)\\(\S*?)$">
+                    <Variable name="worker_file_loc" group="1"/>
+                    <Variable name="worker_file_name" group="2"/>
+                </Regex>
+            </Execute>
+        </CommandLine>
+        <CustomFile name="${worker_mount_file_name}" plugin="iis_plugin_tomcat">
+            <FileLocations>
+                <Path>${worker_mount_file_loc}</Path>
+            </FileLocations>
+            <!-- Return variable "worker_name" -->
+        </CustomFile>
+        <PropertyFile name="${worker_file_name}">
+            <FileLocations>
+                <Path>${worker_file_loc}</Path>
+            </FileLocations>
+            <PropertyVariable name="worker_host" key="worker.${worker_name}.host"/>
+            <PropertyVariable name="worker_port" key="worker.${worker_name}.port"/>
+        </PropertyFile>
+
+        <Output>
+            <SCP type="${client_protocol}" host="${client_host}" port="${client_port}" context="${client_context}"/>
+            <SCP type="sqlserver" host="${sqlserver_host}" port="${sqlserver_port}" context="${sqlserver_database}"/>
+            <SCP type="db2" host="${db2_host}" port="${db2_port}" context="${db2_database}"/>
+            <SCP type="oracle" host="${oracle_host}" port="${oracle_port}" context="${oracle_database}"/>
+            <SCP type="mysql" host="${mysql_host}" port="${mysql_port}" context="${mysql_name}"/>
+            <SCP type="postgres" host="${postgres_host}" port="${postgres_port}" context="${postgres_name}"/>
+            <SCP type="websphere" host="${websphere_host}" port="${websphere_port}"/>
+            <SCP type="isapi" host="${worker_host}" port="${worker_port}" context="${worker_context}"/>
+        </Output>
+    </Application>
+
+    <!-- apache & oam webagte -->
+    <Application name="Apache WebServer" productName="apache_web_server" cit="apache">
+        <CommandLine>
+            <Regex expr='"?(\S+)[/\\]s?bin[/\\](httpd|apache)' ignoreCase="true">
+                <Variable name="home" group="1"/>
+            </Regex>
+        </CommandLine>
+        <CustomFile name="httpd.conf" plugin="config_parser_apache">
+            <FileLocations>
+                <Path>${home}/conf/</Path>
+                <Path>${home}/httpd/conf/</Path>
+            </FileLocations>
+        </CustomFile>
+        <XmlFile name="ObAccessClient.xml">
+            <FileLocations>
+                <Path>${webgate_root}/webgate/config/</Path>
+            </FileLocations>
+            <!-- resolve ip and port for oam -->
+            <XPath xpath="//CompoundList/ValNameList[NameValPair[@ParamName='host']][NameValPair[@ParamName='port']]">
+                <Variable name="oamhost" relativePath="//NameValPair[@ParamName='host']/@Value"/>
+                <Variable name="oamport" relativePath="//NameValPair[@ParamName='port']/@Value"/>
+            </XPath>
+        </XmlFile>
+        <XmlFile name="plugin-cfg.xml" collect="true">
+            <FileLocations>
+                <Path>${pluginPath}</Path>
+            </FileLocations>
+            <XPath xpath="//ServerCluster/Server/Transport">
+                <Variable name="websphere_host" relativePath="./@Hostname"/>
+                <Variable name="websphere_port" relativePath="./@Port"/>
+                <Variable name="websphere_protocol" relativePath="./@Protocol"/>
+            </XPath>
+        </XmlFile>
+        <Output>
+            <SCP type="${protocol}" host="${host}" port="${port}" context="${context}"/>
+            <SCP type="${weblogic_protocol}" host="${weblogic_host}" port="${weblogic_port}" context="${weblogic_context_root}"/>
+            <SCP type="oam" host="${oamhost}" port="${oamport}"/>
+            <SCP type="${websphere_protocol}" host="${websphere_host}" port="${websphere_port}"/>
+        </Output>
+    </Application>
+</ConfigurationFileSignature>

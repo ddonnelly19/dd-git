@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        
+        <plugin id="mom_agent_by_ntcmd">
+            <name>Microsoft Operations Manager Agent by NTCMD</name>
+            <description>Discovers agent's version and the target MOM Server</description>
+            <module>plugins_mom</module>
+            <class>MomAgentByNtcmdPlugin</class>
+            <qualifiers>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+				<qualifier type="os">Windows</qualifier>
+				<qualifier type="application">Microsoft Operations Manager Agent</qualifier>
+            </qualifiers>
+        </plugin>
+        
+        <plugin id="scom_agent_by_ntcmd">
+            <name>System Center Operations Manager Agent by NTCMD</name>
+            <description>Discovers agent's version and the target SCOM Server</description>
+            <module>plugins_mom</module>
+            <class>ScomAgentByNtcmdPlugin</class>
+            <qualifiers>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+				<qualifier type="os">Windows</qualifier>
+				<qualifier type="application">System Center Operations Manager Agent</qualifier>
+            </qualifiers>
+        </plugin>
+
+        <plugin id="mom_agent_by_wmi">
+            <name>Microsoft Operations Manager Agent by WMI</name>
+            <description>Discovers agent's version and the target MOM Server</description>
+            <module>plugins_mom</module>
+            <class>MomAgentByWmiPlugin</class>
+            <qualifiers>
+                <qualifier type="protocol">wmi</qualifier>
+				<qualifier type="os">Windows</qualifier>
+				<qualifier type="application">Microsoft Operations Manager Agent</qualifier>
+            </qualifiers>
+        </plugin>
+        
+        <plugin id="scom_agent_by_wmi">
+            <name>System Center Operations Manager Agent by WMI</name>
+            <description>Discovers agent's version and the target SCOM Server</description>
+            <module>plugins_mom</module>
+            <class>ScomAgentByWmiPlugin</class>
+            <qualifiers>
+                <qualifier type="protocol">wmi</qualifier>
+				<qualifier type="os">Windows</qualifier>
+				<qualifier type="application">System Center Operations Manager Agent</qualifier>
+            </qualifiers>
+        </plugin>
+
+    </plugins>
+</package>

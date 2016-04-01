@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+ 	<plugins>
+        <plugin id="jboss_server">
+            <name>Jboss Server</name>
+            <description>Sets administration_domain and j2eeserver_servername attribute</description>
+            <module>plugins_jboss_server_domain</module>
+            <class>Jboss3to6ServerPlugin</class>
+            <qualifiers>
+                <qualifier type="application">Jboss instance on Windows</qualifier>
+                <qualifier type="application">Jboss instance on Unix</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">wmi</qualifier>
+                <qualifier type="protocol">snmp</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="jboss7_standalone_server">
+            <name>Jboss 7.x Standalone Server</name>
+            <description>Sets administration_domain and j2eeserver_servername attribute</description>
+            <module>plugins_jboss_server_domain</module>
+            <class>Jboss7StandaloneServerPlugin</class>
+            <qualifiers>
+                <qualifier type="application">Jboss standalone instance on Windows</qualifier>
+                <qualifier type="application">Jboss standalone instance on Unix</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="jboss7_managed_server">
+            <name>Jboss 7.x Managed Server</name>
+            <description>Sets j2eeserver_servername attribute</description>
+            <module>plugins_jboss_server_domain</module>
+            <class>Jboss7ManagedServerPlugin</class>
+            <qualifiers>
+                <qualifier type="application">Jboss managed-server instance on Windows</qualifier>
+                <qualifier type="application">Jboss managed-server instance on Unix</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+            </qualifiers>
+        </plugin>
+	</plugins>
+</package>

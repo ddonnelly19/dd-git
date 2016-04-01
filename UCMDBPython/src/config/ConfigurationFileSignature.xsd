@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.hp.com/ucmdb/1-0-0/ConfigurationFileSignature" targetNamespace="http://www.hp.com/ucmdb/1-0-0/ConfigurationFileSignature" elementFormDefault="qualified">
+    <xs:element name="ConfigurationFileSignature" type="configurationSignature"/>
+    <xs:complexType name="configurationSignature">
+        <xs:sequence maxOccurs="unbounded">
+            <xs:element name="Application" type="application"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="application">
+        <xs:sequence>
+            <xs:choice minOccurs="1" maxOccurs="unbounded">
+                <xs:element name="CommandLine" type="cmdLine"/>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="XmlFile" type="xmlFile"/>
+                    <xs:element name="TextFile" type="textFile"/>
+                    <xs:element name="PropertyFile" type="propertyFile"/>
+                    <!--<xs:element name="IniFile" type="iniFile"/>-->
+                    <xs:element name="CustomFile" type="customFile"/>
+                </xs:choice>
+            </xs:choice>
+            <xs:element name="Output" type="outputVector"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="optional"/>
+        <xs:attribute name="productName" type="xs:string" use="optional"/>
+        <xs:attribute name="cit" type="xs:string" use="optional"/>
+        <xs:attribute name="plugin" type="xs:string" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="cmdLine">
+        <xs:choice minOccurs="1" maxOccurs="unbounded">
+            <xs:element name="Regex">
+                <xs:complexType>
+                    <xs:complexContent>
+                        <xs:extension base="regex">
+                            <xs:attributeGroup ref="os"/>
+                        </xs:extension>
+                    </xs:complexContent>
+                </xs:complexType>
+            </xs:element>
+            <!--xs:element name="PythonVariable" type="pythonVar" /-->
+            <xs:element name="SystemVariable" type="systemVar"/>
+            <xs:element name="Execute" type="execCmd"/>
+        </xs:choice>
+        <xs:attribute name="includeParentProcesses" type="xs:boolean" use="optional" default="false"/>
+    </xs:complexType>
+    <xs:complexType name="execCmd">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="Regex" type="regex"/>
+        </xs:sequence>
+        <xs:attribute name="cmdline" type="xs:string" use="required"/>
+        <xs:attributeGroup ref="os"/>
+    </xs:complexType>
+    <xs:complexType name="baseFile" abstract="true">
+        <xs:choice>
+            <xs:element name="FileLocations" type="locationsType"/>
+            <xs:element name="FileContent" type="xs:string"/>
+        </xs:choice>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="collect" type="xs:boolean" use="optional" default="false"/>
+    </xs:complexType>
+    <xs:complexType name="locationsType">
+        <xs:sequence minOccurs="1" maxOccurs="unbounded">
+            <xs:element name="Path" type="path"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="path">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attributeGroup ref="os"/>
+                <xs:attribute name="includeSub" type="xs:boolean" use="optional" default="false"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="xmlFile">
+        <xs:complexContent>
+            <xs:extension base="baseFile">
+                <xs:choice minOccurs="1" maxOccurs="unbounded">
+                    <xs:element name="XPath" type="xpath"/>
+                    <xs:element name="XPathVariable" type="xpathVar"/>
+                    <xs:element name="Regex" type="regex"/>
+                    <!--xs:element name="PythonVariable" type="pythonVar" /-->
+                    <xs:element name="SystemVariable" type="systemVar"/>
+                </xs:choice>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="textFile">
+        <xs:complexContent>
+            <xs:extension base="baseFile">
+                <xs:choice minOccurs="1" maxOccurs="unbounded">
+                    <xs:element name="Regex" type="regex"/>
+                    <!--xs:element name="PythonVariable" type="pythonVar" /-->
+                    <xs:element name="SystemVariable" type="systemVar"/>
+                </xs:choice>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="propertyFile">
+        <xs:complexContent>
+            <xs:extension base="baseFile">
+                <xs:choice minOccurs="1" maxOccurs="unbounded">
+                    <xs:element name="Property" type="property"/>
+                    <xs:element name="PropertyVariable" type="propertyVar"/>
+                    <xs:element name="Regex" type="regex"/>
+                    <!--xs:element name="PythonVariable" type="pythonVar" /-->
+                    <xs:element name="SystemVariable" type="systemVar"/>
+                </xs:choice>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="customFile">
+        <xs:complexContent>
+            <xs:extension base="baseFile">
+                <xs:attribute name="plugin" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="outputVector">
+        <xs:sequence maxOccurs="unbounded">
+            <xs:element name="SCP" type="scp" minOccurs="1" maxOccurs="unbounded"/>
+            <!--xs:element name="CI" type="ci" minOccurs="0" maxOccurs="unbounded"/-->
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="scp">
+        <xs:attribute name="type" type="xs:string" use="required"/>
+        <xs:attribute name="host" type="xs:string" use="required"/>
+        <xs:attribute name="port" type="xs:string" use="optional"/>
+        <xs:attribute name="context" type="xs:string" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="ci">
+        <xs:sequence minOccurs="0">
+            <xs:element name="Attribute">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:string">
+                            <xs:attribute name="name" type="xs:string" use="required"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="CI" type="ci"/>
+        </xs:sequence>
+        <xs:attribute name="cit" type="xs:string" use="required"/>
+        <xs:attribute name="relation" type="xs:string" use="optional" default="composition"/>
+    </xs:complexType>
+    <xs:complexType name="xpath">
+        <xs:choice minOccurs="1">
+            <xs:element name="Variable" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:attribute name="name" type="xs:string" use="required"/>
+                    <xs:attribute name="relativePath" type="xs:string" use="required"/>
+                    <xs:attribute name="defaultValue" type="xs:string" use="optional"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="Regex" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:complexContent>
+                        <xs:extension base="regex">
+                            <xs:attribute name="relativePath" type="xs:string" use="optional"/>
+                        </xs:extension>
+                    </xs:complexContent>
+                </xs:complexType>
+            </xs:element>
+        </xs:choice>
+        <xs:attribute name="xpath" type="xs:string" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="regex">
+        <xs:sequence minOccurs="1" maxOccurs="unbounded">
+            <xs:element name="Variable" type="regexVar"/>
+        </xs:sequence>
+        <xs:attribute name="expr" type="xs:string" use="required"/>
+        <xs:attribute name="ignoreCase" type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="flag" type="xs:string" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="property">
+        <xs:sequence minOccurs="1">
+            <xs:element name="Regex" type="regex"/>
+        </xs:sequence>
+        <xs:attribute name="key" type="xs:string" use="required"/>
+        <xs:attribute name="defaultValue" type="xs:string" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="xpathVar">
+        <xs:attributeGroup ref="baseVar"/>
+        <xs:attribute name="xpath" type="xs:string" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="regexVar">
+        <xs:attributeGroup ref="baseVar"/>
+        <xs:attribute name="group" type="xs:integer" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="propertyVar">
+        <xs:attributeGroup ref="baseVar"/>
+        <xs:attribute name="key" type="xs:string" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="systemVar">
+        <xs:attributeGroup ref="baseVar"/>
+        <xs:attribute name="environmentName" type="xs:string" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="pythonVar">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:simpleType name="osType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="win"/>
+            <xs:enumeration value="unix"/>
+            <xs:enumeration value="both"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:attributeGroup name="os">
+        <xs:attribute name="os" type="osType" use="optional" default="both"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="baseVar">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="defaultValue" type="xs:string" use="optional"/>
+    </xs:attributeGroup>
+</xs:schema>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+ 	<plugins>
+        <plugin id="websphere_server_win">
+            <name>Websphere Server on Win</name>
+            <description>Sets key attributes for websphere server</description>
+            <module>plugins_websphere_server</module>
+            <class>WebsphereServerPluginWindows</class>
+            <qualifiers>
+                <qualifier type="application">WebSphere on Windows</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">snmp</qualifier>
+                <qualifier type="protocol">wmi</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="websphere_server_domain_unix">
+            <name>Websphere Server on Unix</name>
+            <description>Sets key attributes for websphere server</description>
+            <module>plugins_websphere_server</module>
+            <class>WebsphereServerPluginUnix</class>
+            <qualifiers>
+                <qualifier type="application">WebSphere on Unix</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">snmp</qualifier>
+                <qualifier type="protocol">wmi</qualifier>
+            </qualifiers>
+        </plugin>
+	</plugins>
+</package>

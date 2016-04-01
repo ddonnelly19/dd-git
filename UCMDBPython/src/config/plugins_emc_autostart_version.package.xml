@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="emc_autostart_cluster_version_information">
+            <name>EMC AutoStart Cluster Information by Shell</name>
+            <description>Sets version and cluster resource group information for EMC AutoStart Cluster by shell</description>
+            <module>plugin_emc_autostart_cluster_by_shell</module>
+            <class>EMCAutoStartClusterPluginByShell</class>
+            <qualifiers>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="application">EMC Autostart on Unix</qualifier>
+                <qualifier type="application">EMC Autostart on Windows</qualifier>
+            </qualifiers>
+        </plugin>
+    </plugins>
+</package>

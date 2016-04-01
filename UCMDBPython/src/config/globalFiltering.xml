@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resultFilters recursiveFilter="false" enableFilter="true">
+    <excludeFilter>
+        <vector>
+            <object class="ip_address">
+                <attribute name="name" type="String" operator="BETWEEN">224.0.0.0/4</attribute>
+            </object>
+            <object class="ip_address">
+                <attribute name="name" type="String" operator="BETWEEN">169.254.0.0/16</attribute>
+            </object>
+            <object class="ip_address">
+                <attribute name="name" type="String" operator="BETWEEN">127.0.0.0/8</attribute>
+            </object>
+            <object class="ip_address">
+                <attribute name="name" type="String" operator="BETWEEN">FF00::/8</attribute>
+            </object>
+            <object class="ip_address">
+                <attribute name="name" type="String" operator="BETWEEN">FE80::/10</attribute>
+            </object>
+            <object class="ip_address">
+                <attribute name="name" type="String" operator="BETWEEN">::1/128</attribute>
+            </object>
+        </vector>
+    </excludeFilter>
+    <includeFilter>
+        <vector />
+    </includeFilter>
+</resultFilters>
+

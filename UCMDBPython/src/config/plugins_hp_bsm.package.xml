@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="hp_bsm_information_shell">
+            <name>HP BSM version and topology by shell</name>
+            <description>Sets proper version, name and topology data</description>
+            <module>plugin_hp_bsm</module>
+            <class>BsmTopologyByShell</class>
+            <qualifiers>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">telnet</qualifier> 
+                <qualifier type="application">HP BSM DPS Server</qualifier>
+                <qualifier type="application">HP BSM GW Server</qualifier>
+                <qualifier type="application">HP BAC DPS Server on Unix</qualifier>
+                <qualifier type="application">HP BAC DPS Server on Windows</qualifier>
+                <qualifier type="application">HP BAC GW Server on Unix</qualifier>
+                <qualifier type="application">HP BAC GW Server on Windows</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="hp_bsm_information_non_shell">
+            <name>HP BSM proper data of non shell type</name>
+            <description>Sets BSM name and version</description>
+            <module>plugin_hp_bsm</module>
+            <class>BsmBasePlugin</class>
+            <qualifiers>
+                <qualifier type="protocol">wmi</qualifier>
+                <qualifier type="protocol">snmp</qualifier>
+                <qualifier type="application">HP BSM DPS Server</qualifier>
+                <qualifier type="application">HP BSM GW Server</qualifier>
+                <qualifier type="application">HP BAC DPS Server on Unix</qualifier>
+                <qualifier type="application">HP BAC DPS Server on Windows</qualifier>
+                <qualifier type="application">HP BAC GW Server on Unix</qualifier>
+                <qualifier type="application">HP BAC GW Server on Windows</qualifier>
+            </qualifiers>
+        </plugin>
+    </plugins>
+</package>

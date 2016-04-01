@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package
+    parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="bobj_data_services">
+            <name>BO Data Services</name>
+            <description>Determine Business Objects Data Services Component</description>
+            <module>plugins_bobj_data_services</module>
+            <class>BobjDataServicesPlugin</class>
+            <qualifiers>
+                <qualifier type="application">BO Data Services</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powershell</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>command</module>
+                <module>fptools</module>
+            </dependencies>
+        </plugin>
+    </plugins>
+</package>

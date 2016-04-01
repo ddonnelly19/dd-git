@@ -1,0 +1,32 @@
+<TimeTemplates>
+    <TimeTemplate TemplateType="dailyTime">
+        <Name>Day time</Name>
+        <dayTimeTemplate>
+            <TimeCostrains From="08:00" To="17:30" />
+        </dayTimeTemplate>
+    </TimeTemplate>
+    <TimeTemplate TemplateType="weeklyTime">
+        <BlackoutInfo>
+            <dayElem hoursInDay="08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00">FRI</dayElem>
+            <dayElem hoursInDay="08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00">WED</dayElem>
+            <dayElem hoursInDay="08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00">MON</dayElem>
+            <dayElem hoursInDay="08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00">THU</dayElem>
+            <dayElem hoursInDay="08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00">TUE</dayElem>
+        </BlackoutInfo>
+        <Name>Work time</Name>
+    </TimeTemplate>
+    <TimeTemplate TemplateType="dailyTime">
+        <Name>Night time</Name>
+        <dayTimeTemplate>
+            <TimeCostrains From="19:00" To="07:00" />
+        </dayTimeTemplate>
+    </TimeTemplate>
+    <TimeTemplate TemplateType="weeklyTime">
+        <BlackoutInfo>
+            <dayElem hoursInDay="00:00,00:30,01:00,01:30,02:00,02:30,03:00,03:30,04:00,04:30,05:00,05:30,06:00,06:30,07:00,07:30,08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00,17:30,18:00,18:30,19:00,19:30,20:00,20:30,21:00,21:30,22:00,22:30,23:00,23:30">SUN</dayElem>
+            <dayElem hoursInDay="20:00,20:30,21:00,21:30,22:00,22:30,23:00,23:30">FRI</dayElem>
+            <dayElem hoursInDay="00:00,00:30,01:00,01:30,02:00,02:30,03:00,03:30,04:00,04:30,05:00,05:30,06:00,06:30,07:00,07:30,08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00,17:30,18:00,18:30,19:00,19:30,20:00,20:30,21:00,21:30,22:00,22:30,23:00,23:30">SAT</dayElem>
+        </BlackoutInfo>
+        <Name>Weekend time</Name>
+    </TimeTemplate>
+</TimeTemplates>

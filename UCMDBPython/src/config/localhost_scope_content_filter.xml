@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ConfigurationDocumentContentFilter xmlns="http://www.hp.com/ucmdb/1-0-0/Dependencies">
+    <Operator type="or">
+		<Operand value="localhost"/>
+		<Operand value="127.0.0.1"/>
+    </Operator>
+</ConfigurationDocumentContentFilter>

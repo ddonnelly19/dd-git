@@ -1,0 +1,30 @@
+<ud_rum_configuration parserClassName="com.hp.ucmdb.discovery.probe.agents.probemgr.jitdiscovery.configure.UDRUMConfigurationFile">
+	<domains />
+	<!--This default confugration will be used for a new RUM configuration-->
+	<default_configurations>
+		<domain_configuration>
+			<types>
+				<ip>
+					<active>true</active>
+					<remove_time_sec>7200</remove_time_sec>
+					<remove_on_approval>false</remove_on_approval>
+				</ip>
+				<rsw>
+					<active>true</active>
+					<remove_time_sec>7200</remove_time_sec>
+					<remove_on_approval>false</remove_on_approval>
+				</rsw>
+				<connection>
+					<active>true</active>
+				</connection>
+			</types>
+			<remove_verification>
+				<num_retries>3</num_retries>
+				<wait_interval>900000</wait_interval>
+				<overall_simultaneous_pings>50</overall_simultaneous_pings>
+				<verify_ports_by_scanning>false</verify_ports_by_scanning>
+			</remove_verification>
+		</domain_configuration>
+		<ranges isAllProbeRange="true" />
+	</default_configurations>
+</ud_rum_configuration>

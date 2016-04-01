@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uri-endpoint-configuration>
+	<uri-endpoint>
+		<url>http://ostbus-po-a1p.sys.comcast.net:15672/#/</url>
+		<type>mq</type>
+	</uri-endpoint>
+	<uri-endpoint>
+		<url>http://ostbus-po-a2p.sys.comcast.net:15672/#/</url>
+		<type>mq</type>
+	</uri-endpoint>
+	<uri-endpoint>
+		<url>http://ostbus-po-a3p.sys.comcast.net:15672/#/</url>
+		<type>mq</type>
+	</uri-endpoint>
+	<uri-endpoint>
+		<url>http://scoutarchive.cmc.co.ndcwest.comcast.net</url>
+		<type>wget</type>
+	</uri-endpoint>
+	<uri-endpoint>
+		<url>http://aums.cable.comcast.com:9060</url>
+		<type>http</type>
+	</uri-endpoint>
+	<uri-endpoint>
+		<url>http://cm2.g.comcast.net</url>
+		<type>http</type>
+	</uri-endpoint>
+	<uri-endpoint>
+		<url>http://gismaps.g.comcast.com</url>
+		<type>http</type>
+	</uri-endpoint>
+	<uri-endpoint>
+		<url>http://services.arcgisonline.com/ArcGIS/rest/services/</url>
+		<type>rest</type>
+	</uri-endpoint>
+	<uri-endpoint>
+		<url>http://paoakxocsrv01.cable.comcast.com:1000</url>
+		<type>http</type>
+	</uri-endpoint>
+	<uri-endpoint>
+		<url>http://sams.cable.comcast.com/cgi-bin/arnie.cgi?</url>
+		<type>http</type>
+	</uri-endpoint>
+	<uri-endpoint>
+		<url>http://networkscoutservice.g.comcast.net:80</url>
+		<type>http</type>
+	</uri-endpoint>
+
+	<!--configure another uri endpoint-->
+	<!--uri-endpoint>
+        <url>http://<IP or hostname>:5000/v2.0</url>
+        <type>openstack</type>
+    </uri-endpoint-->
+</uri-endpoint-configuration>

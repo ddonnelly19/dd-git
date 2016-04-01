@@ -1,0 +1,455 @@
+<GlobalSettings parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.GeneralSettingsConfigFile" resourceFile="globalSettingsUIRB">
+    <!--
+        Additional path that enables to run different patterns (i.e. database patterns);
+        all paths should be relative to the $PROBE_INSTALL/root/lib/collectors/probeManager/discoveryResources/ folder
+        and should be semicolon separated
+    -->
+    <property name="AdditionalClasspath">db/oracle/*.*;db/mssqlserver/*.*;db/db2/*.*;db/db2/9.x/*.*;db/db2/8.x/*.*;db/sybase/*.*;AtriumPushAdapter/*.*;AS400/*.*;http/*.*;Service-Now/*.*;cim/*.*;vcloud/*.*</property>
+
+    <!--
+        Lists patterns for localized Windows Virtual interface description which must not take part in the Host Key creation process.
+        Format- comma separated list of strings, no additional whitespaces allowed.
+    -->
+    <property name="ignoreLocalizedVirtualInterfacesPatternList">\u041c\u0438\u043d\u0438\u043f\u043e\u0440\u0442</property>
+
+    <!--
+        Indicate whether we would like to ignore MAC address of the VMWare
+        1: When there is a Physical MACs (default) - the VMWare MAC address will be used only if the pattern can not find any physical MAC address
+        2: Always - always ignore VMWare MAC Address
+    -->
+    <property name="ignoreVmwareInterfaces">1</property>
+
+    <!-- 
+        Indicates whether the data present in configutaion files of SAP Application Servers is trustable in for used database reporting
+        Affects Host Application Jobs, SAP ABAP Topology by SAP JCO
+        false - do not report databases based on config files content
+        true - report databases based on config files content
+    -->
+    <property name="reportSapAppServerDatabase">false</property>
+    <!--
+        Indicates whether the BIOS UUID value for Windows OSs should be reported in Microsoft style (some bytes order reversed in comparison with original BIOS value)
+        Affects Host Connection Jobs.
+        false - convert to original BIOS stored value
+        true - convert to Microsoft standard
+        WARNING: be aware that turning this parameter to true might result conflicts with Bios UUID value discovered
+                 by VMWare Jobs or some integrations
+     -->
+    <property name="setBiosUuidToMicrosoftStandart">false</property>
+
+    <!--
+        This value enables limiting the number of new connections created by the probe to other machines per second.
+        By default the number is 0 (unlimited). A different value will limit the maximum number of connections.
+        If this limit is reached, any job trying to create a new connection will wait for a period of time
+        that is determined in "timeToSleepWhenMaximumConnectionsLimitReached" element.
+    -->
+    <property name="maximumConnectionsPerSecond" displayName="MAXIMUM_CONNECTION_PER_SECOND_DISPLAY_NAME" scope="probe" group="MAXIMUM_CONNECTION_PER_SECOND_GROUP_NAME" description="MAXIMUM_CONNECTION_PER_SECOND_DESCRIPTION">0</property>
+
+    <!--
+        This value is influenced by "maximumConnectionsPerSecond" value. If "maximumConnectionsPerSecond" is 0, then
+        this value is ignored. When "maximumConnectionsPerSecond" is higher than 0, this value determines how
+        long a job needs to wait until a new connection can be created assuming the limit is reached. The value represents
+        the number of milliseconds to wait. Default is 1000 - one second.
+    -->
+    <property name="timeToSleepWhenMaximumConnectionsLimitReached">1000</property>
+
+    <!--
+        dbQueryTimeout - the timeout for all SQL queries.
+        The number is in seconds and indicates for how much time
+        to wait for query result.
+        Some JDBC drivers can not support this setting.
+        The timeout applies only if the value is greater than zero (0)
+    -->
+    <property name="dbQueryTimeout" displayName="DB_QUERY_TIMEOUT_DISPLAY_NAME" scope="Management Zone" group="DB_QUERY_TIMEOUT_GROUP_NAME" description="DB_QUERY_TIMEOUT_DESCRIPTION">100</property>
+    <!--
+        consoleCommands - comma-separated list of commands globally available for all PowerShell connections.
+        Commands specified in this list will be executed using CMD interpreter (cmd /c "command")
+    -->
+    <property name="consoleCommands">cluster,</property>
+    <!--
+        shellGlobalCommandTimeout - global timeout for all shell client's commands.
+        The number is in milliseconds and indicates for how much time to wait for
+        command's result.
+    -->
+    <property name="shellGlobalCommandTimeout" displayName="SHELL_GLOBAL_COMMAND_TIMEOUT_DISPLAY_NAME" scope="Management Zone" group="SHELL_GLOBAL_COMMAND_TIMEOUT_GROUP_NAME" description="SHELL_GLOBAL_COMMAND_TIMEOUT_DESCRIPTION">15000</property>
+    <!--
+        shellGlobalBandwidthLimit - global speed limit for shell objects that support file downloading and uploading.
+        The speed is in kilobits and 0 symbolizes unlimited speed. The speed can be overridden at adapter level.
+    -->
+    <property name="shellGlobalBandwidthLimit"  displayName="SHELL_GLOBAL_BANDWIDTH_LIMIT_DISPLAY_NAME" scope="Management Zone" group="SHELL_GLOBAL_BANDWIDTH_LIMIT_GROUP_NAME" description="SHELL_GLOBAL_BANDWIDTH_LIMIT_DESCRIPTION">0</property>
+    <!--
+        snmpGlobalRequestTimeout - global timeout for snmp client's commands.
+        The number is in milliseconds and indicates for how much time to wait for
+        command's result.
+    -->
+    <property name="snmpGlobalRequestTimeout">3000</property>
+    <!--
+        objectSendAmountThreshold - when amount of discovered objects exceeds this threshold, objects immediate sent to server,
+        requires using sendObject(s) API in jython scripts
+    -->
+    <property name="objectSendAmountThreshold">2000</property>
+    <!--
+        objectSendTimeThreshold - when passed more than specified time (in seconds) from previous objects report, objects immediate sent to server,
+        requires using sendObject(s) API in jython scripts
+    -->
+    <property name="objectSendTimeThreshold">300</property>
+    <!--
+        multipleUpdateIgnoreTypes - Probe will not generate "Multiple updates in bulk" warning for enumerated CI Types.
+    -->
+    <property name="multipleUpdateIgnoreTypes">process,clientserver,host,dependency</property>
+    <!--
+        clearCommandLineForProcesses - Command line for these processes will be cleaned up.
+        This option is used to ensure that no private or confidential data is stored in CMDB.
+        Process names are case insensitive and should be split by commas.
+    -->
+    <property name="clearCommandLineForProcesses">srvrmgr.exe, srvrmgr, xCmd.exe, HPcmd.exe, ssonsvr.exe</property>
+    <!--
+        autoTruncatePercentage - if value of attribute (which has DDM_AUTOTRUNCATE qualifier) exceeds size limit multiplied by this
+        parameter it will be truncated to the specified part of defined size. Default 100 percents.
+    -->
+    <property name="autoTruncatePercentage">100</property>
+
+    <!--
+        autoTruncateDbEncoding - indicates the encoding used by CMDB underlaying database. The default one is UTF8.
+        This property is used during results truncation property (in case the property was identified
+        as auto truncate enabled) for calculating number of characters that should be sent after truncation.
+    -->
+    <property name="autoTruncateDbEncoding">UTF8</property>
+
+    <!--
+        These two parameters are used to determine if host's operating system is of desktop or server type.
+        If operating system name of the host contains value from one of these lists its 'host_isdesktop' is set accordingly.
+        Otherwise value of 'host_isdesktop' attribute is left empty.
+     -->
+    <property name="desktopOperatingSystems">Windows XP, Windows 7, Vista, Windows 8, Windows 10</property>
+    <property name="serverOperatingSystems">Windows NT, Windows 2003, Windows 2008, Linux, AIX, SunOS, HP-UX</property>
+
+    <!--
+        This parameter is for NtcmdSessionAgent and should be always be true. This
+        parameter tells how to create a new process - if true, the new process will
+        be created by ProcessBuilder (new API from Java 5.0), if false, new process
+        will be created by Runtime.exec (old API, from Java 1.4.2). Turn this to
+        false, only in case of backward compatibility problems.
+     -->
+    <property name="NtcmdSessionUseProcessBuilder">true</property>
+
+    <!--
+        Setting this parameter to 'true' makes discovery result processing
+        lenient (not recommended):
+        1. In case string attribute with too large value is reported, it is
+            automatically being truncated according to CMDB Class Model
+            definition.
+        2. In case of OSH invalid attribute (type / nonexisting attribute
+                / missing ID attribute) - only the invalid OSH is being dropped
+            instead of the default behavior which drops the entire bulk.
+    -->
+    <property name="ResultProcessIsLenient">false</property>
+
+    <!--
+        Ignore these attributes in discovery result processing
+        Format: node.name,node.description
+        In this example, probe will not validate node attribute name and description. It will not report these attributes to UCMDB.
+    -->
+    <property name="IgnoreClassAttributes">node.misc_info</property>
+
+    <!--
+        Describes storage types which have to be reported to uCMDB. Options are splitted by comma
+        Available options are (from modeling.py):
+            'FixedDisk'
+            'NetworkDisk'
+            'CompactDisk'
+            'RemovableDisk'
+            'FloppyDisk'
+            'VirtualMemory'
+            'FlashMemory'
+            'RamDisk'
+            'Ram'
+            'No Root Directory'
+            'Other'
+            'UNKNOWN'
+    -->
+    <property name="discoveredStorageTypes">FixedDisk, Local hard disk, Network</property>
+
+    <!--Application signature-->
+    <property name="discovereAllListenPorts">true</property>
+
+    <!--Paths to search tnsnames.ora file (including tnsnames.ora itself, comma separated)-->
+    <!--property name="tnsnamesFilePaths">c:\temp\tnsnames.ora</property-->
+    <property name="tnsnamesFilePaths"></property>
+
+    <!--
+        Indicate whether Jython scripts are allowed to get
+        credentials secured data (true) or not (false).
+        If this setting is set to false, then Jython scripts
+        are not allowed to retrieve sensitive credentials
+        data (like passwords that are stored on the server side).
+        Default value is true.
+    -->
+    <property name="allowGettingCredentialSecuredAttribute">true</property>
+
+    <!--
+         In some cases Universal Discovery Content copies scripts and third-party
+         utilities on a client machine. removeCopiedData parameter
+         defines should or not these files be deleted after discovery
+         is finished.
+    -->
+    <property name="removeCopiedFiles">true</property>
+
+    <!--
+        Ntcmd agent retention mode
+        Specifies how to handle remote Ntcmd service and its executable
+        file when closing the connection
+            0 - (default) unregister service and delete remote executable file
+            1 - unregister service, but keep executable file on file system
+            2 - leave service running, keep executable
+     -->
+    <property name="NtcmdAgentRetention">0</property>
+
+    <!--
+        Indicates whether to use markers with counters in NTCMD agents'
+        infrastructure (true) or use old NTCMD behavior - without markers with
+        counters (false)
+    -->
+    <property name="useNtcmdModifiedMarkers">false</property>
+
+
+    <!--
+        Process intercommunication and TCP discovery related properties
+    -->
+
+    <!--
+        Expiration properties: when running 'Host Resources By XXX' job, all entries
+        which are not touched within specified time frame removed from probe database
+    -->
+
+    <!--
+        The expiration time of TCP connection entry in probe database.
+        The value is in hours.
+        Default is 24 hours.
+    -->
+    <property name="tcpExpirationTime">24</property>
+
+    <!--
+        The expiration time of TCP/UDP port entry in probe database defined in seconds.
+        Default is 60 seconds.
+    -->
+    <property name="portExpirationTime">60</property>
+
+    <!--
+        The expiration time of Process entry in probe database.
+        Default is 60 seconds.
+    -->
+    <property name="processExpirationTime">60</property>
+
+    <!--
+        After launched, remote process should connect to probe
+        within defined time, otherwise error
+        'Failed to connect to remote process' is produced.
+        Value is in milliseconds.
+    -->
+    <property name="remoteProcessTimeout">300000</property>
+
+    <!--
+        Usage of intermediate temporary file for data transfer by 'wmic' command.
+        Default value is false.
+     -->
+    <property name="useIntermediateFileForWmic">false</property>
+
+    <!--
+        Property used to configure file_mon_utils to prevent downloading DTD files while validating XML.
+    -->
+    <property name="loadExternalDTD">false</property>
+
+    <!--
+        Specifies maximal number of execution records which can be in communication log.
+        This parameter should be used when the discovery process brings a lot of data.
+        Also parameter can be overridden on adapter level - in this case
+        add parameter to adapter with desired records limit (see Probe documentation).
+        Default -1 means unlimited.
+    -->
+    <property name="maxExecutionRecords">-1</property>
+
+    <!--
+        This parameter enables to omit specifying client number in SAP ABAP protocols. This enables to create one one credential for multiple
+        SAP systems with different clients supported
+    -->
+    <property name="defaultSapClients">800</property>
+
+
+    <!--
+        This section enumerates driver classes used to connect to dedicated
+        Database server. Names of subkeys must be the same as used in credentials
+        (sqlprotocol_dbtype attribute of protocol).
+        Change them if not-OOTB JDBC drivers are used.
+    -->
+    <property name="jdbcDrivers">
+        <oracle>oracle.jdbc.OracleDriver</oracle>
+        <oracleSSL>oracle.jdbc.OracleDriver</oracleSSL>
+        <MicrosoftSQLServer>net.sourceforge.jtds.jdbc.Driver</MicrosoftSQLServer>
+        <MicrosoftSQLServerNTLM>net.sourceforge.jtds.jdbc.Driver</MicrosoftSQLServerNTLM>
+        <MicrosoftSQLServerNTLMv2>net.sourceforge.jtds.jdbc.Driver</MicrosoftSQLServerNTLMv2>
+        <Sybase>com.sybase.jdbc3.jdbc.SybDriver</Sybase>
+        <SybaseSSL>com.sybase.jdbc3.jdbc.SybDriver</SybaseSSL>
+        <db2>com.ibm.db2.jcc.DB2Driver</db2>
+        <mysql>com.mysql.jdbc.Driver</mysql>
+        <postgresql>org.postgresql.Driver</postgresql>
+    </property>
+
+    <!--
+        This section enumerates URL templates used to connect to dedicated
+        Database server. Names of subkeys must be the same as used in credentials
+        (sqlprotocol_dbtype attribute of protocol).
+        Change them if not-OOTB JDBC drivers are used.
+        Values are dependend from used driver and should be taken from driver documentation.
+        Note: symbol ampersand must be escaped according to XML standard (&amp;)
+    -->
+    <property name="jdbcPreUrls">
+        <oracle>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%%ipaddress%%)(PORT=%%protocol_port%%))(CONNECT_DATA=(%%connect_data%%=%%sqlprotocol_dbsid%%)))</oracle>
+        <oracleSSL>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=tcps)(HOST=%%ipaddress%%)(PORT=%%protocol_port%%))(CONNECT_DATA=(%%connect_data%%=%%sqlprotocol_dbsid%%)))</oracleSSL>
+        <MicrosoftSQLServer>jdbc:jtds:sqlserver://[%%ipaddress%%]:%%protocol_port%%/%%sqlprotocol_dbname%%;instance=%%sqlprotocol_dbsid%%;loginTimeout=%%protocol_timeout%%;logging=false;ssl=request</MicrosoftSQLServer>
+        <MicrosoftSQLServerNTLM>jdbc:jtds:sqlserver://[%%ipaddress%%]:%%protocol_port%%/%%sqlprotocol_dbname%%;instance=%%sqlprotocol_dbsid%%;domain=%%sqlprotocol_windomain%%;loginTimeout=%%protocol_timeout%%;logging=false</MicrosoftSQLServerNTLM>
+        <MicrosoftSQLServerNTLMv2>jdbc:jtds:sqlserver://[%%ipaddress%%]:%%protocol_port%%/%%sqlprotocol_dbname%%;instance=%%sqlprotocol_dbsid%%;domain=%%sqlprotocol_windomain%%;loginTimeout=%%protocol_timeout%%;logging=false;ssl=request;useNTLMv2=true</MicrosoftSQLServerNTLMv2>
+        <Sybase>jdbc:sybase:Tds:%%ipaddress%%:%%protocol_port%%?DatabaseName=%%sqlprotocol_dbname%%&amp;CHARSET=cp1252</Sybase>
+        <SybaseSSL>jdbc:sybase:Tds:%%ipaddress%%:%%protocol_port%%?DatabaseName=%%sqlprotocol_dbname%%&amp;CHARSET=cp1252&amp;ENCRYPT_PASSWORD=true&amp;JCE_PROVIDER_CLASS=org.bouncycastle.jce.provider.BouncyCastleProvider</SybaseSSL>
+        <db2>jdbc:db2://%%ipaddress%%:%%protocol_port%%/%%sqlprotocol_dbname%%</db2>
+        <mysql>jdbc:mysql://address=(protocol=tcp)(host=%%ipaddress%%)(port=%%protocol_port%%)/%%sqlprotocol_dbname%%</mysql>
+        <postgresql>jdbc:postgresql://%%ipaddress%%:%%protocol_port%%/%%sqlprotocol_dbname%%</postgresql>
+        <!--
+            This section works for oracle database only
+        -->
+        <parameters>
+            <parameter type="oracle" name="connect_data">
+                <value>SERVICE_NAME</value>
+                <value>SID</value>
+            </parameter>
+            <!--
+            Regular Expressions for errors which will be used to trigger fallback mechanism
+            This section need in case when more then one value were specified for any parameter only
+            -->
+            <fallbackExceptionList>
+                <error type="oracle">.*ORA\-12514.*</error>
+            </fallbackExceptionList>
+        </parameters>
+    </property>
+
+    <!--
+        This is default snmp test query for SNMP Agent
+        Can be overridden for specific devices.
+    -->
+    <property name="snmpTestQueries">
+        <query>1.3.6.1.2.1.1.1,1.3.6.1.2.1.1.2,string</query>
+    </property>
+
+    <!--
+        Specifies maximal number of sent results which can be stored in communication log.
+        This parameter can be changed if there's too much results stored into communication log.
+        If this value is changed larger than 0, it will store the correspond number of results for deleted results AND updated result.
+        That means there will be twice maxStoreSentResults number total in the results set.
+        Default -1 means unlimited.
+    -->
+    <property name="maxStoreSentResults">-1</property>
+
+    <!--
+        Specifies maximum idle time for powershellconnector.exe process.
+        Timer resets its state after each command execution.
+        The value is in milliseconds.
+     -->
+    <property name="powershellConnectionIdleTimeout">3600000</property>
+
+    <!--
+        siebelCommandTimeout - global timeout for siebel clients commands.
+        The number is in milliseconds and indicates for how much time to wait for
+        command's result.
+    -->
+    <property name="siebelCommandTimeout">180000</property>
+
+    <!--
+        specifies a list of methods not to be recorded in communication log.
+        To remove a method from being recorded in communication log, copy its name from communication log and add it here.
+        example:
+        <property name="notRecordedMethods">
+            <method>getLastCommandOutputBytes</method>
+        </property>
+    -->
+    <property name="notRecordedMethods">
+        <method>getLastCommandOutputBytes</method>
+    </property>
+
+    <!--
+    It's all about deployment scope. Deployment scope - it is a term that describes visibility of
+    resource/application for other components of JEE topology.
+    For simplification Deployment Scope can be compared to the Deployment Target.
+
+    In an old JEE model - container for resource/application CI is a J2EE Domain and deployment scope is showed as
+    a 'deployment' linkage with a deployment target (for instance, J2EE Cluster or J2EE Server).
+    In an enhanced model - deployment target becomes a container for the resource/application so
+    'deployment' link is redundant.
+
+    Also enhanced model has a new CIT called 'JEE Node' to represents Node in terms of
+    WebSphere Node and Weblogic Machine. This CIT is not reported for JBoss as
+    it is hard to reflect simplified JBoss domain model onto mentioned concept.
+
+    Option enables reporting of improved JEE topology.
+     -->
+    <property name="enableJeeEnhancedTopology">false</property>
+
+    <!--Switch for if allowing data center IP to call home-->
+    <property name="allowDataCenterCallhome">true</property>
+    <!--Switch for if allowing to call home-->
+    <property name="allowCallhome">true</property>
+    <!-- allow client type ip address ping-->
+    <property name="pingClientTypeIp">false</property>
+    <!-- Whether to resolve IP address from primary dns name during connection in Inventory Discovery by Scanner job-->
+    <property name="pingHostName">false</property>
+
+    <!--
+    These properties related to the UD Agent - defined default UD Agent connection properties
+    -->
+
+    <!--Encoding algorithms-->
+    <property name="ddmagentCiphers">SSL_RSA_WITH_3DES_EDE_CBC_SHA</property>
+    <!--Agent prefic-->
+    <property name="ddmagentPrefix">agent</property>
+    <!--Connection protocol-->
+    <property name="ddmagentProtocol">https</property>
+    <!--Should download resume be enabled. If set to false no resume functionality will be available-->
+    <property name="ddmagentEnableDownloadResume">true</property>
+    <!--Chunks for download/upload in bytes-->
+    <property name="ddmagentDefaultBlockLen">8192</property>
+    <!--Extension for parts of resumable file-->
+    <property name="ddmagentResumableFileSuffix">-part</property>
+    <!--Chunks for resumed files un bytes-->
+    <property name="ddmagentDefaultResumeBlockLen">51200</property>
+    <!--Should upload resume be enables. If set to false no resume functionality will be available-->
+    <property name="ddmagentEnableUploadResume">true</property>
+
+    <!--
+    The external SSH library log level (one of the parameters. used for debug purpose) log level ranges 1-7
+    The debug level is 7
+    -->
+    <property name="ssh-log-level" displayName="SSH_LOG_LEVEL_DISPLAY_NAME" scope="Management Zone" group="SSH_LOG_LEVEL_GROUP_NAME" description="SSH_LOG_LEVEL_DESCRIPTION">1</property>
+    <!--Maximum IPv6 count of per range for Ping Sweep -->
+    <property name="maxPingIPv6CountPerRange">1000000</property>
+    <!--Whether to report physical serial number from hwsmbiosPhysicalAttributeSerialNumber of scan file-->
+    <property name="reportPhysicalSerialNumbers">false</property>
+    <!--Whether to use SSH shared home directory  -->
+    <property name="enableSSHSharedHomeDir">false</property>
+    <!--Time interval in hours that is allowed between two call home requests from the same host -->
+    <property name="allowCallhomeInterval">24</property>
+
+    <!--Whether to allow the execution of pfiles on Solaris. Warning: Turning on this switch may cause problems for some processes on some Solaris systems.-->
+    <property name="allowPFilesOnSunOS">false</property>
+    <!--Whether to allow the execution of pfiles on HP-UX. Warning: Turning on this switch may cause problems for some processes on some HP-UX systems.-->
+    <property name="allowPFilesOnHPUX">false</property>
+
+    <!--Whether multiple DB2 instances are installed on the same server-->
+    <property name="multipleDB2Instances">true</property>
+
+    <!--Whether to allow the execution of caliper on HPUX. It will be used in websphere_by_shell, to get full commandline when 'ps' fails to do so.-->
+    <property name="allowCaliperOnHPUX">false</property>
+
+    <!--The protocol connection order for Host Connection by Shell job-->
+    <property name="protocolConnectionOrder">ssh,telnet,ntadmin</property>
+
+    <!--Whether to enable label function for normalization engine .-->
+    <property name="enableNormalizationRuleLabel">false</property>
+</GlobalSettings>

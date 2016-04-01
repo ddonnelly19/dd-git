@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="ibm_webshpere_version_plugin_by_ntcmd">
+            <name>IBM WebSphere MQ Version from Executable File</name>
+            <description>Plugin discovers IBM WebSphere MQ version by querying specific executables for their file versions using NTCMD protocol.</description>
+            <module>plugin_ibm_webshpere_version</module>
+            <class>IBMWebSphereMQVersionFromExecutableNTCMD</class>
+            <qualifiers>
+                <qualifier type="application">IBM WebSphere MQ</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+                <qualifier type="os">Windows</qualifier>
+            </qualifiers>
+        </plugin>
+         <plugin id="ibm_webshpere_version_plugin_by_wmi">
+            <name>IBM WebSphere MQ Version from Executable File</name>
+            <description>Plugin discovers IBM WebSphere MQ version by querying specific executables for their file versions using WMI protocol.</description>
+            <module>plugin_ibm_webshpere_version</module>
+            <class>IBMWebSphereMQVersionFromExecutableWMI</class>
+            <qualifiers>
+                <qualifier type="application">IBM WebSphere MQ</qualifier>
+                <qualifier type="protocol">wmi</qualifier>
+                <qualifier type="os">Windows</qualifier>
+            </qualifiers>
+        </plugin>
+    </plugins>
+</package>

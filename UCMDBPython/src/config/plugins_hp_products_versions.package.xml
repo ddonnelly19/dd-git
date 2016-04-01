@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+     <plugins>
+        <plugin id="HP UCMDB Probe">
+            <name>HP UCMDB Probe version by shell</name>
+            <description>Sets HP UCMDB Probe version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>UcmdbProbeVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP UCMDB Probe</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+        <plugin id="HP UCMDB Server 8">
+            <name>HP UCMDB Server version by shell</name>
+            <description>Sets HP UCMDB (8.0X) Server version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>UcmdbServer8VersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP UCMDB Server on Windows</qualifier>
+                <qualifier type="application">HP UCMDB Server on Unix</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+        <plugin id="HP UCMDB Server for 9,10 versions">
+            <name>HP UCMDB Server version by shell</name>
+            <description>Sets HP UCMDB (9.X, 10.X) Server version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>UcmdbServer9And10VersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP UCMDB Server 9_10 on Windows</qualifier>
+                <qualifier type="application">HP UCMDB Server 9_10 on Unix</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powershell</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+
+        <plugin id="HP Quality Center">
+            <name>HP QC version by shell</name>
+            <description>Sets HP QC version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>QcVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP Quality Center</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+
+        <plugin id="HP PPM Center">
+            <name>HP PPM version by shell</name>
+            <description>Sets HP PPM version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>PpmVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP PPM Center</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+
+        <plugin id="HP Network Node Manager">
+            <name>HP MMN version by shell</name>
+            <description>Sets HP NNM version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>NnmVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP Network Node Manager</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+
+        <plugin id="HP Service Manager">
+            <name>HP Service Manager version by shell</name>
+            <description>Sets HP Service Manager version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>ServiceManagerVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP Service Manager</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+
+        <plugin id="HP RUM">
+            <name>HP RUM version by shell</name>
+            <description>Sets HP RUM version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>RumVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP RUM</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+        <plugin id="HP RUM Probe">
+            <name>HP RUM Probe version by shell</name>
+            <description>Sets HP RUM Probe version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>RumProbeVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP RUM Probe</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+
+        <plugin id="HP OpenView Operations for Windows">
+            <name>HP OMW version by shell</name>
+            <description>Sets HP OMW version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>OmwVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP OpenView Operations for Windows</qualifier>
+                <qualifier type="application">HP OpenView Agent for Windows</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+        <plugin id="HP OpenView Operations for Unix">
+            <name>HP OMU version by shell</name>
+            <description>Sets HP OMU version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>OmuVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP OpenView Operations for Unix</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+        <plugin id="HP OpenView Agent">
+            <name>HP OMW version by shell</name>
+            <description>Sets HP OM Agent version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>OmAgentVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP OpenView Agent for Windows</qualifier>
+                <qualifier type="application">HP OpenView Agent for Unix</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+        <plugin id="HP OpenView Agent">
+            <name>HP Operations Agent version by shell</name>
+            <description>SetsHP Operations Agent version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>OpAgentVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP Operations Agent</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+        <plugin id="HP WebInspect">
+            <name>HP WebInspect version by shell</name>
+            <description>Sets HP WebInspect version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>WebInspectVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP WebInspect</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+        <plugin id="HP QAInspect">
+            <name>HP QAInspect version by shell</name>
+            <description>Sets HP QAInspect version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>QaInspectVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP QAInspect</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+        <plugin id="HP AMP">
+            <name>HP AMP version by shell</name>
+            <description>Sets HP AMP version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>AmpVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP AMP</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+
+        <plugin id="HP BPM">
+            <name>HP BPM version by shell</name>
+            <description>Sets HP BPM version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>BpmVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP BPM</qualifier>
+                <qualifier type="application">HP BAC GW Server on Windows</qualifier>
+                <qualifier type="application">HP BAC GW Server on Unix</qualifier>
+                <qualifier type="application">HP BAC DPS Server on Windows</qualifier>
+                <qualifier type="application">HP BAC DPS Server on Unix</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+
+        <plugin id="HP TransactionVision">
+            <name>HP TransactionVision version by shell</name>
+            <description>Sets HP TransactionVision version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>TransactionVisionVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP TransactionVision</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+
+        <plugin id="HP Load Runner">
+            <name>HP Load Runner by shell</name>
+            <description>Sets HP Load Runner version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>LoadRunnerVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP Load Runner</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+
+        <plugin id="HP SiteScope Server">
+            <name>HP SiteScope Server by shell</name>
+            <description>Sets HP SiteScope Server version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>SiteScopeServerPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP SiteScope Server</qualifier>
+                <qualifier type="application">HP SiteScope Server by java process</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+
+        <plugin id="HP Diagnostics Probe">
+            <name>HP Diagnostics Probe by shell</name>
+            <description>Sets HP Diagnostics Probe version attribute</description>
+            <module>plugins_hp_product_version_by_shell</module>
+            <class>DiagnosticsProbeVersionPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HP Diagnostics Probe</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                  <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>plugins_basics</module>
+            </dependencies>
+        </plugin>
+
+    </plugins>
+</package>

@@ -1,0 +1,339 @@
+<Troubleshooters>
+    <Troubleshooter id="NetworkWizard" titleKey="Basic_IT_Wizard_TITLE" subtitleKey="Basic_IT_Wizard_SUBTITLE"
+                    descriptionKey="Basic_IT_Wizard_DESC" icon="/system/wizard_net.png">
+        <BasedOnActivities>
+            <Activity type="Network">
+                <Jobs>
+                    <Job>Class C IPs by ICMP</Job>
+                    <Job>Class B IPs by ICMP</Job>
+                    <Job>DNS Resolver</Job>
+                    <Job>Host Connection by SNMP</Job>
+                    <Job>Host Connection by Shell</Job>
+                    <Job>Host Connection by PowerShell</Job>
+                    <!--these are jobs that are enrichment type and Troubleshooter does not support such jobs
+                    <Job>MS Domains</Job>
+                    <Job>MS Domains Topology</Job>
+                    -->
+                    <Job>Upgrade UD Agent</Job>
+                    <Job>Install UD Agent</Job>
+                    <Job>Host Connection by WMI</Job>
+                    <Job>Range IPs by ICMP</Job>
+                </Jobs>
+              </Activity>
+            <Activity type="ADM">
+                <Jobs>
+                    <Job>Host Resources and Applications by Shell</Job>
+                    <Job>Host Resources and Applications by SNMP</Job>
+                    <Job>Host Resources and Applications by WMI</Job>
+                    <Job>Host Resources and Applications by PowerShell</Job>
+                    <!--these are jobs that are enrichment type and Troubleshooter does not support such jobs
+                    <Job>Collect Network Data by NetFlow</Job>
+                    <Job>Network Connectivity Data Analyzer</Job>
+                    <Job>TCP data by Shell</Job>
+                    <Job>TCP data by SNMP</Job>
+                    -->
+                </Jobs>
+              </Activity>
+        </BasedOnActivities>
+        <Steps>
+            <Step id="WaitForJobsToFinishInitial" type="WaitForJobsToFinish"
+                  titleKey="Troubleshooter_Step_Wait_For_Jobs_To_Finish_TITLE">
+                <Jobs>
+                    <ActivityJobs>Network</ActivityJobs>
+                </Jobs>
+            </Step>
+
+            <Step id="InputTargetMachine" titleKey="Troubleshooter_Step_Input_Target_Machine_TITLE"/>
+
+            <Step id="ResolveTargetMachineIP" titleKey="Troubleshooter_Step_Resolve_Target_Machine_IP_TITLE">
+                <step-id-for-reset>InputTargetMachine</step-id-for-reset>
+            </Step>
+
+            <Step id="ValidateIpRange" titleKey="Troubleshooter_VALIDATE_RANGE_TITLE">
+                <step-id-for-reset>InputTargetMachine</step-id-for-reset>
+            </Step>
+
+            <Step id="ValidateIpCiExists" type="ValidateCIExistence" titleKey="Troubleshooter_Validate_CI_Exists_TITLE">
+                <start-message>Searching for requested IpAddress CI in UCMDB...</start-message>
+                <query>
+                    <query-name>troubleshooter_discovery_validate_ip_existence</query-name>
+                    <query-element>IpAddress</query-element>
+                    <query-params>
+                        <param name="target_ip_address" param-element="IpAddress">${targetMachineIPAddress}</param>
+                    </query-params>
+                </query>
+                <output-param>targetMachineIpCiId</output-param>
+            </Step>
+
+            <Step id="WaitForJobsToFinishNodeConnectionJobDueToStrategy" type="WaitForJobsToFinish"
+                  titleKey="Troubleshooter_Step_Wait_For_Jobs_To_Finish_TITLE">
+                <prerequisites>
+                    <prerequisite name="nodeConnectionJobReran" validate-param-value="false"/>
+                </prerequisites>
+                <destination-info>
+                    <Jobs>
+                        <Job>${nodeConnectionJobName}</Job>
+                    </Jobs>
+                    <ciId>${targetMachineIpCiId}</ciId>
+                </destination-info>
+            </Step>
+
+            <Step id="AutoResolveAgentTypeFromDetectionMethod" type="GenericOptionChooser"
+                  titleKey="">
+                <prerequisites>
+                    <prerequisite name="nodeDetectionMethod" validate-param-value="false"/>
+                </prerequisites>
+                <SelectionHeader>N/A</SelectionHeader>
+                <InputParameterName>nodeDetectionMethod</InputParameterName>
+                <OutputParameterName>agentResolvedClass</OutputParameterName>
+                <Options>
+                    <Option Name="WMI">wmi</Option>
+                    <Option Name="Shell">ssh,telnet,ntcmd</Option>
+                    <Option Name="PowerShell">powershell</Option>
+                    <Option Name="SNMP">snmp</Option>
+                </Options>
+            </Step>
+
+            <Step id="ValidateNodeCiExists" type="ValidateCIExistence"
+                  titleKey="Troubleshooter_Validate_CI_Exists_TITLE">
+                <prerequisites>
+                    <prerequisite name="targetMachineAgentCiId" missing="true" clear="false"/>
+                </prerequisites>
+                <start-message>Searching for requested Agent CI in UCMDB...</start-message>
+                <class-restriction>${agentResolvedClass}</class-restriction>
+                <query>
+                    <query-name>ts_node_and_ip</query-name>
+                    <query-element>Agent</query-element>
+                    <query-params>
+                        <param name="target_ip_address" param-element="IpAddress">${targetMachineIPAddress}</param>
+                    </query-params>
+                </query>
+                <output-param>targetMachineAgentCiId</output-param>
+            </Step>
+
+            <Step id="AutoResolveDetectionMethodFromAgentType" type="GenericOptionChooser"
+                  titleKey="">
+                <prerequisites>
+                    <prerequisite name="targetMachineAgentCiId" validate-param-value="false"/>
+                </prerequisites>
+                <SelectionHeader>Select detection method for the requested host:</SelectionHeader>
+                <InputParameterName>targetMachineAgentCiId_type</InputParameterName>
+                <OutputParameterName>nodeDetectionMethod</OutputParameterName>
+                <Options>
+                    <Option Name="wmi" IsDefault="yes">WMI</Option>
+                    <Option Name="ssh">Shell</Option>
+                    <Option Name="telnet">Shell</Option>
+                    <Option Name="ntcmd">Shell</Option>
+                    <Option Name="powershell">PowerShell</Option>
+                    <Option Name="snmp">SNMP</Option>
+                </Options>
+            </Step>
+
+            <Step id="ChooseNodeDetectionMethod" type="GenericOptionChooser"
+                  titleKey="Troubleshooter_GENERIC_OPTION_CHOOSER_TITLE">
+                <prerequisites>
+                    <prerequisite name="targetMachineAgentCiId" missing="true"/>
+                </prerequisites>
+                <SelectionHeader>Select detection method for the requested host:</SelectionHeader>
+                <InputParameterName>nodeDetectionMethod</InputParameterName>
+                <OutputParameterName>nodeConnectionJobName</OutputParameterName>
+                <Options>
+                    <Option Name="WMI" IsDefault="yes">Host Connection by WMI</Option>
+                    <Option Name="Shell">Host Connection by Shell</Option>
+                    <Option Name="PowerShell">Host Connection by PowerShell</Option>
+                    <Option Name="SNMP">Host Connection by SNMP</Option>
+                </Options>
+            </Step>
+
+            <Step id="WaitForJobsToFinishNodeConnectionJob" type="WaitForJobsToFinish"
+                  titleKey="Troubleshooter_Step_Wait_For_Jobs_To_Finish_TITLE">
+                <prerequisites>
+                    <prerequisite name="nodeConnectionJobReran" validate-param-value="false"/>
+                </prerequisites>
+                <destination-info>
+                    <Jobs>
+                        <Job>${nodeConnectionJobName}</Job>
+                    </Jobs>
+                    <ciId>${targetMachineIpCiId}</ciId>
+                </destination-info>
+            </Step>
+
+            <Step id="AutoResolveAgentTypeFromDetectionMethodPostRerun" type="GenericOptionChooser"
+                  titleKey="">
+                <prerequisites>
+                    <prerequisite name="nodeDetectionMethod" validate-param-value="false"/>
+                </prerequisites>
+                <SelectionHeader>N/A</SelectionHeader>
+                <InputParameterName>nodeDetectionMethod</InputParameterName>
+                <OutputParameterName>agentResolvedClass</OutputParameterName>
+                <Options>
+                    <Option Name="WMI">wmi</Option>
+                    <Option Name="Shell">ssh,telnet,ntcmd</Option>
+                    <Option Name="PowerShell">powershell</Option>
+                    <Option Name="SNMP">snmp</Option>
+                </Options>
+            </Step>
+
+            <Step id="ValidateNodeCiExistsPostRerun" type="ValidateCIExistence"
+                  titleKey="Troubleshooter_Validate_CI_Exists_TITLE">
+                <prerequisites>
+                    <prerequisite name="nodeConnectionJobReran_Revalidate" validate-param-value="false"/>
+                    <prerequisite name="targetMachineAgentCiId" missing="true" clear="false"/>
+                </prerequisites>
+                <start-message>Searching for requested Agent CI in UCMDB...</start-message>
+                <class-restriction>${agentResolvedClass}</class-restriction>
+                <query>
+                    <query-name>ts_node_and_ip</query-name>
+                    <query-element>Agent</query-element>
+                    <query-params>
+                        <param name="target_ip_address" param-element="IpAddress">${targetMachineIPAddress}</param>
+                    </query-params>
+                </query>
+                <output-param>targetMachineAgentCiId</output-param>
+            </Step>
+
+            <Step id="InvestigateMissingNodeCI" type="InvestigateMissingCI"
+                  titleKey="Troubleshooter_Investigate_Missing_Node_TITLE">
+                <prerequisites>
+                    <prerequisite name="targetMachineAgentCiId" missing="true"/>
+                </prerequisites>
+                <destination-info>
+                    <Jobs>
+                        <Job>${nodeConnectionJobName}</Job>
+                    </Jobs>
+                    <ciId>${targetMachineIpCiId}</ciId>
+                </destination-info>
+                <step-id-for-reset>WaitForJobsToFinishNodeConnectionJob</step-id-for-reset>
+                <flag-to-submit>nodeConnectionJobReran</flag-to-submit>
+                <flag-to-submit>nodeConnectionJobReran_Revalidate</flag-to-submit>
+                <step-id-for-reset case="strategy">WaitForJobsToFinishNodeConnectionJobDueToStrategy</step-id-for-reset>
+                <step-id-for-reset case="change_method">ChooseNodeDetectionMethod</step-id-for-reset>
+                <flag-to-clear case="change_method">nodeDetectionMethod</flag-to-clear>
+                <flag-to-clear case="change_method">nodeConnectionJobName</flag-to-clear>
+                <flag-to-clear case="change_method">targetMachineAgentCiId</flag-to-clear>
+                <flag-to-clear case="change_method">targetMachineAgentCiId_type</flag-to-clear>
+                <step-id-to-clear-state case="change_method">InvestigateMissingNodeCI</step-id-to-clear-state>
+            </Step>
+
+            <!--
+                        <Step id="UpdateCredentialsStep" type="RequestForActionAndRedispatch"
+                              titleKey="Troubleshooter_Update_Credentials_TITLE">
+                            <prerequisites>
+                                <prerequisite name="targetMachineIpCiId" missing="true"/>
+                                <prerequisite name="updateCredentialsFlag" validate-param-value="false"/>
+                            </prerequisites>
+                            <request-type>UPDATE_CREDENTIALS_REQUEST</request-type>
+                            <start-message>UPDATE_CREDENTIALS_REQUEST_START_MESSAGE</start-message>
+                            <destination-info>
+                                <Jobs>
+                                    <Job>${nodeConnectionJobName}</Job>
+                                </Jobs>
+                                <ciId>${targetMachineIpCiId}</ciId>
+                            </destination-info>
+                            <step-id-for-reset>WaitForJobsToFinishNodeConnectionJob</step-id-for-reset>
+                            <flag-to-submit>nodeConnectionJobReran</flag-to-submit>
+                        </Step>
+            -->
+
+            <Step id="WaitForJobsToFinishHostResourcesJob" type="WaitForJobsToFinish"
+                  titleKey="Troubleshooter_Step_Wait_For_Jobs_To_Finish_TITLE">
+                <prerequisites>
+                    <prerequisite name="hostResourcesJobReran" validate-param-value="false"/>
+                </prerequisites>
+                <destination-info>
+                    <Jobs>
+                        <Job>${hostResourcesJobName}</Job>
+                    </Jobs>
+                    <ciId>${targetMachineAgentCiId}</ciId>
+                </destination-info>
+            </Step>
+
+            <Step id="RetrieveRunningSoftwareCIsForNode" type="RetrieveCIs"
+                  titleKey="TROUBLESHOOTER_RETRIEVE_RUNNING_SOFTWARE_TITLE">
+                <start-message>Retrieve Running Software CIs related to the Node CI in UCMDB</start-message>
+                <query>
+                    <query-name>ts_retrieve_running_software</query-name>
+                    <query-element>RunningSoftware</query-element>
+                    <query-params>
+                        <param name="target_ip_address" param-element="IpAddress">${targetMachineIPAddress}</param>
+                    </query-params>
+                </query>
+                <output-param>isRunningSoftwareFound</output-param>
+            </Step>
+
+            <Step id="ChooseHostResourcesDetectionMethod" type="GenericOptionChooser"
+                  titleKey="Troubleshooter_GENERIC_OPTION_CHOOSER_TITLE">
+                <prerequisites>
+                    <prerequisite name="isRunningSoftwareFound" validate-param-value="true">false</prerequisite>
+                </prerequisites>
+                <SelectionHeader>Select connection method for the requested host:</SelectionHeader>
+                <InputParameterName>nodeDetectionMethod</InputParameterName>
+                <OutputParameterName>hostResourcesJobName</OutputParameterName>
+                <Options>
+                    <Option Name="WMI" IsDefault="yes">Host Resources and Applications by WMI</Option>
+                    <Option Name="Shell">Host Resources and Applications by Shell</Option>
+                    <Option Name="PowerShell">Host Resources and Applications by PowerShell</Option>
+                    <Option Name="SNMP">Host Resources and Applications by SNMP</Option>
+                </Options>
+            </Step>
+
+            <Step id="InvestigateMissingRunningSoftwareCI" type="InvestigateMissingCI"
+                  titleKey="Troubleshooter_Investigate_Missing_Running_Software_TITLE">
+                <prerequisites>
+                    <prerequisite name="isRunningSoftwareFound" validate-param-value="true">false</prerequisite>
+                </prerequisites>
+                <destination-info>
+                    <Jobs>
+                        <Job>${hostResourcesJobName}</Job>
+                    </Jobs>
+                    <ciId>${targetMachineAgentCiId}</ciId>
+                </destination-info>
+                <step-id-for-reset>WaitForJobsToFinishHostResourcesJob</step-id-for-reset>
+                <flag-to-submit>hostResourcesJobReran</flag-to-submit>
+                <step-id-for-reset case="change_method">ChooseNodeDetectionMethod</step-id-for-reset>
+                <flag-to-clear case="change_method">nodeDetectionMethod</flag-to-clear>
+                <flag-to-clear case="change_method">nodeConnectionJobName</flag-to-clear>
+                <flag-to-clear case="change_method">hostResourcesJobName</flag-to-clear>
+                <flag-to-clear case="change_method">targetMachineAgentCiId</flag-to-clear>
+                <flag-to-clear case="change_method">targetMachineAgentCiId_type</flag-to-clear>
+                <step-id-to-clear-state case="change_method">InvestigateMissingNodeCI</step-id-to-clear-state>
+            </Step>
+
+            <Step id="shouldUserAddAppSignatureAgain" type="GenericOptionChooser"
+                  titleKey="Troubleshooter_GENERIC_OPTION_CHOOSER_TITLE">
+                <prerequisites>
+                    <prerequisite name="AppSignatureWasAlreadyInvoked" validate-param-value="false"/>
+                </prerequisites>
+                <SelectionHeader>The Running Software CI that you are looking for could not be found.</SelectionHeader>
+                <InputParameterName deleteAfterSelection="Yes">changeAppSig</InputParameterName>
+                <OutputParameterName>WhatToDo</OutputParameterName>
+                <Options>
+                    <Option Name="Update software identification rules and rerun discovery" IsDefault="yes"
+                            IfChosenSetStepStateTo="Done">TryAgain
+                    </Option>
+                    <Option Name="Close the troubleshooter and save support log"
+                            IfChosenSetStepStateTo="closeWithSupport">FinishWithSupport
+                    </Option>
+                </Options>
+            </Step>
+
+            <Step id="UpdateApplicationSignatureForHostResources" type="RequestForActionAndRedispatch"
+                  titleKey="Troubleshooter_Update_Application_Signature_TITLE">
+                <prerequisites>
+                    <prerequisite name="isRunningSoftwareFound" validate-param-value="true">false</prerequisite>
+                </prerequisites>
+                <request-type>UPDATE_APPLICATION_SIGNATURE_REQUEST</request-type>
+                <start-message>UPDATE_APPLICATION_SIGNATURE_REQUEST_START_MESSAGE</start-message>
+                <destination-info>
+                    <Jobs>
+                        <Job>${hostResourcesJobName}</Job>
+                    </Jobs>
+                    <ciId>${targetMachineAgentCiId}</ciId>
+                </destination-info>
+                <step-id-for-reset>WaitForJobsToFinishHostResourcesJob</step-id-for-reset>
+                <flag-to-submit>hostResourcesJobReran</flag-to-submit>
+                <flag-to-submit>AppSignatureWasAlreadyInvoked</flag-to-submit>
+            </Step>
+        </Steps>
+    </Troubleshooter>
+</Troubleshooters>

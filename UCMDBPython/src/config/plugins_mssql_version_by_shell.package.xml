@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+ 	<plugins>
+        <plugin id="mssql_version_by_shell">
+            <name>MSSql version by shell</name>
+            <description>Discovers MSSQL version by shell</description>
+            <module>plugins_mssql_version_by_shell</module>
+            <class>MssqlVersionByNtcmdPlugin</class>
+            <qualifiers>
+                <qualifier type="application">MSSQL DB</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+                <qualifier type="os">Windows</qualifier>
+            </qualifiers>
+        </plugin>
+	</plugins>
+</package>

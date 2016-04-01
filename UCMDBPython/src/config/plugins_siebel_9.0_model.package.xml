@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="siebel_9.0_model_adjustments_app_server">
+            <name>Siebel model adjustments for Application Server in 9.0</name>
+            <description>Plug-in corrects several attributes in compliance with UCMDB 9.0 model for Application Server</description>
+            <module>plugin_siebel_90_model</module>
+            <class>SiebelAppServer90ModelPlugin</class>
+            <qualifiers>
+				<qualifier type="application">Siebel Server</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="siebel_9.0_model_adjustments_gateway">
+			<name>Siebel model adjustments for Gateway in 9.0</name>
+			<description>Plug-in corrects several attributes in compliance with UCMDB 9.0 model for Gateway</description>
+			<module>plugin_siebel_90_model</module>
+			<class>SiebelGateway90ModelPlugin</class>
+			<qualifiers>
+				<qualifier type="application">Siebel Gateway Name Server</qualifier>
+			</qualifiers>
+        </plugin>
+    </plugins>
+</package>

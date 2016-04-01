@@ -1,0 +1,640 @@
+<agents-configuration parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.platform.agents.AgentsByPlatformConfigurationFile" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./AgentsConfiguration.xsd">
+    <!--All missed properties for specific platform will be taken from "all" platform.-->
+    <!--Each property can be specified for platform per architecture-->
+    <!--
+        This section dedicated to scanner deployment.
+    -->
+    <platform name="all">
+        <agent-install>
+            <basedir-name>
+                <dir>discagnt</dir>
+            </basedir-name>
+            <basedir>
+                <dir>~/.VAR{basedir-name}VAR{file-separator}</dir>
+            </basedir>
+            <agent-process-name>
+                <executable>discagnt</executable>
+            </agent-process-name>
+            <agent-installation-name>
+                <executable/>
+            </agent-installation-name>
+            <agent-installation-resources>
+                <resource/>
+            </agent-installation-resources>
+            <agent-remote-installation-name>
+                <executable>udainstall</executable>
+            </agent-remote-installation-name>
+
+            <!-- Pre-install commands -->
+            <pre-install-commands>
+                <command>chmod 744 VAR{basedir}VAR{agent-remote-installation-name}</command>
+                <command>chmod 744 VAR{basedir}agentinstall.sh</command>
+            </pre-install-commands>
+
+            <!-- Placeholders -->
+            <agent-install-port-placeholder>
+                <executable>{%PORT%}</executable>
+            </agent-install-port-placeholder>
+
+            <agent-install-url0-placeholder>
+                <executable>{%URL0%}</executable>
+            </agent-install-url0-placeholder>
+            <agent-install-url1-placeholder>
+                <executable>{%URL1%}</executable>
+            </agent-install-url1-placeholder>
+            <agent-install-url2-placeholder>
+                <executable>{%URL2%}</executable>
+            </agent-install-url2-placeholder>
+            <agent-install-callhome-timeout-placeholder>
+                <executable>{%CALLHOME-TIMEOUT%}</executable>
+            </agent-install-callhome-timeout-placeholder>
+
+            <agent-install-username-placeholder>
+                <executable>{%USER-NAME%}</executable>
+            </agent-install-username-placeholder>
+            <agent-install-group-id-placeholder>
+                <executable>{%GROUP-ID%}</executable>
+            </agent-install-group-id-placeholder>
+
+            <agent-install-sw-utilization-placeholder>
+                <executable>{%SWUTIL%}</executable>
+            </agent-install-sw-utilization-placeholder>
+            <agent-install-sw-utilization-period-placeholder>
+                <executable>{%SWUTILPERIOD%}</executable>
+            </agent-install-sw-utilization-period-placeholder>
+
+            <!--Default values of unix family-->
+            <agent-install-url0-prefix>
+                <!-- We do need the space in the end" -->
+                <executable xml:space="preserve">--url0 </executable>
+            </agent-install-url0-prefix>
+            <agent-install-url1-prefix>
+                <!-- We do need the space in the end" -->
+                <executable xml:space="preserve">--url1 </executable>
+            </agent-install-url1-prefix>
+            <agent-install-url2-prefix>
+                <!-- We do need the space in the end" -->
+                <executable xml:space="preserve">--url2 </executable>
+            </agent-install-url2-prefix>
+
+            <agent-install-callhome-timeout-prefix>
+                <!-- We do need the space in the end" -->
+                <executable xml:space="preserve">--timeout </executable>
+            </agent-install-callhome-timeout-prefix>
+
+            <agent-install-username-prefix>
+                <executable xml:space="preserve">--user </executable>
+            </agent-install-username-prefix>
+
+            <agent-install-group-id-prefix>
+                <executable xml:space="preserve">--group </executable>
+            </agent-install-group-id-prefix>
+
+            <agent-install-get-username-cmd>
+                <executable>id -un</executable>
+            </agent-install-get-username-cmd>
+
+            <agent-install-get-group-id-cmd>
+                <executable>id -gn</executable>
+            </agent-install-get-group-id-cmd>
+
+            <agent-get-hostname-cmd>
+                <executable>hostname</executable>
+            </agent-get-hostname-cmd>
+
+            <agent-install-sw-util-on>
+                <executable>--softwareutilization</executable>
+            </agent-install-sw-util-on>
+            <agent-install-sw-util-off>
+                <executable/>
+            </agent-install-sw-util-off>
+
+            <agent-install-sw-util-period-prefix>
+                <!-- We do need the space in the end" -->
+                <executable xml:space="preserve">--period </executable>
+            </agent-install-sw-util-period-prefix>
+
+            <agent-install-data-folder>
+                <executable>DEFAULT</executable>
+            </agent-install-data-folder>
+
+            <agent-install-temp-folder>
+                <executable>DEFAULT</executable>
+            </agent-install-temp-folder>
+
+            <agent-install-data-folder-placeholder>
+                <executable>{%INSTALL_DATA_FOLDER%}</executable>
+            </agent-install-data-folder-placeholder>
+
+            <agent-install-temp-folder-placeholder>
+                <executable>{%INSTALL_TEMP_FOLDER%}</executable>
+            </agent-install-temp-folder-placeholder>
+            <agent-fips-placeholder>
+                <executable>{%FIPS%}</executable>
+            </agent-fips-placeholder>
+            <agent-fips-enable-flag>
+                <executable>--fips</executable>
+            </agent-fips-enable-flag>
+
+            <agent-is-install-cmd>
+                <executable>VAR{basedir}agentinstall.sh --isinstalled</executable>
+            </agent-is-install-cmd>
+
+            <agent-install-cmd>
+                <executable>nohup VAR{basedir}agentinstall.sh --async --logfile VAR{basedir}VAR{install-log-file-name} --sleep 15 VAR{basedir}VAR{agent-remote-installation-name} --port VAR{agent-install-port-placeholder} VAR{agent-install-url0-placeholder} VAR{agent-install-url1-placeholder} VAR{agent-install-url2-placeholder} VAR{agent-install-callhome-timeout-placeholder} VAR{agent-install-sw-utilization-placeholder} VAR{agent-install-sw-utilization-period-placeholder} VAR{agent-install-data-folder-placeholder} VAR{agent-install-temp-folder-placeholder} VAR{agent-install-username-placeholder} VAR{agent-install-group-id-placeholder} --cert VAR{basedir}. --home VAR{basedir}..VAR{file-separator} VAR{agent-fips-placeholder}; sleep 5; echo ''</executable>
+            </agent-install-cmd>
+            <install-log-file-name>
+                <executable>agent-install.log</executable>
+            </install-log-file-name>
+            <delete-installed-resources-cmd>
+                <executable>cd VAR{basedir} ; rm -f agentca.pem acstrust.cert agentinstall.sh VAR{agent-remote-installation-name} VAR{agent-process-name} agentupgrade.sh aioptionrc nohup.out VAR{agent-installation-name} VAR{agent-migration-name} VAR{install-log-file-name} VAR{uninstall-log-file-name} VAR{upgrade-log-file-name} ; cd .. ; rmdir VAR{basedir}</executable>
+            </delete-installed-resources-cmd>
+            <agent-get-install-error-code>
+                <executable>VAR{basedir}agentinstall.sh --getlasterror</executable>
+            </agent-get-install-error-code>
+            <file-separator>
+                <separator>/</separator>
+            </file-separator>
+            <agent-basic-resources>
+                <resource>agentinstall.sh</resource>
+            </agent-basic-resources>
+            <agent-basic-resources-process-commands>
+                <command>/bin/chmod 744 VAR{basedir}agentinstall.sh</command>
+            </agent-basic-resources-process-commands>
+        </agent-install>
+        <agent-uninstall>
+            <agent-clean-uninstall-placeholder>
+                <executable>{%CLEAN_UNINSTALL%}</executable>
+            </agent-clean-uninstall-placeholder>
+            <agent-clean-uninstall-on>
+                <executable>--clean</executable>
+            </agent-clean-uninstall-on>
+            <agent-uninstall-cmd>
+                <executable>nohup VAR{basedir}agentinstall.sh --async --logfile VAR{basedir}VAR{uninstall-log-file-name} --sleep 15 --uninstall VAR{agent-clean-uninstall-placeholder} VAR{agent-install-data-folder-placeholder}  ;  echo ''</executable>
+            </agent-uninstall-cmd>
+            <uninstall-log-file-name>
+                <executable>agent-uninstall.log</executable>
+            </uninstall-log-file-name>
+            <agent-get-uninstall-error-code>
+                <executable>VAR{basedir}agentinstall.sh --getlasterror</executable>
+            </agent-get-uninstall-error-code>
+        </agent-uninstall>
+        <agent-upgrade>
+            <agent-upgrade-cmd>
+                <executable>nohup VAR{basedir}agentinstall.sh --async --logfile VAR{basedir}VAR{upgrade-log-file-name} --sleep 15 --upgrade VAR{basedir}VAR{agent-remote-installation-name} --port VAR{agent-install-port-placeholder} VAR{agent-install-url0-placeholder} VAR{agent-install-url1-placeholder} VAR{agent-install-url2-placeholder} VAR{agent-install-callhome-timeout-placeholder} VAR{agent-install-sw-utilization-placeholder} VAR{agent-install-sw-utilization-period-placeholder} VAR{agent-install-data-folder-placeholder} VAR{agent-install-temp-folder-placeholder} VAR{agent-install-username-placeholder} VAR{agent-install-group-id-placeholder}  --cert VAR{basedir}. --home VAR{basedir}..VAR{file-separator} VAR{agent-fips-placeholder}; sleep 5; echo ''</executable>
+            </agent-upgrade-cmd>
+            <upgrade-log-file-name>
+                <executable>agent-upgrade.log</executable>
+            </upgrade-log-file-name>
+            <agent-get-upgrade-error-code>
+                <executable>VAR{basedir}agentinstall.sh --getlasterror</executable>
+            </agent-get-upgrade-error-code>
+        </agent-upgrade>
+        <agent-migrate>
+            <agent-migration-name>
+                <executable/>
+            </agent-migration-name>
+            <agent-migrate-cmd>
+                <executable>VAR{basedir}agentupgrade.sh --logfile VAR{basedir}VAR{upgrade-log-file-name} VAR{basedir}VAR{agent-migration-name} VAR{agent-fips-placeholder}</executable>
+            </agent-migrate-cmd>
+
+            <agent-is-native-cmd>
+                <executable>VAR{basedir}agentinstall.sh --isnative 2>/dev/null</executable>
+            </agent-is-native-cmd>
+
+            <agent-migrate-resources>
+                <resource/>
+            </agent-migrate-resources>
+
+            <!-- Pre-migrate commands -->
+            <pre-migrate-commands>
+                <command>/bin/chmod 744 VAR{basedir}VAR{agent-migration-name}</command>
+                <command>/bin/chmod 744 VAR{basedir}agentupgrade.sh</command>
+            </pre-migrate-commands>
+
+        </agent-migrate>
+        <platform-recognition>
+            <!-- Commands to identify platform and architecture -->
+            <platform-identification-commands>
+                <command>ver</command>
+                <command>reg query "HKLM\System\CurrentControlSet\Control\Session Manager\Environment" /v PROCESSOR_ARCHITECTURE</command>
+                <command>echo BREAKOP4WIN</command>
+                <command>uname -s</command>
+                <command>uname -p</command>
+                <command>uname -m</command>
+                <command>uname -v</command>
+            </platform-identification-commands>
+        </platform-recognition>
+    </platform>
+    <platform name="windows" display-name="Windows">
+        <agent-install>
+            <basedir>
+                <dir>%SystemRoot%VAR{file-separator}VAR{basedir-name}VAR{file-separator}</dir>
+            </basedir>
+
+            <agent-installation-name architecture="x86">
+                <executable>hp-ud-agent-win32-x86.msi</executable>
+            </agent-installation-name>
+            <agent-installation-name architecture="amd64">
+                <executable>hp-ud-agent-win32-x86.msi</executable>
+            </agent-installation-name>
+
+            <agent-basic-resources>
+                <resource>agentinstall.cmd</resource>
+            </agent-basic-resources>
+            <agent-basic-resources-process-commands/>
+
+            <agent-installation-resources>
+                <resource>hp-ud-agent-win32-x86.msi</resource>
+                <resource>agentupgrade.cmd</resource>
+            </agent-installation-resources>
+
+            <pre-install-commands/>
+
+            <agent-install-url0-prefix>
+                <executable>URL0=</executable>
+            </agent-install-url0-prefix>
+            <agent-install-url1-prefix>
+                <executable>URL1=</executable>
+            </agent-install-url1-prefix>
+            <agent-install-url2-prefix>
+                <executable>URL2=</executable>
+            </agent-install-url2-prefix>
+            <agent-install-callhome-timeout-prefix>
+                <!-- We do need the space in the end" -->
+                <executable xml:space="preserve">TIMEOUT=</executable>
+            </agent-install-callhome-timeout-prefix>
+
+            <agent-install-sw-util-on>
+                <executable>SOFTWAREUTILIZATION=ON</executable>
+            </agent-install-sw-util-on>
+            <agent-install-sw-util-off>
+                <executable>SOFTWAREUTILIZATION=OFF</executable>
+            </agent-install-sw-util-off>
+
+            <agent-install-sw-util-period-prefix>
+                <executable>PERIOD=</executable>
+            </agent-install-sw-util-period-prefix>
+
+            <agent-install-get-username-cmd>
+                <executable/>
+            </agent-install-get-username-cmd>
+            <agent-install-get-group-id-cmd>
+                <executable/>
+            </agent-install-get-group-id-cmd>
+            <agent-fips-enable-flag>
+                <executable>FIPS=ON</executable>
+            </agent-fips-enable-flag>
+            <agent-is-install-cmd>
+                <executable>VAR{basedir}agentinstall.cmd --isinstalled</executable>
+            </agent-is-install-cmd>
+
+            <agent-remote-installation-name>
+                <executable>udainstall.msi</executable>
+            </agent-remote-installation-name>
+
+            <agent-install-cmd>
+                <executable>msiexec /quiet /i "VAR{basedir}VAR{agent-remote-installation-name}" CERTPATH=VAR{basedir} PORT=VAR{agent-install-port-placeholder} VAR{agent-install-url0-placeholder} VAR{agent-install-url1-placeholder} VAR{agent-install-url2-placeholder} VAR{agent-install-callhome-timeout-placeholder} VAR{agent-install-sw-utilization-placeholder} VAR{agent-install-sw-utilization-period-placeholder} /Lv VAR{basedir}VAR{install-log-file-name} VAR{agent-fips-placeholder}</executable>
+            </agent-install-cmd>
+            <agent-get-install-error-code>
+                <executable>type VAR{basedir}VAR{install-log-file-name} | findstr /c:"success or error status:" /c:"MainEngineThread is returning"</executable>
+            </agent-get-install-error-code>
+            <agent-process-name>
+                <executable>discagnt.exe</executable>
+            </agent-process-name>
+            <delete-installed-resources-cmd>
+                <executable>DEL /Q VAR{basedir}agentca.pem VAR{basedir}acstrust.cert VAR{basedir}VAR{agent-installation-name} VAR{basedir}VAR{agent-basic-resources} VAR{basedir}agentupgrade.cmd VAR{basedir}VAR{agent-remote-installation-name} VAR{basedir}VAR{install-log-file-name} VAR{basedir}VAR{uninstall-log-file-name} VAR{basedir}VAR{upgrade-log-file-name} &amp;&amp; RD VAR{basedir}</executable>
+            </delete-installed-resources-cmd>
+            <file-separator>
+                <separator>\</separator>
+            </file-separator>
+        </agent-install>
+
+        <agent-uninstall>
+            <agent-clean-uninstall-on>
+                <executable>CLEAN=ON</executable>
+            </agent-clean-uninstall-on>
+            <agent-uninstall-cmd>
+                <executable>msiexec /quiet /x {B7643B11-A60E-4A33-A465-263FEB32113A} /Lv VAR{basedir}VAR{uninstall-log-file-name} VAR{agent-clean-uninstall-placeholder}</executable>
+            </agent-uninstall-cmd>
+            <agent-get-uninstall-error-code>
+                <executable>type VAR{basedir}VAR{uninstall-log-file-name} | findstr /c:"success or error status:" /c:"MainEngineThread is returning"</executable>
+            </agent-get-uninstall-error-code>
+        </agent-uninstall>
+        <agent-upgrade>
+            <agent-upgrade-cmd>
+                <executable>"VAR{basedir}agentupgrade.cmd" "VAR{basedir}VAR{agent-remote-installation-name}" "VAR{basedir}" "VAR{basedir}VAR{upgrade-log-file-name}" "PORT=VAR{agent-install-port-placeholder}" "VAR{agent-install-url0-placeholder}" "VAR{agent-install-url1-placeholder}" "VAR{agent-install-url2-placeholder}" "VAR{agent-install-callhome-timeout-placeholder}" "VAR{agent-install-sw-utilization-placeholder}" "VAR{agent-install-sw-utilization-period-placeholder}" "VAR{agent-fips-placeholder}"</executable>
+            </agent-upgrade-cmd>
+            <agent-get-upgrade-error-code>
+                <executable>type VAR{basedir}VAR{upgrade-log-file-name} | findstr /c:"success or error status:" /c:"MainEngineThread is returning"</executable>
+            </agent-get-upgrade-error-code>
+        </agent-upgrade>
+        <agent-migrate>
+            <agent-migrate-cmd>
+                <executable>"VAR{basedir}agentupgrade.cmd" "VAR{basedir}VAR{agent-remote-installation-name}" "VAR{basedir}" "VAR{basedir}VAR{upgrade-log-file-name}" "PORT=VAR{agent-install-port-placeholder}" "VAR{agent-install-url0-placeholder}" "VAR{agent-install-url1-placeholder}" "VAR{agent-install-url2-placeholder}" "VAR{agent-install-callhome-timeout-placeholder}" "VAR{agent-install-sw-utilization-placeholder}" "VAR{agent-install-sw-utilization-period-placeholder}" "VAR{agent-fips-placeholder}"</executable>
+            </agent-migrate-cmd>
+
+            <agent-is-native-cmd>
+                <executable/>
+            </agent-is-native-cmd>
+
+            <agent-migration-name>
+                <executable>hp-ud-agent-win32-x86.msi</executable>
+            </agent-migration-name>
+
+            <pre-migrate-commands/>
+
+            <agent-migrate-resources>
+                <resource>hp-ud-agent-win32-x86.msi</resource>
+                <resource>agentupgrade.cmd</resource>
+            </agent-migrate-resources>
+        </agent-migrate>
+        <platform-recognition>
+            <platform-aliases>
+                <alias>windows</alias>
+                <alias>winnt</alias>
+            </platform-aliases>
+            <platform-architectures default="x86">
+                <architecture display-name="x86">x86</architecture>
+                <architecture display-name="x64">amd64</architecture>
+            </platform-architectures>
+        </platform-recognition>
+    </platform>
+    <platform name="solaris" display-name="Solaris">
+        <agent-install>
+            <basedir>
+                <dir>$HOME/.VAR{basedir-name}VAR{file-separator}</dir>
+            </basedir>
+            <agent-installation-name architecture="sparc">
+                <executable>hp-ud-agent-solaris-sparc.sparc</executable>
+            </agent-installation-name>
+            <agent-installation-resources architecture="sparc">
+                <resource>hp-ud-agent-solaris-sparc.sparc</resource>
+            </agent-installation-resources>
+            <agent-installation-name architecture="i86pc">
+                <executable>hp-ud-agent-solaris-x86.i86pc</executable>
+            </agent-installation-name>
+            <agent-installation-resources architecture="i86pc">
+                <resource>hp-ud-agent-solaris-x86.i86pc</resource>
+            </agent-installation-resources>
+
+            <agent-install-get-username-cmd architecture="i86pc">
+                <executable>/usr/xpg4/bin/id -un</executable>
+            </agent-install-get-username-cmd>
+            <agent-install-get-group-id-cmd architecture="i86pc">
+                <executable>/usr/xpg4/bin/id -gn</executable>
+            </agent-install-get-group-id-cmd>
+
+            <agent-install-get-username-cmd architecture="sparc">
+                <executable>/usr/xpg4/bin/id -un</executable>
+            </agent-install-get-username-cmd>
+            <agent-install-get-group-id-cmd architecture="sparc">
+                <executable>/usr/xpg4/bin/id -gn</executable>
+            </agent-install-get-group-id-cmd>
+        </agent-install>
+        <agent-migrate>
+            <agent-migration-name architecture="sparc">
+                <executable>hp-ud-agent-solaris-sparc.tar.z</executable>
+            </agent-migration-name>
+            <agent-migration-name architecture="i86pc">
+                <executable>hp-ud-agent-solaris-x86.tar.z</executable>
+            </agent-migration-name>
+            <agent-migrate-resources architecture="sparc">
+                <resource>hp-ud-agent-solaris-sparc.tar.z</resource>
+                <resource>agentupgrade.sh</resource>
+            </agent-migrate-resources>
+            <agent-migrate-resources architecture="i86pc">
+                <resource>hp-ud-agent-solaris-x86.tar.z</resource>
+                <resource>agentupgrade.sh</resource>
+            </agent-migrate-resources>
+        </agent-migrate>
+        <agent-uninstall>
+        </agent-uninstall>
+        <agent-upgrade>
+        </agent-upgrade>
+        <platform-recognition>
+            <platform-identification-commands>
+                <command>uname -s</command>
+                <command>uname -m</command>
+            </platform-identification-commands>
+            <platform-aliases>
+                <alias>solaris</alias>
+                <alias>sunos</alias>
+            </platform-aliases>
+            <platform-architectures default="sparc">
+                <architecture display-name="SPARC">sparc</architecture>
+                <architecture display-name="x86">i86pc</architecture>
+            </platform-architectures>
+        </platform-recognition>
+    </platform>
+    <platform name="macosx" display-name="Mac OS X">
+        <agent-install>
+            <agent-remote-installation-name>
+                <executable>udainstall.dmg</executable>
+            </agent-remote-installation-name>
+            <agent-installation-name architecture="i386">
+                <executable>hp-ud-agent-macosx-x86.dmg</executable>
+            </agent-installation-name>
+            <agent-installation-resources architecture="i386">
+                <resource>hp-ud-agent-macosx-x86.dmg</resource>
+            </agent-installation-resources>
+        </agent-install>
+        <agent-migrate>
+            <agent-migration-name>
+                <executable>hp-ud-agent-macosx-x86.tar.z</executable>
+            </agent-migration-name>
+            <agent-migrate-resources architecture="i386">
+                <resource>hp-ud-agent-macosx-x86.tar.z</resource>
+                <resource>agentupgrade.sh</resource>
+            </agent-migrate-resources>
+        </agent-migrate>
+        <agent-uninstall>
+        </agent-uninstall>
+        <agent-upgrade>
+        </agent-upgrade>
+        <platform-recognition>
+            <platform-aliases>
+                <alias>darwin</alias>
+                <alias>macintosh</alias>
+            </platform-aliases>
+            <platform-architectures default="i386">
+                <architecture display-name="x86">i386</architecture>
+            </platform-architectures>
+        </platform-recognition>
+    </platform>
+    <platform name="linux" display-name="Linux">
+        <agent-install>
+            <agent-installation-name architecture="x86">
+                <executable>hp-ud-agent-linux-x86.rpm</executable>
+            </agent-installation-name>
+            <agent-installation-name architecture="x86_64">
+                <executable>hp-ud-agent-linux-x64.rpm</executable>
+            </agent-installation-name>
+            <agent-installation-resources architecture="x86">
+                <resource>hp-ud-agent-linux-x86.rpm</resource>
+            </agent-installation-resources>
+            <agent-installation-resources architecture="x86_64">
+                <resource>hp-ud-agent-linux-x64.rpm</resource>
+            </agent-installation-resources>
+        </agent-install>
+        <agent-uninstall>
+        </agent-uninstall>
+        <agent-upgrade>
+        </agent-upgrade>
+        <agent-migrate>
+            <agent-migration-name architecture="x86">
+                <executable>hp-ud-agent-linux-x86.tar.z</executable>
+            </agent-migration-name>
+            <agent-migrate-resources architecture="x86">
+                <resource>hp-ud-agent-linux-x86.tar.z</resource>
+                <resource>agentupgrade.sh</resource>
+            </agent-migrate-resources>
+            <agent-migration-name architecture="x86_64">
+                <executable>hp-ud-agent-linux-x64.tar.z</executable>
+            </agent-migration-name>
+            <agent-migrate-resources architecture="x86_64">
+                <resource>hp-ud-agent-linux-x64.tar.z</resource>
+                <resource>agentupgrade.sh</resource>
+            </agent-migrate-resources>
+        </agent-migrate>
+        <platform-recognition>
+            <platform-aliases>
+                <alias>linux</alias>
+            </platform-aliases>
+            <platform-architectures default="x86">
+                <architecture display-name="x86_64">x86_64</architecture>
+                <architecture display-name="x86">x86</architecture>
+            </platform-architectures>
+        </platform-recognition>
+    </platform>
+    <platform name="ubuntu" display-name="Ubuntu">
+        <agent-install>
+            <agent-installation-name architecture="x86">
+                <executable>hp-ud-agent-linux-deb-x86.deb</executable>
+            </agent-installation-name>
+            <agent-installation-name architecture="x86_64">
+                <executable>hp-ud-agent-linux-deb-x64.deb</executable>
+            </agent-installation-name>
+            <agent-installation-resources architecture="x86">
+                <resource>hp-ud-agent-linux-deb-x86.deb</resource>
+            </agent-installation-resources>
+            <agent-installation-resources architecture="x86_64">
+                <resource>hp-ud-agent-linux-deb-x64.deb</resource>
+            </agent-installation-resources>
+        </agent-install>
+        <agent-uninstall>
+        </agent-uninstall>
+        <agent-upgrade>
+        </agent-upgrade>
+        <agent-migrate>
+            <agent-migration-name architecture="x86">
+                <executable>hp-ud-agent-linux-x86.tar.z</executable>
+            </agent-migration-name >
+            <agent-migrate-resources architecture="x86">
+                <resource>hp-ud-agent-linux-x86.tar.z</resource>
+                <resource>agentupgrade.sh</resource>
+            </agent-migrate-resources>
+            <agent-migration-name architecture="x86_64">
+                <executable>hp-ud-agent-linux-x64.tar.z</executable>
+            </agent-migration-name >
+            <agent-migrate-resources architecture="x86_64">
+                <resource>hp-ud-agent-linux-x64.tar.z</resource>
+                <resource>agentupgrade.sh</resource>
+            </agent-migrate-resources>
+        </agent-migrate>
+        <platform-recognition>
+            <platform-aliases>
+                <alias>ubuntu</alias>
+            </platform-aliases>
+            <platform-architectures default="x86">
+                <architecture display-name="x86_64">x86_64</architecture>
+                <architecture display-name="x86">x86</architecture>
+            </platform-architectures>
+        </platform-recognition>
+    </platform>
+    <platform name="hpux" display-name="HP-UX">
+        <agent-install>
+            <agent-installation-name architecture="ia64">
+                <executable>hp-ud-agent-hpux-ia64.depot</executable>
+            </agent-installation-name>
+            <agent-installation-resources architecture="ia64">
+                <resource>hp-ud-agent-hpux-ia64.depot</resource>
+            </agent-installation-resources>
+
+            <agent-installation-name architecture="hppa">
+                <executable>hp-ud-agent-hpux-hppa.depot</executable>
+            </agent-installation-name>
+            <agent-installation-resources architecture="hppa">
+                <resource>hp-ud-agent-hpux-hppa.depot</resource>
+            </agent-installation-resources>
+            <agent-fips-enable-flag architecture="hppa">
+                <executable></executable>
+            </agent-fips-enable-flag>
+        </agent-install>
+        <agent-migrate>
+            <agent-migration-name architecture="ia64">
+                <executable>hp-ud-agent-hpux-ia64.tar.z</executable>
+            </agent-migration-name>
+            <agent-migration-name architecture="hppa">
+                <executable>hp-ud-agent-hpux-hppa.tar.z</executable>
+            </agent-migration-name>
+            <agent-migrate-resources architecture="ia64">
+                <resource>hp-ud-agent-hpux-ia64.tar.z</resource>
+                <resource>agentupgrade.sh</resource>
+            </agent-migrate-resources>
+            <agent-migrate-resources architecture="hppa">
+                <resource>hp-ud-agent-hpux-hppa.tar.z</resource>
+                <resource>agentupgrade.sh</resource>
+            </agent-migrate-resources>
+        </agent-migrate>
+        <agent-uninstall>
+        </agent-uninstall>
+        <agent-upgrade>
+        </agent-upgrade>
+        <platform-recognition>
+            <platform-identification-commands>
+                <command>uname -s</command>
+                <command>uname -m</command>
+            </platform-identification-commands>
+            <platform-aliases>
+                <alias>hpux</alias>
+                <alias>hp-ux</alias>
+            </platform-aliases>
+            <platform-architectures default="hppa">
+                <architecture display-name="ia64">ia64</architecture>
+                <architecture display-name="HPPA">hppa</architecture>
+            </platform-architectures>
+        </platform-recognition>
+    </platform>
+    <platform name="aix" display-name="AIX">
+        <agent-install>
+            <agent-installation-name architecture="power">
+                <executable>hp-ud-agent-aix-ppc.bff</executable>
+            </agent-installation-name>
+            <agent-installation-resources>
+                <resource>hp-ud-agent-aix-ppc.bff</resource>
+            </agent-installation-resources>
+        </agent-install>
+        <agent-migrate>
+            <agent-migration-name>
+                <executable>hp-ud-agent-aix-ppc.tar.z</executable>
+            </agent-migration-name>
+            <agent-migrate-resources>
+                <resource>hp-ud-agent-aix-ppc.tar.z</resource>
+                <resource>agentupgrade.sh</resource>
+            </agent-migrate-resources>
+        </agent-migrate>
+        <agent-uninstall>
+        </agent-uninstall>
+        <agent-upgrade>
+        </agent-upgrade>
+        <platform-recognition>
+            <platform-aliases>
+                <alias>aix</alias>
+            </platform-aliases>
+            <platform-architectures default="power">
+                <architecture display-name="POWER">power</architecture>
+            </platform-architectures>
+        </platform-recognition>
+    </platform>
+</agents-configuration>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="exchange_version_by_wmi">
+            <name>Exchange Version Information by WMI</name>
+            <description>Sets file version information by WMI</description>
+            <module>plugins_exchange_version_by_wmi</module>
+            <class>ExchangeVersionPluginByWmi</class>
+            <qualifiers>
+                <qualifier type="protocol">wmi</qualifier>
+                <qualifier type="os">Windows</qualifier>
+                <qualifier type="application">Microsoft Exchange Server</qualifier>
+            </qualifiers>
+        </plugin>
+    </plugins>
+</package>

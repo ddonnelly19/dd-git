@@ -1,0 +1,20 @@
+<PrePostScanScriptingConfiguration>
+    <platform name="unix"/>
+    <platform name="aix"/>
+    <platform name="hpux">
+        <architecture>ia64</architecture>
+        <architecture>hppa</architecture>
+    </platform>
+    <platform name="linux">
+        <architecture>i686</architecture>
+        <architecture>x86_64</architecture>
+    </platform>
+    <platform name="macosx">
+        <architecture>i386</architecture>
+    </platform>
+    <platform name="solaris">
+        <architecture>i86pc</architecture>
+        <architecture>sparc</architecture>
+    </platform>
+    <platform name="windows"/>
+</PrePostScanScriptingConfiguration>

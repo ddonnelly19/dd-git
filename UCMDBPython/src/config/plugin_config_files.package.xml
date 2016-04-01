@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+     <plugins>
+        <plugin id="plugin_config_files">
+            <name>Configuration Files</name>
+            <description>Plugin discovers configuration files of application</description>
+            <module>plugin_config_files</module>
+            <class>ConfigurationFilesPlugin</class>
+            <qualifiers>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powershell</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+            </qualifiers>
+        </plugin>
+     </plugins>
+</package>

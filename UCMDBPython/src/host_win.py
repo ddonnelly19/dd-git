@@ -1,0 +1,29 @@
+#coding=utf-8
+class HostDo:
+    def __init__(self):
+        self.ntVersion = None
+        self.hostOsName = None
+        self.description = None
+        self.servicePack = None
+        self.buildNumber = None
+        self.biosUUID = None
+        self.biosAssetTag = None
+        self.defaultGateway = None
+        self.osFamily = 'windows'
+        self.serialNumber = None
+        self.hostModel = None
+        self.hostManufacturer = None
+        self.installType = None
+        self.vendor = None
+        self.hostName = None
+        self.lastBootDate = None
+        self.ipIsVirtual = None
+        self.ipIsNATed = None
+        self.registeredOwner = None
+        self.physicalMemory = None
+        self.organization = None
+        self.osDomain = None
+        self.winProcessorsNumber = None
+        self.udUniqueId = None
+        self.paeEnabled = None
+        self.osArchitecture = None

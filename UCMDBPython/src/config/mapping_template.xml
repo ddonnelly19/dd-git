@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation=".\mapping_schema.xsd" parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.CiMappingConfigFile">
+	<ci type="">
+		<map>
+			<attribute></attribute>
+			<column></column>
+			<converter module=""></converter>
+		</map>
+	</ci>
+</mappings>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DiscoveryGroupsConfiguration>
+	<DiscoveryGroup name="Network">
+		<ActiveDiscoveryJobs>
+			<DiscoveryJob>Microsoft Exchange Topology by WMI</DiscoveryJob>
+			<DiscoveryJob>Microsoft Exchange Connection by WMI</DiscoveryJob>
+			<DiscoveryJob>Microsoft Exchange Connection by NTCMD</DiscoveryJob>
+			<DiscoveryJob>Microsoft Exchange Topology by NTCMD</DiscoveryJob>
+			<DiscoveryJob>MQ by Shell</DiscoveryJob>
+			<DiscoveryJob>MS Cluster by NTCMD</DiscoveryJob>
+			<DiscoveryJob>Service Guard Cluster Topology by TTY</DiscoveryJob>
+			<DiscoveryJob>Veritas Cluster by Shell</DiscoveryJob>
+			<DiscoveryJob>J2EE JBoss by Shell</DiscoveryJob>
+			<DiscoveryJob>J2EE Weblogic by Shell</DiscoveryJob>
+			<DiscoveryJob>J2EE WebSphere by Shell</DiscoveryJob>
+			<DiscoveryJob>Range IPs by ICMP</DiscoveryJob>
+			<DiscoveryJob>Class C IPs by ICMP</DiscoveryJob>
+			<DiscoveryJob>DNS Resolver</DiscoveryJob>
+			<DiscoveryJob>Host Connection by Shell</DiscoveryJob>
+			<DiscoveryJob>Host Connection by SNMP</DiscoveryJob>
+			<DiscoveryJob>Host Connection by WMI</DiscoveryJob>
+			<DiscoveryJob>Host Resources and Applications by Shell</DiscoveryJob>
+			<DiscoveryJob>Host Resources and Applications by SNMP</DiscoveryJob>
+			<DiscoveryJob>Host Resources and Applications by WMI</DiscoveryJob>
+			<DiscoveryJob>Alteon application switch by SNMP</DiscoveryJob>
+			<DiscoveryJob>Cisco CSS by SNMP</DiscoveryJob>
+			<DiscoveryJob>F5 BIG-IP LTM by SNMP</DiscoveryJob>
+			<DiscoveryJob>Webserver by Shell</DiscoveryJob>
+			<DiscoveryJob>WebServer Detection using TCP Ports</DiscoveryJob>
+			<DiscoveryJob>IHS Websphere Plugin by Shell</DiscoveryJob>
+			<DiscoveryJob>IIS Applications by NTCMD</DiscoveryJob>
+		</ActiveDiscoveryJobs>
+		<DiscoveryProperties>
+			<Propery display_name="Discover All Installed-Software">
+				<JobParameter>
+					<DiscoveryJob>Host Resources and Applications by Shell</DiscoveryJob>
+					<ParameterName>discoverInstalledSoftware</ParameterName>
+				</JobParameter>
+				<JobParameter>
+					<DiscoveryJob>Host Resources and Applications by WMI</DiscoveryJob>
+					<ParameterName>discoverInstalledSoftware</ParameterName>
+				</JobParameter>
+				<JobParameter>
+					<DiscoveryJob>Host Resources and Applications by SNMP</DiscoveryJob>
+					<ParameterName>discoverInstalledSoftware</ParameterName>
+				</JobParameter>
+			</Propery>
+			<Propery display_name="Discover All Services">
+				<JobParameter>
+					<DiscoveryJob>Host Resources and Applications by Shell</DiscoveryJob>
+					<ParameterName>discoverServices</ParameterName>
+				</JobParameter>
+				<JobParameter>
+					<DiscoveryJob>Host Resources and Applications by WMI</DiscoveryJob>
+					<ParameterName>discoverServices</ParameterName>
+				</JobParameter>
+				<JobParameter>
+					<DiscoveryJob>Host Resources and Applications by SNMP</DiscoveryJob>
+					<ParameterName>discoverServices</ParameterName>
+				</JobParameter>
+			</Propery>
+			<Propery display_name="Shell Command Timeout">
+				<GlobalParameter>
+					<ConfigFileName>globalSettings.xml</ConfigFileName>
+					<ParameterName>shellGlobalCommandTimeout</ParameterName>
+				</GlobalParameter>
+			</Propery>
+			<Propery display_name="Discover all Ports">
+				<GlobalParameter>
+					<ConfigFileName>globalSettings.xml</ConfigFileName>
+					<ParameterName>discovereAllListenPorts</ParameterName>
+				</GlobalParameter>
+			</Propery>
+		</DiscoveryProperties>
+	</DiscoveryGroup>
+</DiscoveryGroupsConfiguration>

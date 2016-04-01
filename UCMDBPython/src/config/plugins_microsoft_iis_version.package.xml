@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="microsoft_iis_version_by_ntcmd">
+            <name>Microsoft IIS Version by NTCMD</name>
+            <description>Sets IIS version by Windows shell</description>
+            <module>plugins_microsoft_iis_version</module>
+            <class>PluginMicrosoftIisVersionByNtcmd</class>
+            <qualifiers>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+				<qualifier type="os">Windows</qualifier>
+				<qualifier type="application">Microsoft IIS WebServer</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="microsoft_iis_version_by_wmi">
+            <name>Microsoft IIS Version by WMI</name>
+            <description>Sets IIS version by WMI</description>
+            <module>plugins_microsoft_iis_version</module>
+            <class>PluginMicrosoftIisVersionByWmi</class>
+            <qualifiers>
+                <qualifier type="protocol">wmi</qualifier>
+				<qualifier type="os">Windows</qualifier>
+				<qualifier type="application">Microsoft IIS WebServer</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="microsoft_iis_version_by_powershell">
+            <name>Microsoft IIS Version by PowerShell</name>
+            <description>Sets IIS version by PowerShell</description>
+            <module>plugins_microsoft_iis_version</module>
+            <class>PluginMicrosoftIisVersionByPowerShell</class>
+            <qualifiers>
+                <qualifier type="protocol">powershell</qualifier>
+				<qualifier type="os">Windows</qualifier>
+				<qualifier type="application">Microsoft IIS WebServer</qualifier>
+            </qualifiers>
+        </plugin>
+    </plugins>
+</package>
+        

@@ -1,0 +1,7 @@
+<!-- edited with XML Spy v4.0.1 U (http://www.xmlspy.com) by xx (xx) -->
+<!-- The all attribute indicates if the service should discover all domains or discover by the list -->
+<MsDomainNames all="true">
+        <!-- In order to limit the discovered domains, set above attribute all="false" and add elements such as:
+        <MsDomain>DISCOVERED-MS-DOMAIN</MsDomain>
+        -->
+</MsDomainNames>

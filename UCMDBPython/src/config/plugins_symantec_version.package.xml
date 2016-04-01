@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="ntcmd_symantec_version_information">
+            <name>Symantec Antivirus Version Information by NTCMD</name>
+            <description>Sets file version information by Windows shell</description>
+            <module>plugin_symantec_ntcmd_version</module>
+            <class>SymantecInformationPluginByNTCMD</class>
+            <qualifiers>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+				<qualifier type="os">Windows</qualifier>
+				<qualifier type="application">Symantec Antivirus</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="wmi_symantec_version_information">
+            <name>Symantec Antivirus Version Information by WMI</name>
+            <description>Sets file version information by WMI</description>
+            <module>plugin_symantec_wmi_version</module>
+            <class>SymantecInformationPluginByWMI</class>
+            <qualifiers>
+                <qualifier type="protocol">wmi</qualifier>
+				<qualifier type="os">Windows</qualifier>
+				<qualifier type="application">Symantec Antivirus</qualifier>
+            </qualifiers>
+        </plugin>
+    </plugins>
+</package>

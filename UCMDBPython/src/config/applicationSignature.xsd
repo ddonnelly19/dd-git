@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <xs:element name="Application-Component" type="Application-ComponentType"/>
+    <xs:complexType name="Application-ComponentType">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="clustered-application" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="process" type="processType" minOccurs="1" maxOccurs="unbounded"/>
+                <xs:element name="parse-rule" type="parse-ruleType" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="plugins" type="pluginsType" minOccurs="0" maxOccurs="1"/>
+            </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="app_id" type="xs:string"/>
+        <xs:attribute name="name" type="xs:string"/>
+        <xs:attribute name="category" type="xs:string" use="optional"/>
+        <xs:attribute name="vendor" type="xs:string" use="optional"/>
+        <xs:attribute name="supported_versions" type="xs:string" use="optional"/>
+        <xs:attribute name="installedSoftwareName" type="xs:string" use="optional"/>
+        <xs:attribute name="ci_type" type="xs:string" use="optional"/>
+        <xs:attribute name="discover" type="xs:string" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="processType" mixed="true">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="application-ip-source" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="service-endpoint-name" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="parse-rule" type="parse-ruleType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string"/>
+        <xs:attribute name="ports" type="xs:string"/>
+        <xs:attribute name="cmdline" type="xs:string" use="optional"/>
+        <xs:attribute name="description" type="xs:string" use="optional"/>
+        <xs:attribute name="main-process" type="xs:string" use="optional"/>
+        <xs:attribute name="required" type="xs:string" use="optional"/>
+        <xs:attribute name="startswith" type="xs:string" use="optional"/>
+        <xs:attribute name="ignore-case" type="xs:string" use="optional"/>
+        <xs:attribute name="owner" type="xs:string" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="attributeType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="name" type="xs:string"/>
+                <xs:attribute name="value" type="xs:string"/>
+                <xs:attribute name="type" type="xs:string" use="optional"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="parse-ruleType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="id" type="xs:string"/>
+                <xs:attribute name="name" type="xs:string"/>
+                <xs:attribute name="method" type="xs:string" use="optional"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="pluginsType">
+        <xs:sequence>
+            <xs:element name="plugin" type="pluginType" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="pluginType">
+        <xs:sequence>
+            <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required"/>
+    </xs:complexType>
+</xs:schema>

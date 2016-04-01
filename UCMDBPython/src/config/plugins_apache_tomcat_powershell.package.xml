@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+     <plugins>
+        <plugin id="apache_tomcat_by_powershell">
+            <name>Apache Tomcat By PowerShell</name>
+            <description>Sets Apache Tomcat version and configuration file using PowerShell</description>
+            <module>plugin_apache_tomcat</module>
+            <class>ApacheTomcatPlugin</class>
+            <qualifiers>
+                <qualifier type="application">Apache Tomcat by tomcat process</qualifier>
+                <qualifier type="application">Apache Tomcat by java process</qualifier>
+                <qualifier type="protocol">powershell</qualifier>
+            </qualifiers>
+        </plugin>
+     </plugins>
+</package>

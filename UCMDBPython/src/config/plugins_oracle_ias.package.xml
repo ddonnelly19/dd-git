@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+ 	<plugins>
+        <plugin id="oracle_ias_version_by_shell">
+            <name>Oracle iAS version by shell</name>
+            <description>Sets Oracle iAS version attribute for discovered Oracle iAS CI</description>
+            <module>plugins_appsignature_oracle_ias_by_shell</module>
+            <class>OracleIASVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">Oracle iAS</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">ssh</qualifier> 
+				<qualifier type="protocol">uda</qualifier> 
+  				<qualifier type="protocol">telnet</qualifier> 
+            </qualifiers>
+        </plugin>
+     </plugins>
+</package>

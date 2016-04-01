@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+ 	<plugins>
+        <plugin id="mcafee_version_by_shell">
+            <name>McAfee VirusScan version by shell</name>
+            <description>Set McAfee VirusScan version attribute for discovered CIs by shell</description>
+            <module>plugins_mcafee_version_by_shell</module>
+            <class>McAfeeShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">McAfee VirusScan</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+            </qualifiers>
+        </plugin>
+        <plugin id="mcafee_version_by_wmi">
+            <name>McAfee VirusScan version by wmi</name>
+            <description>Set McAfee VirusScan version attribute for discovered CIs by wmi</description>
+            <module>plugins_mcafee_version_by_wmi</module>
+            <class>McAfeeWMIPlugin</class>
+            <qualifiers>
+                <qualifier type="application">McAfee VirusScan</qualifier>
+                <qualifier type="protocol">wmi</qualifier>
+        	</qualifiers>>
+        </plugin>
+        <plugin id="mcafee_version_by_ssh">
+            <name>McAfee VirusScan version by ssh</name>
+            <description>Set McAfee VirusScan version attribute for discovered CIs by ssh</description>
+            <module>plugins_mcafee_version_by_ssh</module>
+            <class>McAfeeSshPlugin</class>
+            <qualifiers>
+                <qualifier type="protocol">ssh</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+				<qualifier type="protocol">telnet</qualifier>
+				<qualifier type="application">McAfee VirusScan</qualifier>
+            </qualifiers>
+        </plugin>
+</plugins>
+</package>

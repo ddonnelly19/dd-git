@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+ 	<plugins>
+        <plugin id="postgresql_version_by_shell">
+            <name>PostgreSQL version by shell</name>
+            <description>Sets PostgreSQL version attribute for discovered PostgreSQL CI</description>
+            <module>plugin_appsignature_postgresql_by_shell</module>
+            <class>PostgreSQLVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">PostgreSQL</qualifier>
+                <qualifier type="protocol">ssh</qualifier> 
+				<qualifier type="protocol">uda</qualifier> 
+  				<qualifier type="protocol">telnet</qualifier> 
+            </qualifiers>
+        </plugin>
+     </plugins>
+</package>

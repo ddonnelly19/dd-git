@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+ 	<plugins>
+        <plugin id="jboss_server_windows_powershell">
+            <name>JBoss Server on Windows by PowerShell"</name>
+            <description>Sets administration_domain and j2eeserver_servername attribute for JBoss Server discovered using PowerShell</description>
+            <module>plugins_jboss_server_domain</module>
+            <class>Jboss3to6ServerPlugin</class>
+            <qualifiers>
+                <qualifier type="application">Jboss instance on Windows</qualifier>
+                <qualifier type="protocol">powershell</qualifier>
+            </qualifiers>
+        </plugin>
+	</plugins>
+</package>

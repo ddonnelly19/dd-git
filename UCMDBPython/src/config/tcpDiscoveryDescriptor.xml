@@ -1,0 +1,126 @@
+<scopes>
+    <!-- 
+        scope tag defines rules for analysis and reporting approach per ip range scope.
+        It is possible to define several scopes with its own filter and reporting rules.
+        -->
+    <scope name="default">
+        <!-- 
+            serverDetectionApproach defines approaches for detecting client server 
+            relation between two pairs of ip:port entries. 'active' attribute disables\enables according approach.
+         -->
+        <serverDetectionApproach>
+            <!-- 
+               ListenPortsBasedApproach defines client server relation basing on LISTEN\ESTABLISHED state of a connection(netstat, pfile, lsof output).
+               It is necessary to run process to process discovery to use this approach.
+             -->
+            <approach name="ListenPortsBasedApproach" active="true" />
+
+            <!-- 
+                KnownPortsBasedApproach defines client server relation basing on port list from portNumberToPortName.xml 
+                file. So, the host is resolved as server if its port is found at portNumberToPortName.xml file. 
+            -->
+            <approach name="KnownPortsBasedApproach" active="true" />
+
+            <!--
+                StatisticBasedApproach defines client server relation basing on minimal condition matching. 
+                The condition is not taken into account if its value is zero.
+                For current conditions, approach will indicate node as a server if t has minimum 5 connections opened.
+                Minimum octets and packets conditions are valid only for data brought by the 'Collect Network Data by Netfow' Job. 
+             -->
+            <approach name="StatisticBasedApproach" active="true"
+                minClients="5" minOctets="0" minPackets="0" />
+        </serverDetectionApproach>
+        <!-- 
+            Reporting section defines filter rules and list of active reporters. 
+            'active' attribute disables\enables reporting of according ci. 
+            If no reporters are defined or none of them is activated, 
+            job will still report default topology consisting of discovered ip and node. 
+            The filtering defined at configuration tag is applied to all the reporters defined. 
+            Each reporter can override default filtering defining <filtering> tag in its body.
+        -->
+        <reporting>
+            <configuration>
+                <!-- 
+                    Filtering section defines rules to accept reporting of discovered nodes. 'active' attribute disables\enables according filter.
+                    If filtering tag is not defined, job creates default filtering with probe ranges taken as include range list. 
+                 -->
+                <filtering>
+                    <!-- 
+                        Ranges section defines filtering by ip address. If include tag is empty, probe ranges are taken as include range list.
+                        There are number of keywords that could be used to define specific ranges, they are:
+                            probe_ranges - includes all ranges defined at Protocol Manager
+                            outscope_clients - includes all client ips that are out of probe range scope
+                            outscope_servers - includes all server ips that are out of probe range scope
+                            ddm_related_connections - includes probe ip. Allows user to filter Universal Discovery related connections initiated while discovery process
+                     -->
+                    <ranges active="true">
+                        <include>
+                            <range>probe_ranges</range>
+                            <range>outscope_clients</range>
+                            <range>outscope_servers</range>
+                        </include>
+                        <exclude>                            
+                        </exclude>
+                    </ranges>
+                    <!-- Services section defines filtering by service name (ssh, oracle, 
+                        mysql, etc)
+                        It is possible to set:
+                        1.service names (ssh, oracle,mysql, etc)
+                        2.port numbers of services
+                        3.* - means all services 
+                        4.known_services - means all services described in portNumberToPortName.xml configuration file with discover flag set to true -->
+                    <services active="true">
+                        <include>
+                            <!--<service name="known_services" /> -->
+                            <service name="*" />
+                        </include>
+                        <exclude>
+                            <service name="ssh" />
+                            <service name="snmp" />
+                        </exclude>
+                    </services>
+                </filtering>
+            </configuration>
+            <!-- 
+                ipTrafficLink reports traffic link between discovered ips. 
+                'reportTrafficDetails' attribute indicates whether job should report 
+                octetCount, packetCount and portset attributes on the link.
+             -->
+            <reporter name="ipTrafficLink" active="true" reportTrafficDetails="true"/>
+
+            <!-- 
+                nodeDependencyLink reports dependency link between discovered nodes.
+             -->
+            <reporter name="nodeDependencyLink" active="false" />
+
+            <!-- 
+                Client server link reporting includes reporting of clientProcess(event 
+                if clientProcess active="false") ip communication endpoint and client-server 
+                link between them.
+             -->
+            <reporter name="clientServerLink" active="true" />
+
+            <!--
+                clientProcess reports discovered client process.
+             -->
+            <reporter name="clientProcess" active="true" />
+
+            <!-- 
+                serverProcess reports discovered server process. 
+                'linkWithCommunicationEndpoint' attribute indicates whether job should link process 
+                with discovered ip communication endpoint(with 'usage' link)
+             -->
+            <reporter name="serverProcess" active="true"
+                linkWithCommunicationEndpoint="true" />
+
+            <!--
+                serverRunningSoftware reports server running software linked with ip communication endpoint(with 'usage' link) and the server process.
+                'linkWithProcess' attribute indicates whether reporter should link discovered running software with server process(with 'dependency' link). 
+                Server running software is reported only if the service it is representing is marked as discover="1" at portNumberToPortName.xml file.
+             -->
+            <reporter name="serverRunningSoftware" active="false"
+                linkWithProcess="true" />
+
+        </reporting>
+    </scope>
+</scopes>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<tql:query group-id="3" priority="low" is-live="true" name="Localhost scope topology filter" xmlns:ns4="http://www.hp.com/ucmdb/1-0-0/ViewDefinition" xmlns:ns3="http://www.hp.com/ucmdb/1-0-0/PolicyRuleDefinition" xmlns:tql="http://www.hp.com/ucmdb/1-0-0/TopologyQueryLanguage">
+	<tql:node class="node" name="Node" id="13">
+		<tql:where>
+			<tql:data-stores>
+				<tql:data-store>UCMDB</tql:data-store>
+			</tql:data-stores>
+		</tql:where>
+	</tql:node>
+	<tql:node class="infrastructure_element" name="Deployable" id="14">
+		<tql:where>
+			<tql:data-stores>
+				<tql:data-store>UCMDB</tql:data-store>
+			</tql:data-stores>
+		</tql:where>
+	</tql:node>
+	<tql:compound-link max-depth="4" from="Node" to="Deployable" class="compound_f" strict-class="true" name="Virtual - Compound" id="15">
+		<tql:inner-node name="0" id="12"/>
+		<tql:inner-link name="1" id="11"/>
+		<tql:allowed-step class="deployed" name="Virtual - Compound-compound-link1" id="18">
+			<tql:from class="running_software" name="Virtual - Compound-compound-from-node1" id="16"/>
+			<tql:to class="applicationresource" name="Virtual - Compound-compound-to-node1" id="17"/>
+		</tql:allowed-step>
+		<tql:allowed-step class="composition" name="Virtual - Compound-compound-link3" id="24">
+			<tql:from class="applicationresource" name="Virtual - Compound-compound-from-node3" id="22"/>
+			<tql:to class="applicationresource" name="Virtual - Compound-compound-to-node3" id="23"/>
+		</tql:allowed-step>
+		<tql:allowed-step class="composition" name="Virtual - Compound-compound-link2" id="21">
+			<tql:from class="node" name="Virtual - Compound-compound-from-node2" id="19"/>
+			<tql:to class="running_software" name="Virtual - Compound-compound-to-node2" id="20"/>
+		</tql:allowed-step>
+		<tql:allowed-step class="composition" name="Virtual - Compound-compound-link4" id="27">
+			<tql:from class="running_software" name="Virtual - Compound-compound-from-node4" id="25"/>
+			<tql:to class="applicationresource" name="Virtual - Compound-compound-to-node4" id="26"/>
+		</tql:allowed-step>
+	</tql:compound-link>
+</tql:query>

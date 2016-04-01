@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package
+    parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="webseal_instances_on_windows">
+            <name>Webseal instances on Windows</name>
+            <description>Determines Webseal databases on Windows host</description>
+            <module>plugins_webseal_instances</module>
+            <class>WebsealInstancesByShellWindows</class>
+            <qualifiers>
+                <qualifier type="application">IBM Security Access Manager</qualifier>
+                <qualifier type="protocol">powershell</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+            </qualifiers>
+        </plugin>
+
+        <plugin id="webseal_instances_on_unix">
+            <name>Webseal instances on Unix</name>
+            <description>Determines Webseal databases on Unix host</description>
+            <module>plugins_webseal_instances</module>
+            <class>WebsealInstancesByShellUnix</class>
+            <qualifiers>
+                <qualifier type="application">IBM Security Access Manager</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+            </qualifiers>
+        </plugin>
+    </plugins>
+</package>

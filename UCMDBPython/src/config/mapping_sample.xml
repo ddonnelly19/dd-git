@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation=".\mapping_schema.xsd" parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.CiMappingConfigFile">
+	<ci type="ip">
+		<map>
+			<attribute>ip_address</attribute>
+			<column>0</column>
+		</map>
+		<map>
+			<attribute>ip_domain</attribute>
+			<column>1</column>
+		</map>
+		<map>
+			<attribute>ip_dnsname</attribute>
+			<column>2</column>
+		</map>
+	</ci>
+</mappings>

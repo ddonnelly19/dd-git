@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+     <plugins>
+        <plugin id="plugin_sap_ccms_unix">
+            <name>SAP CCMS Agent version by shell</name>
+            <description>Sets CCMS Agent version attribute for discovered SAP CCMS Agent instance</description>
+            <module>plugin_sap_ccms_by_shell</module>
+            <class>SapCcmsAgentPlugin</class>
+            <qualifiers>
+                <qualifier type="application">SAP CCMS Agent Unix</qualifier>
+                <qualifier type="protocol">ssh</qualifier> 
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>entity</module>
+                <module>iteratortools</module>
+                <module>sap</module>
+                <module>sap_discoverer</module>
+            </dependencies>
+        </plugin>
+        <plugin id="plugin_sap_ccms_windows">
+            <name>SAP CCMS Agent version by shell</name>
+            <description>Sets CCMS Agent version attribute for discovered SAP CCMS Agent instance</description>
+            <module>plugin_sap_ccms_by_shell</module>
+            <class>SapCcmsAgentPlugin</class>
+            <qualifiers>
+                <qualifier type="application">SAP CCMS Agent Windows</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier> 
+                <qualifier type="protocol">uda</qualifier> 
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">powershell</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>entity</module>
+                <module>iteratortools</module>
+                <module>sap</module>
+                <module>sap_discoverer</module>
+            </dependencies>
+        </plugin>
+     </plugins>
+</package>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package
+    parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="hanadb">
+            <name>HANA Database</name>
+            <description>Determine HANA database instances</description>
+            <module>plugins_hanadb</module>
+            <class>HanaDbPlugin</class>
+            <qualifiers>
+                <qualifier type="application">HANA Database</qualifier>
+                <qualifier type="protocol">powershell</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>db_platform</module>
+                <module>db</module>
+                <module>db_builder</module>
+                <module>hana_wiring</module>
+                <module>hana_pyarg_validator</module>
+                <module>hana_base_parser</module>
+                <module>hana_host</module>
+                <module>hana</module>
+                <module>hana_pdo</module>
+                <module>hana_base_command</module>
+                <module>hana_sql_base_command</module>
+                <module>hana_hdbsql</module>
+                <module>hana_sql_command</module>
+                <module>hana_shell_command</module>
+                <module>hana_discoverer</module>
+                <module>hana_tools</module>
+            </dependencies>
+        </plugin>
+    </plugins>
+</package>

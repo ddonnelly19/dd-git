@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+     <plugins>
+        <plugin id="plugins_sap_message_server">
+            <name>SAP Message Server</name>
+            <description>Determine instance and system of Message Server</description>
+            <module>plugins_sap_central_components</module>
+            <class>MessageServerTopology</class>
+            <qualifiers>
+                <qualifier type="application">SAP Message Server</qualifier>
+
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">wmi</qualifier>
+                <qualifier type="protocol">snmp</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>entity</module>
+                <module>command</module>
+                <module>cmdlineutils</module>
+                <module>iteratortools</module>
+                <module>db_platform</module>
+                <module>db_builder</module>
+                <module>db</module>
+	            <module>jdbc_url_parser</module>
+                <module>jmx</module>
+                <module>jdbc</module>
+                <module>jee</module>
+                <module>sap</module>
+                <module>sap_db</module>
+                <module>sap_discoverer</module>
+                <module>sap_discoverer_by_shell</module>
+            </dependencies>
+        </plugin>
+        <plugin id="plugins_sap_enqueue_server">
+            <name>SAP Enqueue Server</name>
+            <description>Determine instance and system of Enqueue Server</description>
+            <module>plugins_sap_central_components</module>
+            <class>EnqueueServerTopology</class>
+            <qualifiers>
+                <qualifier type="application">SAP Enqueue Server</qualifier>
+
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">wmi</qualifier>
+                <qualifier type="protocol">snmp</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>entity</module>
+                <module>command</module>
+                <module>cmdlineutils</module>
+                <module>iteratortools</module>
+                <module>db_platform</module>
+                <module>db_builder</module>
+                <module>db</module>
+	            <module>jdbc_url_parser</module>
+                <module>jmx</module>
+                <module>jdbc</module>
+                <module>jee</module>
+                <module>sap</module>
+                <module>sap_db</module>
+                <module>sap_discoverer</module>
+                <module>sap_discoverer_by_shell</module>
+            </dependencies>
+        </plugin>
+        
+     </plugins>
+</package>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+     <plugins>
+        <plugin id="plugins_sap_abap_instance_to_system_linkage">
+            <name>SAP ABAP Instance to System Topology Reporting</name>
+            <description>Reporting relation between SAP instance and its system</description>
+            <module>plugins_sap_instance_topology</module>
+            <class>AbapInstanceToSystem</class>
+            <qualifiers>
+                <qualifier type="application">SAP ABAP Central Services</qualifier>
+                <qualifier type="application">SAP ABAP Application Server (Central)</qualifier>
+                <qualifier type="application">SAP ABAP Application Server (Dialog)</qualifier>
+                <qualifier type="application">SAP ABAP Application Server</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">wmi</qualifier>
+                <qualifier type="protocol">snmp</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>entity</module>
+                <module>command</module>
+                <module>cmdlineutils</module>
+                <module>sap</module>
+                <module>iteratortools</module>
+                <module>db_platform</module>
+                <module>db_builder</module>
+                <module>db</module>
+	            <module>jdbc_url_parser</module>
+                <module>jmx</module>
+                <module>jdbc</module>
+                <module>jee</module>
+                <module>sap_jee</module>
+                <module>sap_db</module>
+                <module>sap_discoverer</module>
+                <module>process</module>
+                <module>process_discoverer</module>
+                <module>sap_discoverer_by_shell</module>
+            </dependencies>
+        </plugin>
+        <plugin id="plugins_sap_java_app_server_kernel_version">
+            <name>SAP Java Application Server kernel version discovery</name>
+            <description>Determine Java server kernel version based on \"jstart -v\" command execution</description>
+            <module>plugins_sap_instance_topology</module>
+            <class>JavaAppServerKernelVersionPlugin</class>
+            <qualifiers>
+                <qualifier type="application">SAP J2EE Application Server</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>entity</module>
+                <module>command</module>
+                <module>cmdlineutils</module>
+                <module>sap</module>
+                <module>iteratortools</module>
+                <module>db_platform</module>
+                <module>db_builder</module>
+                <module>db</module>
+	            <module>jdbc_url_parser</module>
+                <module>jmx</module>
+                <module>jdbc</module>
+                <module>jee</module>
+                <module>sap_jee</module>
+                <module>sap_db</module>
+                <module>sap_discoverer</module>
+                <module>process</module>
+                <module>process_discoverer</module>
+                <module>sap_discoverer_by_shell</module>
+            </dependencies>
+        </plugin>
+        <plugin id="plugins_sap_java_instance_to_system_linkage">
+            <name>SAP Java Instance to System Topology Reporting</name>
+            <description>Reporting relation between SAP instance and its system</description>
+            <module>plugins_sap_instance_topology</module>
+            <class>JavaInstanceToSystem</class>
+            <qualifiers>
+                <qualifier type="application">SAP J2EE Central Services</qualifier>
+                <qualifier type="application">SAP J2EE Application Server</qualifier>
+
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">wmi</qualifier>
+                <qualifier type="protocol">snmp</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>entity</module>
+                <module>command</module>
+                <module>cmdlineutils</module>
+                <module>sap</module>
+                <module>iteratortools</module>
+                <module>db_platform</module>
+                <module>db_builder</module>
+                <module>db</module>
+	            <module>jdbc_url_parser</module>
+                <module>jmx</module>
+                <module>jdbc</module>
+                <module>jee</module>
+                <module>sap_jee</module>
+                <module>sap_db</module>
+                <module>sap_discoverer</module>
+                <module>process</module>
+                <module>process_discoverer</module>
+                <module>sap_discoverer_by_shell</module>
+            </dependencies>
+        </plugin>
+
+     </plugins>
+</package>

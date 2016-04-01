@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+   <plugins>
+        <plugin id="plugins_sapas_bdm_changes">
+            <name>SAP AS Instance Name Handling</name>
+            <description>Handles SAP Instance Name special case</description>
+            <module>plugins_sapas_bdm_changes</module>
+            <class>SAPASInstanceName</class>
+            <qualifiers>
+                <qualifier type="application">SAP ABAP Central Services</qualifier>
+                <qualifier type="application">SAP J2EE Central Services</qualifier>
+                <qualifier type="application">SAP ABAP Application Server (Central)</qualifier>
+                <qualifier type="application">SAP ABAP Application Server (Dialog)</qualifier>
+                <qualifier type="application">SAP ABAP Application Server</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">wmi</qualifier>
+                <qualifier type="protocol">snmp</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+        </plugin>
+   </plugins>
+</package>

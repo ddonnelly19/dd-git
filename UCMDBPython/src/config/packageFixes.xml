@@ -1,0 +1,96 @@
+<PackageFixes>
+    <Fix regExp="appilog\.collectors" replaceWithStr="com.hp.ucmdb.discovery.probe"/>
+    <Fix regExp="appilog\.collectors\.util +import +ProtocolDictionaryManager" replaceWithStr="com.hp.ucmdb.discovery.library.credentials.dictionary import ProtocolDictionaryManager"/>
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.util +import +ProtocolDictionaryManager" replaceWithStr="com.hp.ucmdb.discovery.library.credentials.dictionary import ProtocolDictionaryManager"/>
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.util\.credentials +import +ProtocolDictionaryManager" replaceWithStr="com.hp.ucmdb.discovery.library.credentials.dictionary import ProtocolDictionaryManager" warnExpl="moved to discoveryLibrary" />
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.util +import +FilesUtil" replaceWithStr="com.hp.ucmdb.discovery.library.execution.impl import FilesUtil"/>
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.util +import +DomainScopeManager" replaceWithStr="com.hp.ucmdb.discovery.library.scope import DomainScopeManager"/>
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.clients +import" replaceWithStr="com.hp.ucmdb.discovery.library.clients import" warnExpl=" clients package was moved to library" />
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.services\.dynamic\.agents +import +AgentConstants" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import AgentConstants" warnExpl=" AgentsConstatns was moved to library" />
+
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.services\.dynamic\.agents +import +BaseAgent" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import BaseAgent" warnExpl=" BaseAgent was moved to library" />
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.services\.dynamic\.agents +import +JBossJMXAgent" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import JBossJMXAgent" warnExpl="JBossJMXAgent was moved to library" />
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.services\.dynamic\.agents +import +JMXAgent" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import JMXAgent" warnExpl="JMXAgent was moved to library" />
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.services\.dynamic\.agents +import +JMXUtil" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import JMXUtil" warnExpl="JMXUtil was moved to library" />
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.services\.dynamic\.agents +import +MSSQLClient" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import MSSQLClient" warnExpl="MSSQLClient was moved to library" />
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.services\.dynamic\.agents +import +SAPAgent" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents.sap import SAPQueryAgent" warnExpl="SAPAgent was moved to library" />
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.services\.dynamic\.agents +import +SSHAgent" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import SSHAgent" warnExpl="SSHAgent was moved to library" />
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.services\.dynamic\.agents +import +WeblogicJMXAgent" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import WeblogicJMXAgent" warnExpl="WeblogicJMXAgent was moved to library" />
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.services\.dynamic\.agents +import +WebsphereAgent" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import WebsphereAgent" warnExpl="WebsphereAgent was moved to library" />
+
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.protocols\.command +import +TimeoutException" replaceWithStr="com.hp.ucmdb.discovery.library.clients.protocols.command import TimeoutException" warnExpl="moved to discoveryLibrary" />
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.clients\.query +import +SqlClient" replaceWithStr="com.hp.ucmdb.discovery.library.clients.query import SqlClient" warnExpl="moved to discoveryLibrary" />
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.util +import +CollectorsParameters" replaceWithStr="com.hp.ucmdb.discovery.library.common import CollectorsParameters" warnExpl="moved to discoveryLibrary" />
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.agents\.probemgr\.downloader\.cfgfiles +import +CiMappingConfigFile" replaceWithStr="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles import CiMappingConfigFile" warnExpl="moved to discoveryLibrary" />
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.agents\.probemgr\.downloader\.cfgfiles +import +GeneralSettingsConfigFile" replaceWithStr="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles import GeneralSettingsConfigFile" warnExpl="moved to discoveryLibrary" />
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.agents\.probemgr\.downloader\.cfgfiles +import +IPProtocols" replaceWithStr="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles import IPProtocols" warnExpl="moved to discoveryLibrary" />
+    <Fix regExp="com\.hp\.ucmdb\.discovery\.probe\.util +import +DomainScopeManager" replaceWithStr="com.hp.ucmdb.discovery.library.scope import DomainScopeManager" warnExpl="moved to discoveryLibrary" />
+    <Fix regExp="Framework\.getClientFactory\(\)\.createClient\(" replaceWithStr="Framework.createClient("  warnExpl="getClientFactory function is deprecated - use createClient instead"/>
+    <Fix regExp="Framework\.getClientFactory\(ClientsConsts\.SNMP_PROTOCOL_NAME\)\.createClient\(" replaceWithStr="Framework.createClient(" warnExpl="getClientFactory function is deprecated - use createClient instead"/>
+    <Fix regExp="Framework\.getClientFactory\(ClientsConsts\.SQL_PROTOCOL_NAME\)\.createClient\(" replaceWithStr="Framework.createClient(" warnExpl="getClientFactory function is deprecated - use createClient instead"/>
+    <Fix regExp="Framework\.getClientFactory\(ClientsConsts\.WMI_PROTOCOL_NAME\)\.createClient\(" replaceWithStr="Framework.createClient(" warnExpl="getClientFactory function is deprecated - use createClient instead"/>
+    <Fix regExp="Framework\.getClientFactory\(ClientsConsts\.LOCAL_SHELL_PROTOCOL_NAME\)\.createClient\(\)" replaceWithStr="Framework.createClient(ClientsConsts.LOCAL_SHELL_PROTOCOL_NAME)" warnExpl="getClientFactory function is deprecated - use createClient instead"/>
+    <Fix regExp="Framework\.getClientFactory\(ClientsConsts\.ICMP_PROTOCOL_NAME\)\.createClient\(properties\)" replaceWithStr="Framework.createClient(ClientsConsts.ICMP_PROTOCOL_NAME, properties)" warnExpl="getClientFactory function is deprecated - use createClient instead"/>
+    <Fix regExp="Framework\.getClientFactory\(ClientsConsts\.HTTP_PROTOCOL_NAME\)\.createClient\(\)" replaceWithStr="Framework.createClient(ClientsConsts.HTTP_PROTOCOL_NAME)" warnExpl="getClientFactory function is deprecated - use createClient instead"/>
+    <Fix regExp="Framework\.getClientFactory\(ClientsConsts\.NTCMD_PROTOCOL_NAME\)\.createClient\(" replaceWithStr="Framework.createClient(" warnExpl="getClientFactory function is deprecated - use createClient instead"/>
+    <Fix regExp="Framework\.getClientFactory\(ClientsConsts\.SAP_PROTOCOL_NAME\)\.createClient\(" replaceWithStr="Framework.createClient(" warnExpl="getClientFactory function is deprecated - use createClient instead"/>
+    <Fix regExp="Framework\.executeCommand\(" replaceWithStr="Framework.createClient(ClientsConsts.LOCAL_SHELL_PROTOCOL_NAME).executeCmd(" warnExpl="executeCommand function is deprecated - use createClient and then executeCmd instead" importDepend="from com.hp.ucmdb.discovery.library.clients import ClientsConsts"/>
+    <Fix regExp="Framework\.getParameterValue\(" replaceWithStr="Framework.getParameter(" warnExpl="getParameterValue is deprecated - use getParameter instead"/>
+    <Fix regExp="Framework\.getBundle\(" replaceWithStr="Framework.getEnvironmentInformation().getBundle(" warnExpl="getBundle was moved to EnvironmentInformation" importDepend="from com.hp.ucmdb.discovery.probe.services.dynamic.core import EnvironmentInformation"/>
+    <Fix regExp="FrameworkImpl\.addExecutionRecordLog\(" replaceWithStr="ScriptsExecutionManager.addExecutionRecordLog(" warnExpl="addExecutionRecordLog was moved to ScriptsExecutionManager class" importDepend="from com.hp.ucmdb.discovery.library.clients import ScriptsExecutionManager"/>
+    <Fix regExp="from com\.hp\.ucmdb\.discovery\.probe\.services\.dynamic\.core import FrameworkImpl" replaceWithStr="" warnExpl="deprecated class"/>
+    <Fix regExp="FrameworkImpl\.getFramework\(\)" replaceWithStr="Framework.getFramework()" warnExpl="FrameworkImpl is deprecated - use Framework instead"/>
+    <Fix regExp="Framework\.getDefaultLanguage\(" replaceWithStr="Framework.getEnvironmentInformation().getDefaultLanguage(" warnExpl="getDefaultLanguage was moved to EnvironmentInformation" importDepend="from com.hp.ucmdb.discovery.probe.services.dynamic.core import EnvironmentInformation"/>
+    <Fix regExp="Framework\.getProbeGwId\(" replaceWithStr="Framework.getEnvironmentInformation().getProbeGwId(" warnExpl="getProbeGwId was moved to EnvironmentInformation" importDepend="from com.hp.ucmdb.discovery.probe.services.dynamic.core import EnvironmentInformation"/>
+    <Fix regExp="Framework\.getProbeGWIp\(" replaceWithStr="Framework.getEnvironmentInformation().getProbeGWIp(" warnExpl="getProbeGWIp was moved to EnvironmentInformation" importDepend="from com.hp.ucmdb.discovery.probe.services.dynamic.core import EnvironmentInformation"/>
+    <Fix regExp="Framework\.getProbeManagerDomain\(" replaceWithStr="Framework.getEnvironmentInformation().getProbeManagerDomain(" warnExpl="getProbeManagerDomain was moved to EnvironmentInformation" importDepend="from com.hp.ucmdb.discovery.probe.services.dynamic.core import EnvironmentInformation"/>
+    <Fix regExp="Framework\.getProbeManagerIP\(" replaceWithStr="Framework.getEnvironmentInformation().getProbeManagerIP(" warnExpl="getProbeManagerIP was moved to EnvironmentInformation" importDepend="from com.hp.ucmdb.discovery.probe.services.dynamic.core import EnvironmentInformation"/>
+    <Fix regExp="Framework\.getProbeMgrIp\(" replaceWithStr="Framework.getEnvironmentInformation().getProbeMgrIp(" warnExpl="getProbeMgrIp was moved to EnvironmentInformation" importDepend="from com.hp.ucmdb.discovery.probe.services.dynamic.core import EnvironmentInformation"/>    
+    <Fix regExp="Framework\.isIpInScope\(" replaceWithStr="Framework.getEnvironmentInformation().isIpInScope(" warnExpl="isIpInScope was moved to EnvironmentInformation" importDepend="from com.hp.ucmdb.discovery.probe.services.dynamic.core import EnvironmentInformation"/>
+    <Fix regExp="Framework\.doConnectionPool\(" replaceWithStr="dbutils.doConnectionPool(" warnExpl="doConnectionPool was moved to dbutils" importDepend="import dbutils"/>
+    <Fix regExp="Framework\.getDestinationAttrValueList\(" replaceWithStr="Framework.getTriggerCIDataAsList(" warnExpl="getDestinationAttrValueList is deprecated - use getTriggerCIDataAsList instead"/>
+    <Fix regExp="Framework\.getHostIP\(" replaceWithStr="netutils.getHostAddress(" warnExpl="getHostIP is deprecated - use netutils.getHostAddress instead" importDepend="import netutils"/>
+    <Fix regExp="Framework\.getHostName\(" replaceWithStr="netutils.getHostName(" warnExpl="getHostName is deprecated - use netutils.getHostName instead" importDepend="import netutils"/>
+    <Fix regExp="Framework\.getListDestinationAttribute\(" replaceWithStr="Framework.getTriggerCIDataAsList(" warnExpl="getListDestinationAttribute is deprecated - use getTriggerCIDataAsList instead"/>
+    <Fix regExp="Framework\.executeCommand\(" warnExpl="Framework.executeCommand is deprecated - use client's execCmd instead"/>
+    <Fix regExp="Framework\.getLogger\(" warnExpl="Framework.getLogger is deprecated - use logger.py instead"/>
+    <Fix regExp="Framework\.getMbeanServer\(" warnExpl="Framework.getMbeanServer is deprecated"/>
+    <Fix regExp="Framework\.getPortDescription\(" replaceWithStr="netutils.getPortDescription(" warnExpl="getPortDescription is deprecated - use netutils.getPortDescription instead" importDepend="import netutils"/>
+    <Fix regExp="Framework\.getRegularExpressionResults\(" warnExpl="Framework.getRegularExpressionResults is deprecated"/>
+    <Fix regExp="Framework\.getTriggerCIErrors\(" warnExpl="Framework.getTriggerCIErrors is deprecated"/>
+    <Fix regExp="Framework\.getUrlsClassPath\(" warnExpl="Framework.getUrlsClassPath is deprecated"/>
+    <Fix regExp="Framework\.getUrlsClassPathList\(" warnExpl="Framework.getUrlsClassPathList is deprecated"/>
+    <Fix regExp="Framework\.performXslTransformation\(" warnExpl="Framework.performXslTransformation is deprecated"/>
+    <Fix regExp="Framework\.sendResults\(" replaceWithStr="Framework.sendObjects(" warnExpl="sendResults is deprecated - use sendObjects instead"/>
+    <Fix regExp="Framework\.setObjectsToDelete\(" replaceWithStr="Framework.deleteObjects(" warnExpl="setObjectsToDelete is deprecated - use deleteObjects instead"/>
+    <Fix regExp="Framework\.tcpConnect\(" replaceWithStr="DynamicPortConnectionOperation.connect(" warnExpl="tcpConnect is deprecated - use DynamicPortConnectionOperation.connect instead" importDepend="from com.hp.ucmdb.discovery.probe.services.dynamic.operations.port import DynamicPortConnectionOperation"/>
+    <Fix regExp="Factory\.getAvailableProtocols\(" warnExpl="Usage of Factory is deprecated. Use Framework.getAvailableProtocols(protocolName) or Framework.getAvailableProtocols(ipAddress, protocolName) instead."/>
+    <Fix regExp="factory\.getAvailableProtocols\(" warnExpl="Usage of Factory is deprecated. Use Framework.getAvailableProtocols(protocolName) or Framework.getAvailableProtocols(ipAddress, protocolName) instead."/>
+    <Fix regExp="Factory\.getProtocolProperty\(" warnExpl="Usage of Factory is deprecated. Use Framework.getProtocolProperty instead."/>
+    <Fix regExp="factory\.getProtocolProperty\(" warnExpl="Usage of Factory is deprecated. Use Framework.getProtocolProperty instead."/>
+    <Fix regExp="Framework\.getClientFactory\(" warnExpl="Usage of Framework.getClientFactory is deprecated. Use Framework.createClient instead."/>
+    <Fix regExp="framework\.getClientFactory\(" warnExpl="Usage of Framework.getClientFactory is deprecated. Use Framework.createClient instead."/>
+    <Fix regExp="netutils\.isValidMAC" replaceWithStr="netutils.isValidMac"/>
+
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.library\.clients\.agents +import +JBossJMXAgent" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import JBossJMXAgent" warnExpl="JBossJMXAgent was moved to content" />-->
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.library\.clients\.agents +import +JMXAgent" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import JMXAgent" warnExpl="JMXAgent was moved to content" />-->
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.library\.clients\.agents +import +JMXUtil" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import JMXUtil" warnExpl="JMXUtil was moved to content" />-->
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.library\.clients\.agents +import +MSSQLClient" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import MSSQLClient" warnExpl="MSSQLClient was moved to content" />-->
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.library\.clients\.agents +import +SAPAgent" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents.sap import SAPQueryAgent" warnExpl="SAPAgent was moved to content" />-->
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.library\.clients\.agents +import +SSHAgent" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import SSHAgent" warnExpl="SSHAgent was moved to content" />-->
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.library\.clients\.agents +import +WeblogicJMXAgent" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import WeblogicJMXAgent" warnExpl="WeblogicJMXAgent was moved to content" />-->
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.library\.clients\.agents +import +WebsphereAgent" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import WebsphereAgent" warnExpl="WebsphereAgent was moved to content" />-->
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.content\.clients\.agents +import +AgentConstants" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import AgentConstants" warnExpl="AgentConstants was moved to library" />-->
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.content\.clients\.agents +import +BaseAgent" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import BaseAgent" warnExpl="BaseAgent was moved to library" />-->
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.library\.clients\.agents +import +SAPJmxAgent" replaceWithStr="com.hp.ucmdb.discovery.library.clients.agents import SAPJmxAgent" warnExpl="SAPJmxAgent was moved to content" />-->
+    <!---->
+    <!---->
+    <!---->
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.library\.clients\.jmx" replaceWithStr="com.hp.ucmdb.discovery.library.clients.jmx" warnExpl="jmx clients were moved to content" />-->
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.library\.clients\.query" replaceWithStr="com.hp.ucmdb.discovery.library.clients.query" warnExpl="queries were moved to content" />-->
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.library\.clients +import +HttpClient" replaceWithStr="com.hp.ucmdb.discovery.library.clients import HttpClient" warnExpl="HttpClient was moved to content" />-->
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.library\.clients +import +SimpleClient" replaceWithStr="com.hp.ucmdb.discovery.library.clients import SimpleClient" warnExpl="SimpleClient was moved to content" />-->
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.library\.clients\.shell" replaceWithStr="com.hp.ucmdb.discovery.library.clients.shell" warnExpl="Shell clients were moved to content" />-->
+    <!--<Fix regExp="com\.hp\.ucmdb\.discovery\.library\.clients\.protocol" replaceWithStr="com.hp.ucmdb.discovery.library.clients.protocols" warnExpl="Protocols were moved to content" />-->
+
+</PackageFixes>

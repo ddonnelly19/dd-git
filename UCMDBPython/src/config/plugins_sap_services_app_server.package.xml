@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+   <plugins>
+        <plugin id="sap_abap_application_server_name">
+            <name>SAP ABAP Application Server Name</name>
+            <description>Sets SAP ABAP Application Server Name</description>
+            <module>plugins_sap_abap_by_shell</module>
+            <class>SapAbapPlugin</class>
+            <qualifiers>
+                <qualifier type="application">SAP ABAP Application Server (Dialog)</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="sap_cs_and_ap_version_by_shell">
+            <name>SAP Central Services and Application Server version by shell</name>
+            <description>Sets SAP Central Services and Application Server version attribute for discovered CIs</description>
+            <module>plugins_sap_cs_and_ap_version_by_shell</module>
+            <class>SAPCSandAPShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">SAP ABAP Application Server (Central)</qualifier>
+                <qualifier type="application">SAP ABAP Application Server (Dialog)</qualifier>
+                <qualifier type="application">SAP ABAP Application Server</qualifier>
+                <qualifier type="application">SAP J2EE Central Services</qualifier>
+                <qualifier type="application">SAP ABAP Central Services</qualifier>
+                <qualifier type="application">SAP ITS Manager</qualifier>
+                <qualifier type="application">SAP Presentation Server (GUI)</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="sap_cs_and_ap_version_by_wmi">
+            <name>SAP Central Services and Application Server version by wmi</name>
+            <description>Sets SAP Central Services and Application Server version attribute for discovered CIs</description>
+            <module>plugins_sap_cs_and_ap_version_by_wmi</module>
+            <class>SAPCSandAPWMIPlugin</class>
+            <qualifiers>
+                <qualifier type="application">SAP ABAP Application Server (Central)</qualifier>
+                <qualifier type="application">SAP ABAP Application Server (Dialog)</qualifier>
+                <qualifier type="application">SAP ABAP Application Server</qualifier>
+                <qualifier type="application">SAP J2EE Central Services</qualifier>
+                <qualifier type="application">SAP ABAP Central Services</qualifier>
+                <qualifier type="application">SAP ITS Manager</qualifier>
+                <qualifier type="application">SAP Presentation Server (GUI)</qualifier>
+                <qualifier type="protocol">wmi</qualifier>
+          </qualifiers>>
+        </plugin>>
+</plugins>
+</package>

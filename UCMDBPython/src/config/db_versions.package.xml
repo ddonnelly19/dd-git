@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+     <plugins>
+        <plugin id="mysql_version_by_shell">
+            <name>MySql version by shell</name>
+            <description>Sets MySQL version attribute for discovered MySQL Server CI</description>
+            <module>plugins_appsignature_dbversion_by_shell</module>
+            <class>MySQLVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">MySQL DB</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">ssh</qualifier> 
+				<qualifier type="protocol">uda</qualifier> 
+				<qualifier type="protocol">telnet</qualifier> 
+            </qualifiers>
+            <dependencies>
+                <module>file_ver_lib</module>
+                <module>mysql_version_by_shell</module>
+            </dependencies>
+        </plugin>
+         <plugin id="oracle_version_by_shell">
+            <name>Oracle version by shell</name>
+            <description>Sets Oracle version attribute for discovered Oracle Server CI</description>
+            <module>plugins_appsignature_dbversion_by_shell</module>
+            <class>OracleVersionShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">Oracle by oracle.exe process</qualifier>
+                <qualifier type="application">Oracle by oracle process Unix</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+                <qualifier type="protocol">ssh</qualifier> 
+                  <qualifier type="protocol">telnet</qualifier> 
+            </qualifiers>
+            <dependencies>
+                <module>file_ver_lib</module>
+                <module>mysql_version_by_shell</module>
+            </dependencies>
+        </plugin>
+         <plugin id="listener_name_version_by_ntcmd">
+            <name>Listener name and version by shell</name>
+            <description>Sets Oracle TNS Listener name and version attribute for discovered CI</description>
+            <module>plugins_appsignature_dbversion_by_shell</module>
+            <class>OracleListenerShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">TNS Listener windows</qualifier>
+                <qualifier type="application">TNS Listener old stile</qualifier>
+                <qualifier type="application">TNS Listener unix</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">ssh</qualifier> 
+				<qualifier type="protocol">uda</qualifier> 
+                <qualifier type="protocol">telnet</qualifier> 
+            </qualifiers>
+            <dependencies>
+                <module>file_ver_lib</module>
+                <module>mysql_version_by_shell</module>
+            </dependencies>
+        </plugin>
+    </plugins>
+</package>

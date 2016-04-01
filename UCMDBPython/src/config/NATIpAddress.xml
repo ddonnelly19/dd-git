@@ -1,0 +1,13 @@
+<!--
+ This XML acts as configuration file to store IP and IP ranges, to handle NAT IP configured for target server
+-->
+<NatIpAddress>
+    <!-- Use tag <IP> to add single IP address
+    <Ip>192.168.1.1</Ip>
+    <Ip>172.0.0.1</Ip>
+    -->
+    <!-- Use tag <IpRange> to add a range IP addresses
+    <IpRange>192.168.2.1-192.168.5.233</IpRange>
+    -->
+</NatIpAddress>
+

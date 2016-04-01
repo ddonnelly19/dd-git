@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+     <plugins>
+        <plugin id="plugin_sap_igs">
+            <name>SAP IGS version by shell</name>
+            <description>Sets SAP IGS version attribute for discovered SAP IGS instance</description>
+            <module>plugin_sap_igs_by_shell</module>
+            <class>SapIgsPlugin</class>
+            <qualifiers>
+                <qualifier type="application">SAP Internet Graphics Service</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier> 
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">powershell</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>entity</module>
+                <module>iteratortools</module>
+                <module>sap</module>
+                <module>sap_discoverer</module>
+            </dependencies>
+        </plugin>
+     </plugins>
+</package>

@@ -1,0 +1,30 @@
+<globallibraries>
+    <library scriptFile="post_import_hooks.py"/>
+    <library scriptFile="logger.py"/>
+    <library scriptFile="ip_addr.py"/>
+    <library scriptFile="shell_interpreter.py"/>
+    <library scriptFile="errorcodes.py"/>
+    <library scriptFile="errorobject.py"/>
+    <library scriptFile="errormessages.py"/>
+    <library scriptFile="dns_resolver.py"/>
+    <library scriptFile="netutils.py"/>
+    <library scriptFile="modeling.py"/>
+    <library scriptFile="shell_execmode.py"/>
+    <library scriptFile="shellutils.py"/>
+    <library scriptFile="dbutils.py"/>
+    <library scriptFile="discoverydbutils.py"/>
+    <library scriptFile="j2eeutils.py"/>
+    <library scriptFile="plugins.py"/>
+    <library scriptFile="wmiutils.py"/>
+    <library scriptFile="resource_locator.py"/>
+    <library scriptFile="snmputils.py"/>
+    <library scriptFile="file_topology.py"/>
+    <library scriptFile="file_info_discoverers.py"/>
+    <library scriptFile="file_system.py"/>
+    <library scriptFile="xmlutils.py"/>
+    <library scriptFile="fptools.py"/>
+    <library scriptFile="entity.py"/>
+    <library scriptFile="regutils.py"/>
+    <library scriptFile="iteratortools.py"/>
+    <library scriptFile="command.py"/>
+</globallibraries>

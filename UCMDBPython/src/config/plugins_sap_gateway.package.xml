@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package
+    parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="sap_gateway">
+            <name>SAP Gateway</name>
+            <description>Determine SAP Gateway instances</description>
+            <module>plugins_sap_virus_scan</module>
+            <class>SapGatewayPlugin</class>
+            <qualifiers>
+                <qualifier type="application">SAP Gateway</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>command</module>
+                <module>entity</module>
+                <module>sap</module>
+                <module>sap_discoverer</module>
+            </dependencies>
+        </plugin>
+    </plugins>
+</package>

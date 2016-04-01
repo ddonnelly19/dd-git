@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="lotus_domino_version_from_exec_file_by_wmi">
+            <name>Lotus Domino Version from Executable File by WMI</name>
+            <description>Plugin discovers Lotus Domino version by querying specific executables for their file versions.</description>
+            <module>plugins_lotus_domino_version_by_wmi</module>
+            <class>LotusDominoVersionFromExecutableByWmiPlugin</class>
+            <qualifiers>
+                <qualifier type="application">IBM Lotus Domino</qualifier>
+                <qualifier type="protocol">wmi</qualifier>
+                <qualifier type="os">Windows</qualifier>
+            </qualifiers>
+        </plugin>
+    </plugins>
+</package>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package
+    parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="weblogic_server_domain_win">
+            <name>Weblogic Server Domain on Win</name>
+            <description>Sets administration domain attribute
+            </description>
+            <module>plugins_weblogic_server_domain</module>
+            <class>WeblogicServerDomainPluginWindows</class>
+            <qualifiers>
+                <qualifier type="application">Weblogic on Windows
+                </qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>fptools</module>
+                <module>j2eeutils</module>
+                <module>protocol</module>
+                <module>iteratortools</module>
+                <module>jmx</module>
+                <module>entity</module>
+                <module>db_platform</module>
+                <module>db_builder</module>
+                <module>db</module>
+                <module>jdbc_url_parser</module>
+                <module>jdbc</module>
+                <module>connection</module>
+                <module>jee_connection</module>
+                <module>jee</module>
+                <module>jms</module>
+                <module>jee_discoverer</module>
+                <module>process_discoverer</module>
+                <module>weblogic</module>
+                <module>weblogic_discoverer</module>
+                <module>weblogic_by_shell</module>
+            </dependencies>
+        </plugin>
+        <plugin id="weblogic_server_domain_unix">
+            <name>Weblogic Server Domain on Unix</name>
+            <description>Sets administration domain attribute
+            </description>
+            <module>plugins_weblogic_server_domain</module>
+            <class>WeblogicServerDomainPluginUnix</class>
+            <qualifiers>
+                <qualifier type="application">Weblogic on Unix</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+                <qualifier type="protocol">ssh</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>fptools</module>
+                <module>j2eeutils</module>
+                <module>protocol</module>
+                <module>iteratortools</module>
+                <module>jmx</module>
+                <module>entity</module>
+                <module>db_platform</module>
+                <module>db_builder</module>
+                <module>db</module>
+                <module>jdbc_url_parser</module>
+                <module>jdbc</module>
+                <module>connection</module>
+                <module>jee_connection</module>
+                <module>jee</module>
+                <module>jms</module>
+                <module>jee_discoverer</module>
+                <module>process_discoverer</module>
+                <module>weblogic</module>
+                <module>weblogic_discoverer</module>
+                <module>weblogic_by_shell</module>
+            </dependencies>
+        </plugin>
+    </plugins>
+</package>

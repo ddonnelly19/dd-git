@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package
+    parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="sap_virus_scan">
+            <name>Virus Scan</name>
+            <description>Determine Virus Scan instances</description>
+            <module>plugins_sap_virus_scan</module>
+            <class>VirusScanPlugin</class>
+            <qualifiers>
+                <qualifier type="application">Virus Scan</qualifier>
+                <qualifier type="protocol">powershell</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>cmdlineutils</module>
+                <module>entity</module>
+                <module>sap</module>
+                <module>sap_discoverer</module>
+                <module>command</module>
+                <module>fptools</module>
+                <module>sap</module>
+            </dependencies>
+        </plugin>
+    </plugins>
+</package>

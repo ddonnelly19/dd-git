@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+ 	<plugins>
+        <plugin id="mssql_server_instances_by_powershell">
+            <name>MSSQL Server Instance by shell</name>
+            <description>Discovers sql server instances using PowerShell</description>
+            <module>plugins_mssql_server_instances</module>
+            <class>MSSQLServerInstancesPlugin</class>
+            <qualifiers>
+                <qualifier type="application">MSSQL DB</qualifier>
+                <qualifier type="protocol">powershell</qualifier>
+            </qualifiers>
+        </plugin>
+	</plugins>
+</package>

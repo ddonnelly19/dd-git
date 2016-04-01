@@ -1,0 +1,12 @@
+<datavalidation parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.ContentDataValidationConfigFile">
+	<!--script name="dataValidator1.py">
+		<library name="validatorLib1.py"/>
+		<library name="validatorLib2.py"/>
+		<library name="validatorLib3.py"/>
+	</script>
+	<script name="dataValidator2.py">
+		<library name="validatorLib4.py"/>
+		<library name="validatorLib5.py"/>
+		<library name="validatorLib6.py"/>
+	</script-->
+</datavalidation>

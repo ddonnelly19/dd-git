@@ -1,0 +1,16 @@
+<agentTypes parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.AgentTypesConfigFile">
+	<agent agentName="DatabaseAgent" className="com.hp.ucmdb.discovery.library.clients.agents.DatabaseAgent"></agent><agent agentName="Ftp" className="com.hp.ucmdb.discovery.probe.services.dynamic.agents.FTPAgent"></agent>
+	<agent agentName="SNMPAgent" className="com.hp.ucmdb.discovery.library.clients.agents.SnmpAgent"></agent>
+	<agent agentName="Telnet" className="com.hp.ucmdb.discovery.library.clients.agents.TelnetAgent"></agent>
+	<agent agentName="SSHAgent" className="com.hp.ucmdb.discovery.library.clients.agents.ssh.SSHAgent"></agent>
+	<agent agentName="NTCmdSession" className="com.hp.ucmdb.discovery.library.clients.agents.NTCmdSessionAgent"></agent>
+	<agent agentName="WmiAgent" className="com.hp.ucmdb.discovery.library.clients.agents.WmiAgent"></agent>
+	<agent agentName="WeblogicJMXAgent" className="com.hp.ucmdb.discovery.library.clients.agents.WeblogicJMXAgent"></agent>
+	<agent agentName="WebsphereJMXAgent" className="com.hp.ucmdb.discovery.library.clients.agents.WebsphereAgent"></agent>
+	<agent agentName="SAPQueryAgent" className="com.hp.ucmdb.discovery.library.clients.agents.sap.SAPQueryAgent"></agent>
+	<agent agentName="SAPJmxAgent" className="com.hp.ucmdb.discovery.library.clients.agents.SAPJmxAgent"></agent>
+	<agent agentName="JBossJMXAgent" className="com.hp.ucmdb.discovery.library.clients.agents.JBossJMXAgent"></agent>
+	<agent agentName="NETLINKS_AGENT" className="com.hp.ucmdb.discovery.probe.services.dynamic.agents.NetlinksAgent"></agent>
+	<agent agentName="UDDIAgent" className="com.hp.ucmdb.discovery.probe.services.dynamic.agents.UDDIAgent"></agent>
+    <agent agentName="as400" className="com.hp.ucmdb.discovery.library.clients.agents.as400.AS400Agent"></agent>
+</agentTypes>

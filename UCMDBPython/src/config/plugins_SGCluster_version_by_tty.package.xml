@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="ssh_sgcluster_version_information">
+            <name>HP Service Guard Cluster Version Information by SSH</name>
+            <description>Sets cluster version information by SSH</description>
+            <module>plugin_sgcluster_ssh_version</module>
+            <class>SGClusterInformationPluginBySSH</class>
+            <qualifiers>
+                <qualifier type="protocol">ssh</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+                <qualifier type="protocol">telnet</qualifier>
+				<qualifier type="os">HP-UX</qualifier>
+				<qualifier type="application">HP Service Guard Cluster SW</qualifier>
+            </qualifiers>
+        </plugin>
+    </plugins>
+</package>

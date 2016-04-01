@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package
+    parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="emccluster">
+            <name>EMC Cluster</name>
+            <description>Fix EMC Cluster Process on Linux, which reports space instead of slash</description>
+            <module>plugin_autostart_fixprocess</module>
+            <class>EmcAutoStartPlugin</class>
+            <qualifiers>
+                <qualifier type="application">EMC Autostart on Linux Broken</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>modeling</module>
+                <module>entity</module>
+                <module>process</module>
+            </dependencies>
+        </plugin>
+    </plugins>
+</package>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="ntcmd_file_version_information">
+            <name>File Version Information by NTCMD</name>
+            <description>Sets file version information by Windows shell</description>
+            <module>plugin_ntcmd_file_version</module>
+            <class>FileVersionInformationPluginByNTCMD</class>
+            <qualifiers>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+				<qualifier type="os">Windows</qualifier>
+				<qualifier type="application">PostgreSQL</qualifier>
+				<qualifier type="application">IBM DB2</qualifier>
+				<qualifier type="application">Symantec pcAnywhere</qualifier>
+				<qualifier type="application">Symantec pcAnywhere Gateway</qualifier>
+				<qualifier type="application">Cisco VPN Client</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="wmi_file_version_information">
+            <name>File Version Information by WMI</name>
+            <description>Sets file version information by WMI</description>
+            <module>plugin_wmi_file_version</module>
+            <class>FileVersionInformationPluginByWMI</class>
+            <qualifiers>
+                <qualifier type="protocol">wmi</qualifier>
+				<qualifier type="os">Windows</qualifier>
+				<qualifier type="application">PostgreSQL</qualifier>
+				<qualifier type="application">IBM DB2</qualifier>
+				<qualifier type="application">Symantec pcAnywhere</qualifier>
+				<qualifier type="application">Symantec pcAnywhere Gateway</qualifier>
+				<qualifier type="application">Cisco VPN Client</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="tty_file_version_information">
+            <name>File Version Information by SSH</name>
+            <description>Sets file version information by ssh</description>
+            <module>plugin_tty_file_version</module>
+            <class>FileVersionInformationPluginBySSH</class>
+            <qualifiers>
+                <qualifier type="protocol">ssh</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+				<qualifier type="protocol">telnet</qualifier>
+				<qualifier type="os">Sun</qualifier>
+				<qualifier type="os">Linux</qualifier>
+				<qualifier type="application">PostgreSQL</qualifier>
+				<qualifier type="application">IBM DB2</qualifier>
+				<qualifier type="application">Cisco VPN Client</qualifier>
+				<qualifier type="application">FileZilla FTP Server</qualifier>
+                <qualifier type="application">IBM WebSphere MQ</qualifier>
+                <qualifier type="application">Pure FTP Daemon</qualifier>
+                <qualifier type="application">Pro FTP Daemon</qualifier>
+                <qualifier type="application">Very Secure FTP Daemon</qualifier>
+            </qualifiers>
+        </plugin>
+    </plugins>
+</package>

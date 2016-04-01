@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package
+    parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="db2_instances_on_windows">
+            <name>Db2 instances on Windows</name>
+            <description>Determines db2 databases on Windows host</description>
+            <module>plugins_db2_instances</module>
+            <class>Db2WindowsPlugin</class>
+            <qualifiers>
+                <qualifier type="application">IBM DB2 on Windows</qualifier>
+                <qualifier type="protocol">powershell</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+            </qualifiers>
+            <dependencies>
+            	<module>host_base_parser</module>
+            	<module>host_topology</module>
+            	<module>db</module>
+            	<module>db_builder</module>
+            	<module>db_platform</module>
+            	<module>db2_pyarg_validator</module>
+            	<module>db2_host</module>
+            	<module>db2_discoverer</module>
+            	<module>db2_model</module>
+            	<module>db2_topology</module>
+            	<module>db2_base_parser</module>
+            	<module>db2_base_shell_discoverer</module>
+            	<module>db2_base_win_shell_discoverer</module>
+            	<module>db2_base_unix_shell_discoverer</module>
+            	<module>db2_unix_shell_v9x_discoverer</module>
+            	<module>db2_win_shell_v9x_discoverer</module>
+            	<module>db2_unix_shell_discoverer</module>
+            	<module>db2_win_shell_discoverer</module>
+            	<module>db2_win_reg_base_discoverer</module>
+            	<module>db2_win32_reg_v9x_discoverer</module>
+            	<module>db2_win64_reg_v9x_discoverer</module>
+            	<module>db2_win_reg_discoverer</module>
+            </dependencies>
+        </plugin>
+         <plugin id="db2_instances_on_unix">
+            <name>Db2 instances on Unix</name>
+            <description>Determines db2 databases on Unix host</description>
+            <module>plugins_db2_instances</module>
+            <class>Db2UnixPlugin</class>
+            <qualifiers>
+                <qualifier type="application">IBM DB2 on Unix</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+            </qualifiers>
+            <dependencies>
+            	<module>host_base_parser</module>
+            	<module>host_topology</module>
+            	<module>db</module>
+            	<module>db_builder</module>
+            	<module>db_platform</module>
+            	<module>db2_pyarg_validator</module>
+            	<module>db2_host</module>
+            	<module>db2_discoverer</module>
+            	<module>db2_model</module>
+            	<module>db2_topology</module>
+            	<module>db2_base_parser</module>
+            	<module>db2_base_shell_discoverer</module>
+            	<module>db2_base_win_shell_discoverer</module>
+            	<module>db2_base_unix_shell_discoverer</module>
+            	<module>db2_unix_shell_v9x_discoverer</module>
+            	<module>db2_win_shell_v9x_discoverer</module>
+            	<module>db2_unix_shell_discoverer</module>
+            	<module>db2_win_shell_discoverer</module>
+            	<module>db2_win_reg_base_discoverer</module>
+            	<module>db2_win32_reg_v9x_discoverer</module>
+            	<module>db2_win64_reg_v9x_discoverer</module>
+            	<module>db2_win_reg_discoverer</module>
+            </dependencies>
+        </plugin>
+    </plugins>
+</package>

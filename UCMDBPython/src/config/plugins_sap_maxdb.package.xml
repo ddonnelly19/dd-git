@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package
+    parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="sap_maxdb_on_unix">
+            <name>Maxdb on Unix</name>
+            <description>Determine Maxdb instances on Unix</description>
+            <module>plugins_sap_maxdb</module>
+            <class>UnixMaxdbPlugin</class>
+            <qualifiers>
+                <qualifier type="application">Maxdb on Unix</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+            </qualifiers>
+
+            <dependencies>
+                <module>cmdlineutils</module>
+                <module>process</module>
+                <module>applications</module>
+                <module>maxdb_base_parser</module>
+                <module>maxdb_base_discoverer</module>
+                <module>maxdb_discoverer</module>
+            </dependencies>
+        </plugin>
+
+         <plugin id="sap_maxdb_on_win">
+            <name>Maxdb on Windows</name>
+            <description>Determine Maxdb instances on Windows</description>
+            <module>plugins_sap_maxdb</module>
+            <class>WinMaxdbPlugin</class>
+            <qualifiers>
+                <qualifier type="application">Maxdb on Windows</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>cmdlineutils</module>
+                <module>process</module>
+                <module>applications</module>
+                <module>maxdb_base_parser</module>
+                <module>maxdb_base_discoverer</module>
+                <module>maxdb_discoverer</module>
+            </dependencies>
+        </plugin>
+
+        <plugin id="sap_maxdb_by_snmp">
+            <name>Maxdb by SNMP</name>
+            <description>Determine validity of Maxdb instance via SNMP, since Unix-like OS might have a running os kernel with same name</description>
+            <module>plugins_sap_maxdb</module>
+            <class>SnmpMaxdbPlugin</class>
+            <qualifiers>
+                <qualifier type="application">Maxdb on Unix</qualifier>
+                <qualifier type="protocol">snmp</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>cmdlineutils</module>
+                <module>process</module>
+                <module>applications</module>
+                <module>maxdb_base_parser</module>
+                <module>maxdb_base_discoverer</module>
+                <module>maxdb_discoverer</module>
+            </dependencies>
+        </plugin>
+
+    </plugins>
+</package>

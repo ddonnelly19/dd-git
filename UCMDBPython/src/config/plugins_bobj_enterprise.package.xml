@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package
+    parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="bobj_enterprise">
+            <name>BO Enterprise</name>
+            <description>Determine Business Objects Enterprise Component</description>
+            <module>plugins_bobj_enterprise</module>
+            <class>BobjEnterprisePlugin</class>
+            <qualifiers>
+                <qualifier type="application">BO Enterprise</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powershell</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>entity</module>
+            </dependencies>
+        </plugin>
+    </plugins>
+</package>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+     <plugins>
+        <plugin id="plugin_sap_host_agent">
+            <name>SAP Host Agent version by shell</name>
+            <description>Sets SAP Host Agent version attribute for discovered SAP Host Agent instance</description>
+            <module>plugin_sap_host_agent</module>
+            <class>SapHostAgentPlugin</class>
+            <qualifiers>
+                <qualifier type="application">Host Agent</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier> 
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">powershell</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+            </qualifiers>
+        </plugin>
+     </plugins>
+</package>

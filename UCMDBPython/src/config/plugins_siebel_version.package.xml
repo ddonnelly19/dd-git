@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="tty_siebel_version_information">
+            <name>Siebel Version Information by SSH</name>
+            <description>Sets Siebel version information by ssh</description>
+            <module>plugin_siebel_by_tty</module>
+            <class>SiebelVersionInformationPluginBySSH</class>
+            <qualifiers>
+                <qualifier type="protocol">ssh</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+				<qualifier type="protocol">telnet</qualifier>
+				<qualifier type="os">Sun</qualifier>
+				<qualifier type="os">Linux</qualifier>
+				<qualifier type="application">Siebel Server</qualifier>
+				<qualifier type="application">Siebel Gateway Name Server</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="ntcmd_siebel_version_information">
+            <name>Siebel Version Information by NTCMD</name>
+            <description>Sets Siebel version information by Windows shell</description>
+            <module>plugin_siebel_by_ntcmd</module>
+            <class>SiebelVersionInformationPluginByNTCMD</class>
+            <qualifiers>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+				<qualifier type="os">Windows</qualifier>
+				<qualifier type="application">Siebel Server</qualifier>
+				<qualifier type="application">Siebel Gateway Name Server</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="wmi_siebel_version_information">
+            <name>Siebel Version Information by WMMI</name>
+            <description>Sets Siebel version information by WMI</description>
+            <module>plugin_siebel_by_wmi</module>
+            <class>SiebelVersionInformationPluginByWMI</class>
+            <qualifiers>
+                <qualifier type="protocol">wmi</qualifier>
+				<qualifier type="os">Windows</qualifier>
+				<qualifier type="application">Siebel Server</qualifier>
+				<qualifier type="application">Siebel Gateway Name Server</qualifier>
+            </qualifiers>
+        </plugin>
+
+    </plugins>
+</package>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package
+    parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="sap_trex">
+            <name>SAP TREX</name>
+            <description>Determine TREX instance configuration information</description>
+            <module>plugins_sap_trex</module>
+            <class>ShellBasedTrexPlugin</class>
+            <qualifiers>
+                <qualifier type="application">SAP TREX Instance</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+            </qualifiers>
+            <dependencies>
+				<module>entity</module>
+				<module>fptools</module>
+				<module>command</module>
+				<module>sap</module>
+				<module>sap_discoverer</module>
+                <module>sap_trex</module>
+                <module>sap_trex_discoverer</module>
+            </dependencies>
+        </plugin>
+    </plugins>
+</package>

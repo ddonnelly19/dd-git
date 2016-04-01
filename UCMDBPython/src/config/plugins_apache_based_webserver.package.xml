@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="apache_based_webserver">
+            <name>Model adjustments for Apache-based WebServer</name>
+            <description>Plug-in set software with strong type if server's configuration file is found. Also deals with IBM HTTP server detection.</description>
+            <module>plugin_apache_based_webserver</module>
+            <class>ApacheBasedWebServerPlugin</class>
+            <qualifiers>
+                <qualifier type="application">Apache WebServer</qualifier>
+                <qualifier type="protocol">ssh</qualifier> 
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+            </qualifiers>
+            <dependencies>
+                <module>Apache</module>
+                <module>file_ver_lib</module>
+            </dependencies>
+        </plugin>
+    </plugins>
+</package>

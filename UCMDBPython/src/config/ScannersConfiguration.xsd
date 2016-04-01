@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com) by Genadi Rabinovich (Mercury Interactive) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="scanners-configuration">
+		<xs:annotation>
+			<xs:documentation>Comment describing your root element</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="platform" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="parserClassName" type="xs:string" use="required" fixed="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.platform.scanners.ScannersByPlatformConfigurationFile"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="platform">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="scanner-deployment"/>
+				<xs:element ref="scanner-upgrade" minOccurs="0"/>
+				<xs:element ref="scanner-execution" minOccurs="0"/>
+				<xs:element ref="platform-recognition"/>
+				<xs:element ref="os-commands" minOccurs="0"/>
+				<xs:element ref="additional-properties" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="display-name" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="scanner-deployment">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="basedir-name" minOccurs="0"/>
+				<xs:element ref="file-separator" minOccurs="0"/>
+				<xs:element ref="basedir" minOccurs="0"/>
+				<xs:element ref="scanner-remote-executable-name" minOccurs="0"/>
+				<xs:element ref="scanner-remote-executable-path" minOccurs="0"/>
+				<xs:element ref="scanner-remote-configfile-name" minOccurs="0"/>
+				<xs:element ref="scanner-remote-configfile-path" minOccurs="0"/>
+				<xs:element ref="scanner-executable" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="scanner-pre-scan-script-local-file" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="scanner-post-scan-script-local-file" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="scanner-pre-scan-script-remote-file" minOccurs="0"/>
+                <xs:element ref="scanner-post-scan-script-remote-file" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="scanner-upgrade">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="scanner-check-version-command" minOccurs="0"/>
+				<xs:element ref="scanner-check-version-pattern" minOccurs="0"/>
+				<xs:element ref="scanner-version" minOccurs="0"/>
+				<xs:element ref="pre-upgrade-commands" minOccurs="0"/>
+				<xs:element ref="post-upgrade-commands" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="scanner-execution">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="run-scanner-cmd"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="platform-recognition">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="platform-identification-commands" minOccurs="0"/>
+				<xs:element ref="platform-aliases" minOccurs="0"/>
+				<xs:element ref="platform-architectures" minOccurs="0"/>
+				<xs:element ref="platform-default-architecture" minOccurs="0"/>
+                <xs:element ref="platform-unsupported-architectures" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="additional-properties">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="property" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="dir"/>
+	<xs:element name="basedir-name">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="dir"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="basedir">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="dir"/>
+			</xs:sequence>
+			<xs:attribute name="architecture" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="executable"/>
+	<xs:element name="scanner-remote-executable-name">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="executable"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="separator"/>
+	<xs:element name="file-separator">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="separator"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="path"/>
+	<xs:element name="scanner-remote-executable-path">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="path"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="name"/>
+	<xs:element name="scanner-remote-configfile-name">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="name"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="scanner-pre-scan-script-local-file">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="name"/>
+			</xs:sequence>
+            <xs:attribute name="architecture" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="scanner-post-scan-script-local-file">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="name"/>
+			</xs:sequence>
+            <xs:attribute name="architecture" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="scanner-pre-scan-script-remote-file">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="name"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="scanner-post-scan-script-remote-file">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="name"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="scanner-remote-configfile-path">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="path"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="command"/>
+	<xs:element name="scanner-check-version-command">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="command"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="pattern"/>
+	<xs:element name="scanner-check-version-pattern">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="pattern"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="version"/>
+	<xs:element name="scanner-version">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="version"/>
+			</xs:sequence>
+			<xs:attribute name="architecture" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="pre-upgrade-commands">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="command" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="architecture" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="post-upgrade-commands">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="command" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="architecture" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="rename-command">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="command"/>
+				<xs:element ref="parameter" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="architecture" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="copy-command">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="command"/>
+				<xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="architecture" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="parameter"/>
+	<xs:element name="delete-command">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="command"/>
+				<xs:element ref="parameter" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="architecture" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="chmod-command">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="command"/>
+				<xs:element ref="parameter" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="os-commands">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="delete-command"/>
+				<xs:element ref="rename-command"/>
+				<xs:element ref="copy-command"/>
+				<xs:element ref="chmod-command"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="run-scanner-cmd">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="command"/>
+			</xs:sequence>
+			<xs:attribute name="architecture" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="platform-identification-commands">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="command" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="property">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="property-value"/>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="architecture" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="property-value"/>
+	<xs:element name="scanner-executable">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="executable"/>
+			</xs:sequence>
+			<xs:attribute name="architecture" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="alias"/>
+	<xs:element name="platform-aliases">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="alias" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="platform-default-architecture">
+		<xs:complexType>
+			<xs:attribute name="display-name" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="architecture">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attribute name="display-name" type="xs:string" use="required"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="platform-architectures">
+		<xs:complexType>
+			<xs:sequence>
+                <xs:element ref="architecture" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="default" type="xs:string" use="optional"/>
+        </xs:complexType>
+	</xs:element>
+    <xs:element name="platform-unsupported-architectures">
+        <xs:complexType>
+      	    <xs:sequence>
+      			<xs:element ref="alias" maxOccurs="unbounded"/>
+      		</xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+    <plugins>
+        <plugin id="microsoft_mq">
+            <name>Microsoft MQ</name>
+            <description>Sets version and other attributes if available</description>
+            <module>plugin_microsoft_mq</module>
+            <class>MicrosoftMqByNTCMD</class>
+            <qualifiers>
+                <qualifier type="application">Microsoft MQ</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+            </qualifiers>
+            <dependencies>
+                <module>regutils</module>
+            </dependencies>
+        </plugin>
+     </plugins>
+</package>

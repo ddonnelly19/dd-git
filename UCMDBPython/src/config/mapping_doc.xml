@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation=".\mapping_schema.xsd" parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.CiMappingConfigFile">
+	<!-- Each mapping may contain the only CI mapping definition -->
+	<ci type="[CI type name here]">
+		<!-- Each 'map' element describes mapping between one CI attribute and one external source item.
+		'ci' element should contain at least one 'map' element -->
+		<map>
+			<!-- CI attribute name -->
+			<attribute>[ci attribute name]</attribute>
+			<!-- Column represents external source item, e.g. column in database table or property in '.properties' file.
+			Attribute 'type' is optional and is 'string' by default.
+			Use converters mechanism in order to convert column value to appropriate CI attribute value -->
+			<column type="optional_type">[name of external source item, e.g. column name or CSV file column index]</column>
+			<!-- Converter which is used to convert data taken from external source to appropriate value of CI attribute.
+				Value of this element is simply method name in Python script which should be invoked in order to convert data.
+				Module name is Python script name (without '.py') -->
+			<converter module="[Python script name, e.g. 'import_converters']">[method name, e.g. 'stringToDate']</converter>
+		</map>
+	</ci>
+</mappings>

@@ -1,0 +1,63 @@
+<MsServerTypes parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.MsDomainsServerTypes">
+	<!-- All workstations  -->
+	<MsServerType value="1" name="WORKSTATION" calc="false"/>
+	<!-- All servers  -->
+	<MsServerType value="2" name="SERVER" calc="false"/>
+	<!--Any server running with Microsoft SQL Server  -->
+	<MsServerType value="4" name="SQLSERVER" calc="true"/>
+	<!-- Primary domain controller -->
+	<MsServerType value="8" name="DOMAIN_CTRL" calc="false"/>
+	<!-- Backup domain controller  -->
+	<MsServerType value="10" name="DOMAIN_BAKCTRL" calc="false"/>
+	<!-- Server running the Timesource service -->
+	<MsServerType value="20" name="TIME_SOURCE" calc="false"/>
+	<!-- Apple File Protocol servers  -->
+	<MsServerType value="40" name="AFP" calc="false"/>
+	<!--  Novell servers -->
+	<MsServerType value="80" name="NOVELL" calc="false"/>
+	<!-- LAN Manager 2.x domain member  -->
+	<MsServerType value="100" name="DOMAIN_MEMBER" calc="false"/>
+	<!-- Server sharing print queue -->
+	<MsServerType value="200" name="PRINTQ_SERVER" calc="false"/>
+	<!--Server running dial-in service  -->
+	<MsServerType value="400" name="DIALIN_SERVER" calc="false"/>
+	<!--Xenix server  -->
+	<MsServerType value="800" name="XENIX_SERVER" calc="false"/>
+	<!-- Windows NT/Windows 2000 workstation or server  -->
+	<MsServerType value="1000" name="NT" calc="false"/>
+	<!--Server running Windows for Workgroups  -->
+	<MsServerType value="2000" name="WFW" calc="false"/>
+	<!-- Microsoft File and Print for NetWare -->
+	<MsServerType value="4000" name="SERVER_MFPN" calc="false"/>
+	<!-- Windows NT/Windows 2000 server that is not a domain controller  -->
+	<MsServerType value="8000" name="SERVER_NT" calc="false"/>
+	<!-- Server that can run the browser service  -->
+	<MsServerType value="10000" name="POTENTIAL_BROWSER" calc="false"/>
+	<!--Server running a browser service as backup  -->
+	<MsServerType value="20000" name="BACKUP_BROWSER" calc="false"/>
+	<!-- Server running the master browser service  -->
+	<MsServerType value="40000" name="MASTER_BROWSER" calc="false"/>
+	<!-- Server running the domain master browser  -->
+	<!-- -->
+	<MsServerType value="80000" name="DOMAIN_MASTER" calc="false"/>
+	<!-- -->
+	<MsServerType value="100000" name="SERVER_OSF" calc="false"/>
+	<!-- -->
+	<MsServerType value="200000" name="SERVER_VMS" calc="false"/>
+	<!-- Windows 95 or later -->
+	<MsServerType value="400000" name="WINDOWS" calc="false"/>
+	<!-- -->
+	<MsServerType value="800000" name="DFS" calc="false"/>
+	<!-- Server clusters available in the domain -->
+	<MsServerType value="1000000" name="CLUSTER_NT" calc="false"/>
+	<!-- -->
+	<MsServerType value="10000000" name="DCE" calc="false"/>
+	<!-- -->
+	<MsServerType value="20000000" name="ALTERNATE_XPORT" calc="false"/>
+	<!--Servers maintained by the browser. See the following Remarks section.  -->
+	<MsServerType value="40000000" name="LOCAL_LIST_ONLY" calc="false"/>
+	<!--  Primary domain  -->
+	<MsServerType value="80000000" name="DOMAIN_ENUM" calc="false"/>
+	<!--All servers  -->
+	<MsServerType value="FFFFFFFF" name="ALL" calc="false"/>
+</MsServerTypes>

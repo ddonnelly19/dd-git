@@ -1,0 +1,355 @@
+<scanners-configuration parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.platform.scanners.ScannersByPlatformConfigurationFile" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./ScannersConfiguration.xsd">
+	<!--All missed properties for specific platform will be taken from "all" platform.-->
+	<!--Each property can be specified for platform per architecture-->
+	<!--
+		This section dedicated to scanner deployment.
+	-->
+	<platform name="all">
+		<scanner-deployment>
+			<basedir-name>
+				<dir>discagnt</dir>
+			</basedir-name>
+			<file-separator>
+				<separator>/</separator>
+			</file-separator>
+			<!-- Agents option which specifies where to place scanner and scanner configuration file. Used for UD Agent compatibility-->
+			<basedir>
+				<dir>~/.VAR{basedir-name}VAR{file-separator}</dir>
+			</basedir>
+			<!-- Scanner executable name on remote machine-->
+			<scanner-remote-executable-name>
+				<executable>scan</executable>
+			</scanner-remote-executable-name>
+			<!-- Full path of scanner executable -->
+			<scanner-remote-executable-path>
+				<path>VAR{basedir}VAR{scanner-remote-executable-name}</path>
+			</scanner-remote-executable-path>
+			<!-- Scanner executable name on remote machine-->
+			<scanner-remote-configfile-name>
+				<name>scan.cxz</name>
+			</scanner-remote-configfile-name>
+			<!-- Full path of scanner configuration file -->
+			<scanner-remote-configfile-path>
+				<path>VAR{basedir}VAR{scanner-remote-configfile-name}</path>
+			</scanner-remote-configfile-path>
+            <scanner-pre-scan-script-remote-file>
+                <name>prescan.sh</name>
+            </scanner-pre-scan-script-remote-file>
+            <scanner-post-scan-script-remote-file>
+                <name>postscan.sh</name>
+            </scanner-post-scan-script-remote-file>
+		</scanner-deployment>
+		<!-- This section defines properties for scanner upgrade process.
+			Based on scanner-check-version property we get scanner banner and using
+			scanner-check-version-pattern property we can obtain scanner version on remote machine
+			and compare it with scanner-version property.
+			Use pre-upgrade-commands and post-upgrade-commands properties for execution commands
+			before and after upgrade.
+		-->
+		<scanner-upgrade>
+			<!-- Commands to be executed before scanner upgrade-->
+			<pre-upgrade-commands>
+				<command>mkdir VAR{basedir}</command>
+			</pre-upgrade-commands>
+			<!-- Commands to be executed after scanner upgrade-->
+			<post-upgrade-commands>
+				<command>chmod 600 VAR{scanner-remote-configfile-path}</command>
+				<command>chmod 700 VAR{scanner-remote-executable-path}</command>
+			</post-upgrade-commands>
+		</scanner-upgrade>
+		<!--
+			This section specifies command for running scanner.
+		-->
+		<scanner-execution>
+			<!-- Command for running scanner. In script we first execute "cd BASEDIR" -->
+			<run-scanner-cmd>
+				<command>nohup sh -c '.VAR{file-separator}VAR{scanner-remote-executable-name} -home:VAR{basedir}.. -cfg:VAR{scanner-remote-configfile-name} -l:local.xsf -appliance &amp;';  echo ''; sleep 5</command>
+			</run-scanner-cmd>
+		</scanner-execution>
+		<!--
+			This section defined properties used for platform and architecture identification.
+			platform-identification-command - which command should be executed by client.
+			Based on the output of this command we can identify platform and architecture
+			using platform-aliases and platform-architectures properties.
+		-->
+		<platform-recognition>
+			<!-- Commands to identify platform and architecture -->
+			<platform-identification-commands>
+                <command>ver</command>
+                <command>reg query "HKLM\System\CurrentControlSet\Control\Session Manager\Environment" /v PROCESSOR_ARCHITECTURE</command>
+                <command>echo BREAKOP4WIN</command>
+                <command>uname -s</command>
+                <command>uname -p</command>
+                <command>uname -m</command>
+            </platform-identification-commands>
+		</platform-recognition>
+		<os-commands>
+			<delete-command>
+				<command>rm</command>
+				<parameter>-f</parameter>
+			</delete-command>
+			<rename-command>
+				<command>mv</command>
+			</rename-command>
+			<copy-command>
+				<command>cp</command>
+			</copy-command>
+			<chmod-command>
+				<command>chmod</command>
+				<parameter>640</parameter>
+			</chmod-command>
+		</os-commands>
+		<additional-properties>
+			<property name="property_name1" architecture="sparc">
+				<property-value>property_value1</property-value>
+			</property>
+			<property name="property_name2">
+				<property-value>property_value2</property-value>
+			</property>
+		</additional-properties>
+	</platform>
+	<platform name="windows" display-name="Windows">
+		<scanner-deployment>
+			<file-separator>
+				<separator>\</separator>
+			</file-separator>
+			<!-- Agents option which specifies where to place scanner and scanner configuration file. Used for UD Agent compatibility
+				Currently it is current directory-->
+			<basedir>
+				<dir>%SystemRoot%VAR{file-separator}</dir>
+			</basedir>
+			<!-- Scanner executable name on remote machine-->
+			<scanner-remote-executable-name>
+				<executable>scan.exe</executable>
+			</scanner-remote-executable-name>
+			<!-- Scanner executable for this platform -->
+            <scanner-executable architecture="x86">
+                <executable>scanwin-x86.exe</executable>
+            </scanner-executable>
+            <scanner-executable architecture="amd64">
+                <executable>scanwin-x64.exe</executable>
+            </scanner-executable>
+            <scanner-pre-scan-script-local-file>
+                <name>win32-x86.prescan.cmd</name>
+            </scanner-pre-scan-script-local-file>
+            <scanner-post-scan-script-local-file>
+                <name>win32-x86.postscan.cmd</name>
+            </scanner-post-scan-script-local-file>
+            <scanner-pre-scan-script-remote-file>
+                <name>prescan.cmd</name>
+            </scanner-pre-scan-script-remote-file>
+            <scanner-post-scan-script-remote-file>
+                <name>postscan.cmd</name>
+            </scanner-post-scan-script-remote-file>
+		</scanner-deployment>
+		<scanner-upgrade>
+			<!-- Commands to be executed after scanner upgrade-->
+			<post-upgrade-commands/>
+		</scanner-upgrade>
+		<scanner-execution>
+			<!-- Command for running scanner -->
+			<run-scanner-cmd>
+				<!-- Command for running scanner. In script we first execute "cd BASEDIR" -->
+				<command>start .VAR{file-separator}VAR{scanner-remote-executable-name} -cfg:VAR{scanner-remote-configfile-name} -l:local.xsf -appliance</command>
+			</run-scanner-cmd>
+		</scanner-execution>
+		<platform-recognition>
+			<platform-aliases>
+				<alias>windows</alias>
+				<alias>winnt</alias>
+				<alias>cygwin</alias>
+			</platform-aliases>
+            <platform-architectures default="x86">
+                <architecture display-name="x86">x86</architecture>
+                <architecture display-name="x64">amd64</architecture>
+            </platform-architectures>
+			<platform-default-architecture display-name="x86" />
+		</platform-recognition>
+		<os-commands>
+			<delete-command>
+				<command>del</command>
+			</delete-command>
+			<rename-command>
+				<command>move</command>
+			</rename-command>
+			<!--On windows we want to copy hidden files (/H) and suppress confirmation (/Y) and override read-only files (/R)-->
+			<copy-command>
+				<command>xcopy</command>
+				<parameter>/H</parameter>
+				<parameter>/Y</parameter>
+				<parameter>/R</parameter>
+			</copy-command>
+			<chmod-command>
+				<command>attrib</command>
+				<parameter>-R</parameter>
+				<parameter>-S</parameter>
+				<parameter>-H</parameter>
+			</chmod-command>
+		</os-commands>
+	</platform>
+    <platform name="unix" display-name="All Unix">
+        <scanner-deployment>
+            <scanner-pre-scan-script-local-file>
+                <name>all-unix.prescan.sh</name>
+            </scanner-pre-scan-script-local-file>
+            <scanner-post-scan-script-local-file>
+                <name>all-unix.postscan.sh</name>
+            </scanner-post-scan-script-local-file>
+        </scanner-deployment>
+        <platform-recognition/>
+    </platform>
+	<platform name="solaris" display-name="Solaris">
+		<scanner-deployment>
+			<basedir>
+				<dir>$HOME/.VAR{basedir-name}VAR{file-separator}</dir>
+			</basedir>
+			<!-- Scanner executable for this platform -->
+			<scanner-executable architecture="sparc">
+				<executable>scansolaris-sparc</executable>
+			</scanner-executable>
+			<scanner-executable architecture="i86pc">
+				<executable>scansolaris-x86</executable>
+			</scanner-executable>
+            <scanner-pre-scan-script-local-file architecture="sparc">
+                <name>solaris-sparc.prescan.sh</name>
+            </scanner-pre-scan-script-local-file>
+            <scanner-pre-scan-script-local-file architecture="i86pc">
+                <name>solaris-x86.prescan.sh</name>
+            </scanner-pre-scan-script-local-file>
+            <scanner-post-scan-script-local-file architecture="sparc">
+                <name>solaris-sparc.postscan.sh</name>
+            </scanner-post-scan-script-local-file>
+            <scanner-post-scan-script-local-file architecture="i86pc">
+                <name>solaris-x86.postscan.sh</name>
+            </scanner-post-scan-script-local-file>
+		</scanner-deployment>
+		<platform-recognition>
+            <platform-identification-commands>
+				<command>uname -s</command>
+				<command>uname -m</command>
+			</platform-identification-commands>
+			<platform-aliases>
+				<alias>solaris</alias>
+				<alias>sunos</alias>
+			</platform-aliases>
+			<platform-architectures default="i86pc">
+				<architecture display-name="SPARC">sparc</architecture>
+				<architecture display-name="x86">i86pc</architecture>
+			</platform-architectures>
+		</platform-recognition>
+	</platform>
+	<platform name="macosx" display-name="Mac OS X">
+		<scanner-deployment>
+			<!-- Scanner executable for this platform -->
+			<scanner-executable architecture="i386">
+				<executable>scanmacosx-x86</executable>
+			</scanner-executable>
+            <scanner-pre-scan-script-local-file architecture="i386">
+                <name>macosx-x86.prescan.sh</name>
+            </scanner-pre-scan-script-local-file>
+            <scanner-post-scan-script-local-file architecture="i386">
+                <name>macosx-x86.postscan.sh</name>
+            </scanner-post-scan-script-local-file>
+		</scanner-deployment>
+		<platform-recognition>
+			<platform-aliases>
+				<alias>darwin</alias>
+				<alias>macintosh</alias>
+			</platform-aliases>
+			<platform-architectures default="i386">
+				<architecture display-name="x86">i386</architecture>
+			</platform-architectures>
+		</platform-recognition>
+	</platform>
+	<platform name="linux" display-name="Linux">
+		<scanner-deployment>
+			<!-- Scanner executable for this platform -->
+			<scanner-executable architecture="i686">
+				<executable>scanlinux-x86</executable>
+			</scanner-executable>
+			<scanner-executable architecture="x86_64">
+				<executable>scanlinux-x64</executable>
+			</scanner-executable>
+            <scanner-pre-scan-script-local-file architecture="i686">
+                <name>linux-x86.prescan.sh</name>
+            </scanner-pre-scan-script-local-file>
+            <scanner-pre-scan-script-local-file architecture="x86_64">
+                <name>linux-x64.prescan.sh</name>
+            </scanner-pre-scan-script-local-file>
+            <scanner-post-scan-script-local-file architecture="i686">
+                <name>linux-x86.postscan.sh</name>
+            </scanner-post-scan-script-local-file>
+            <scanner-post-scan-script-local-file architecture="x86_64">
+                <name>linux-x64.postscan.sh</name>
+            </scanner-post-scan-script-local-file>
+		</scanner-deployment>
+		<platform-recognition>
+			<platform-aliases>
+				<alias>linux</alias>
+			</platform-aliases>
+			<platform-architectures default="x86">
+				<architecture display-name="x86">i686</architecture>
+				<architecture display-name="x64">x86_64</architecture>
+			</platform-architectures>
+            <platform-unsupported-architectures>
+                <alias>ia64</alias>
+            </platform-unsupported-architectures>
+		</platform-recognition>
+	</platform>
+	<platform name="hpux" display-name="HP-UX">
+		<scanner-deployment>
+			<!-- Scanner executable for this platform -->
+			<scanner-executable architecture="ia64">
+				<executable>scanhpux-ia64</executable>
+			</scanner-executable>
+			<scanner-executable architecture="hppa">
+				<executable>scanhpux-hppa</executable>
+			</scanner-executable>
+            <scanner-pre-scan-script-local-file architecture="ia64">
+                <name>hpux-ia64.prescan.sh</name>
+            </scanner-pre-scan-script-local-file>
+            <scanner-pre-scan-script-local-file architecture="hppa">
+                <name>hpux-hppa.prescan.sh</name>
+            </scanner-pre-scan-script-local-file>
+            <scanner-post-scan-script-local-file architecture="ia64">
+                <name>hpux-ia64.postscan.sh</name>
+            </scanner-post-scan-script-local-file>
+            <scanner-post-scan-script-local-file architecture="hppa">
+                <name>hpux-hppa.postscan.sh</name>
+            </scanner-post-scan-script-local-file>
+		</scanner-deployment>
+		<platform-recognition>
+            <platform-identification-commands>
+				<command>uname -s</command>
+				<command>uname -m</command>
+			</platform-identification-commands>
+			<platform-aliases>
+				<alias>hpux</alias>
+				<alias>hp-ux</alias>
+			</platform-aliases>
+			<platform-architectures default="hppa">
+				<architecture display-name="ia64">ia64</architecture>
+				<architecture display-name="HPPA">hppa</architecture>
+			</platform-architectures>
+		</platform-recognition>
+	</platform>
+	<platform name="aix" display-name="AIX">
+		<scanner-deployment>
+			<scanner-executable>
+				<executable>scanaix-ppc</executable>
+			</scanner-executable>
+            <scanner-pre-scan-script-local-file>
+                <name>aix-ppc.prescan.sh</name>
+            </scanner-pre-scan-script-local-file>
+            <scanner-post-scan-script-local-file>
+                <name>aix-ppc.postscan.sh</name>
+            </scanner-post-scan-script-local-file>
+		</scanner-deployment>
+		<platform-recognition>
+			<platform-aliases>
+				<alias>aix</alias>
+			</platform-aliases>
+			<platform-default-architecture display-name="POWER" />
+		</platform-recognition>
+	</platform>
+</scanners-configuration>

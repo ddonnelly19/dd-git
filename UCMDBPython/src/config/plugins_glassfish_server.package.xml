@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+ 	<plugins>
+        <plugin id="glassfish_server_win">
+            <name>Glassfish on Windows</name>
+            <description>Sets key attributes for glassfish server</description>
+            <module>plugins_glassfish_server</module>
+            <class>GlassfishServerPluginWindows</class>
+            <qualifiers>
+                <qualifier type="application">Glassfish 2.x on Windows</qualifier>
+                <qualifier type="application">Glassfish 3.x on Windows</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>glassfish_discoverer</module>
+            </dependencies>
+        </plugin>
+        <plugin id="glassfish_server_unix">
+            <name>Glassfish on Unix</name>
+            <description>Sets key attributes for glassfish server</description>
+            <module>plugins_glassfish_server</module>
+            <class>GlassfishServerPluginUnix</class>
+            <qualifiers>
+                <qualifier type="application">Glassfish 2.x on Unix</qualifier>
+                <qualifier type="application">Glassfish 3.x on Unix</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+                <qualifier type="protocol">telnet</qualifier>
+                <qualifier type="protocol">ssh</qualifier>
+            </qualifiers>
+            <dependencies>
+                <module>glassfish_discoverer</module>
+            </dependencies>
+        </plugin>
+	</plugins>
+</package>

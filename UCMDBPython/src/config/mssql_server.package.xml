@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+ 	<plugins>
+        <plugin id="mssql_server_instances_by_shell">
+            <name>MSSQL Server Instance by shell</name>
+            <description>Discovers sql server instances</description>
+            <module>plugins_mssql_server_instances</module>
+            <class>MSSQLServerInstancesPlugin</class>
+            <qualifiers>
+                <qualifier type="application">MSSQL DB</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">uda</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="mssql_server_instances_by_wmi">
+            <name>MSSQL Server Instance by wmi</name>
+            <description>Discovers sql server instances</description>
+            <module>plugins_mssql_server_instances</module>
+            <class>MSSQLServerInstancesPlugin</class>
+            <qualifiers>
+                <qualifier type="application">MSSQL DB</qualifier>
+                <qualifier type="protocol">wmi</qualifier>
+            </qualifiers>
+        </plugin>
+        <plugin id="mssql_server_sw_by_snmp">
+            <name>MSSQL Server Instance by SNMP</name>
+            <description>Discovers sql server applications</description>
+            <module>plugins_mssql_server_by_snmp</module>
+            <class>MSSQLServerInstancesBySNMPPlugin</class>
+            <qualifiers>
+                <qualifier type="application">MSSQL DB</qualifier>
+                <qualifier type="protocol">snmp</qualifier>
+            </qualifiers>
+        </plugin>
+	</plugins>
+</package>

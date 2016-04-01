@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<package parserClassName="com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles.PluginsPackageConfigFile">
+ 	<plugins>
+        <plugin id="squid_version_by_shell">
+            <name>Squid version by shell</name>
+            <description>Set Squid version attribute for discovered CIs by shell</description>
+            <module>plugins_squid_version_by_shell</module>
+            <class>SquidShellPlugin</class>
+            <qualifiers>
+                <qualifier type="application">Squid</qualifier>
+                <qualifier type="protocol">ntadmin</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+            </qualifiers>
+        </plugin>
+        <plugin id="squid_version_by_wmi">
+            <name>Squid version by wmi</name>
+            <description>Set Squid version attribute for discovered CIs by wmi</description>
+            <module>plugins_squid_version_by_wmi</module>
+            <class>SquidWMIPlugin</class>
+            <qualifiers>
+                <qualifier type="application">Squid</qualifier>
+                <qualifier type="protocol">wmi</qualifier>
+        	</qualifiers>>
+        </plugin>
+        <plugin id="squid_version_by_ssh">
+            <name>Squid version by ssh</name>
+            <description>Set Squid version attribute for discovered CIs by ssh</description>
+            <module>plugins_squid_version_by_ssh</module>
+            <class>SquidSshPlugin</class>
+            <qualifiers>
+				<qualifier type="application">Squid</qualifier>
+				<qualifier type="protocol">ssh</qualifier>
+				<qualifier type="protocol">uda</qualifier> 
+				<qualifier type="protocol">telnet</qualifier>
+            </qualifiers>
+        </plugin>
+</plugins>
+</package>
