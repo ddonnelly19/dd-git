@@ -25,4 +25,5 @@
     <client clientName="vcloud" className="com.hp.ucmdb.discovery.library.clients.vmware.vcloud.Client"></client>
     <client clientName="cim" className="com.hp.ucmdb.discovery.library.clients.cim.sblim.CimClient"></client>
     <client clientName="networkautomation" className="com.hp.ucmdb.discovery.library.clients.networkautomation.java.NaJavaClient"></client>
+    <client clientName="powercmd" className="com.hp.ucmdb.discovery.library.clients.shell.PowerCmdClient"></client>
 </clientTypes>

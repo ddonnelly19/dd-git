@@ -558,8 +558,18 @@ class AdditionalPackageResourcesDiscoverer:
         '''
         packageNameToPackageMap = {}
         if configDirPath:
+            configDirPath = configDirPath.strip()
+            packageNameToConfigFileMap = {}
+            if configDirPath.find(';') > 0:
+                configDirPathArray = configDirPath.split(';')
+                for path in configDirPathArray:
+                    configFileMap = self._getConfigFiles(path)
+                    for (key, val) in configFileMap.items():
+                        packageNameToConfigFileMap[key] = val
+            else:
+                packageNameToConfigFileMap = self._getConfigFiles(configDirPath)
 
-            packageNameToConfigFileMap = self._getConfigFiles(configDirPath)
+            logger.debug('The packageNameToConfigFileMap: %s' % packageNameToConfigFileMap)
             if packageNameToConfigFileMap:
                 for (packageName, configFile) in packageNameToConfigFileMap.items():
 

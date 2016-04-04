@@ -9,6 +9,7 @@
             <qualifiers>
                 <qualifier type="application">Microsoft MQ</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
 				<qualifier type="protocol">uda</qualifier> 
             </qualifiers>
             <dependencies>

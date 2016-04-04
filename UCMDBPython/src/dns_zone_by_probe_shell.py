@@ -22,22 +22,15 @@ def _obtainParams(framework):
     isNonEmptyString = lambda s: s and s.strip()
     zoneNameList = filter(isNonEmptyString,
                           map(string.strip, splitRegexp.split(zoneNameList)))
-    
-    if not zoneNameList:
-        zoneNameList = set(framework.getTriggerCIDataAsList("zones") or []) 
-    
+
     from java.lang import Boolean
     includeOutscopeIPs = framework.getParameter('includeOutscopeIPs')
     includeOutscopeIPs = Boolean.valueOf(includeOutscopeIPs)
 
     reportBrokenAliases = framework.getParameter('reportBrokenAliases')
     reportBrokenAliases = Boolean.valueOf(reportBrokenAliases)
-    
-    ip = set(framework.getTriggerCIDataAsList('ip_address') or [])
-    ip.update(framework.getTriggerCIDataAsList('ip_address2') or [])
-    
-    if not ip or len(ip) <=0:
-        ip = [""]
+
+    ip = framework.getDestinationAttribute('ip_address')
 
     return zoneNameList, includeOutscopeIPs, ip, reportBrokenAliases
 
@@ -46,24 +39,18 @@ def DiscoveryMain(framework):
     vector = ObjectStateHolderVector()
     protocol = 'local_shell'
     try:
-        zoneNameList, includeOutscopeIPs, ips, reportBrokenAliases = _obtainParams(framework)
+        zoneNameList, includeOutscopeIPs, ip, reportBrokenAliases = _obtainParams(framework)
         if not zoneNameList:
             logger.reportError('List of zones for transfer is not specified')
             return
-        logger.debug("zonelist: %s" % zoneNameList)
-        logger.debug("dns servers: %s" % ips)
         client = framework.createClient(ClientsConsts.LOCAL_SHELL_PROTOCOL_NAME)
         shell = None
         try:
             shell = shellutils.ShellUtils(client)
             #pass name server IP to the discoverer
-            for ip in ips:
-                try:
-                    dnsDiscoverer = dns_discoverer.createDiscovererByShell(shell, ip)
-                    zoneTopologies = dns_discoverer.discoverDnsZoneTopologies(dnsDiscoverer, zoneNameList, protocol, True, ip)
-                    vector.addAll(dns_discoverer.reportTopologies(zoneTopologies, includeOutscopeIPs, reportBrokenAliases))
-                except:
-                    logger.warnException("Error getting zones %s from %s: " % (zoneNameList, ip))
+            dnsDiscoverer = dns_discoverer.createDiscovererByShell(shell, ip)
+            zoneTopologies = dns_discoverer.discoverDnsZoneTopologies(dnsDiscoverer, zoneNameList, protocol)
+            vector.addAll(dns_discoverer.reportTopologies(zoneTopologies, includeOutscopeIPs, reportBrokenAliases))
         finally:
             try:
                 shell and shell.closeClient()

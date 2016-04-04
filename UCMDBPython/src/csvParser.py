@@ -141,13 +141,6 @@ class __FileIterator(Iterator):
         '''
         return self.next()
 
-    def remove(self):
-        '''
-        Unsupported operation
-        @raise UnsupportedOperationException:
-        '''
-        raise UnsupportedOperationException()
-
 
 class Row:
     '''

@@ -10,6 +10,7 @@
             <qualifiers>
                 <qualifier type="application">BO Crystal Reports</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">powershell</qualifier>
                 <qualifier type="protocol">telnet</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
@@ -28,6 +29,7 @@
             <qualifiers>
                 <qualifier type="application">BO Explorer</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">powershell</qualifier>
                 <qualifier type="protocol">telnet</qualifier>
                 <qualifier type="protocol">ssh</qualifier>

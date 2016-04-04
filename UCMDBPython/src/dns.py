@@ -140,15 +140,13 @@ class Domain(entity.Immutable):
 
 class Zone(entity.Immutable):
     'DNS zone'
-    def __init__(self, name, soa=None, admin=None):
+    def __init__(self, name):
         r'''@types: str
         @raise ValueError: Name is not specified
         '''
         if not name:
             raise ValueError("Name is not specified")
         self.name = name
-        self.soa = soa
-        self.admin = admin
 
     def __eq__(self, other):
         return (isinstance(other, Zone)
@@ -183,8 +181,6 @@ class ZoneBuilder:
         '@types: Zone -> ObjectStateHolder'
         osh = ObjectStateHolder('dnszone')
         osh.setStringAttribute("data_name", zone.name.lower())
-        osh.setAttribute("soa", zone.soa)
-        osh.setAttribute("admin", zone.admin)
         return osh
 
 

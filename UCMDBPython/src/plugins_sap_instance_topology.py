@@ -122,7 +122,11 @@ class InstanceToSystem(plugins.Plugin):
         logger.info("Parsed details from pf name: %s" % str((system, pf_name)))
         topology = self._discover_topology(shell, system, pf_path)
         if topology:
-            resolver = dns_resolver.SocketDnsResolver()
+            #resolver = dns_resolver.SocketDnsResolver()
+            resolver = dns_resolver.create(shell, local_shell=None,
+                                   dns_server=None,
+                                   hosts_filename=None)
+
             db_host_osh, oshs = _report_db_host(topology, resolver)
             application_ip = _report_application_ip(shell, topology, resolver)
             if application_ip:
@@ -151,6 +155,9 @@ class InstanceToSystem(plugins.Plugin):
                 system = sap_discoverer.parse_system_in_pf(pf_doc)
             except ValueError, ve:
                 logger.warn("Failed to discovery system %s. %s" % (system, ve))
+                #we should get the instance information any way in order to have a possibility to properly work with instance ip
+                inst = Sfn(sap_discoverer.parse_inst_in_pf)(pf_doc)
+                topology = _Topology(system, inst, None, None, None)
             else:
                 logger.info("Parsed %s" % system)
                 db_info = sap_discoverer.DbInfoPfParser().parseDbInfo(pf_doc)
@@ -299,7 +306,7 @@ def _report_application_ip(shell, topology, resolver):
         if hostname:
             try:
                 try:
-                    ips = resolver.resolve_ips(hostname)
+                    ips = resolver.resolve_ips(hostname.strip())
                 except dns_resolver.ResolveException, e:
                     logger.warn("Failed to resolve. %s" % e)
                 else:

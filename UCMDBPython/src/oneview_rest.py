@@ -66,7 +66,7 @@ class TrustAllCert:
     def initSSL(cls):
         if not 'java' in sys.platform or cls.SSL_INITED:
             return
-        #logger.info('=============Init Trust All Cert==================')
+        logger.info('=============Init Trust All Cert==================')
         from javax.net.ssl import X509TrustManager
         from javax.net.ssl import SSLContext
 
@@ -92,7 +92,7 @@ class TrustAllCert:
 
     @classmethod
     def enableTrustAllCertificates(cls):
-        #logger.info('Enable trust all certs')
+        logger.info('Enable trust all certs')
         cls.initSSL()
         from javax.net.ssl import SSLContext
 
@@ -119,8 +119,8 @@ class RequestWithMethod(urllib2.Request):
         return self._method if self._method else urllib2.Request.get_method(self)
 
 
-CACHE_READ = True
-CACHE_WRITE = True
+CACHE_READ = False
+CACHE_WRITE = False
 
 
 class ClientCache():
@@ -129,7 +129,6 @@ class ClientCache():
     '''
     @classmethod
     def get_key(cls, req):
-        logger.info("creating cache key for %s" % (req))
         return str(hash(req))
 
     @classmethod
@@ -201,7 +200,7 @@ class RestClient(object):
     @classmethod
     @ClientCache.use_cache
     def __request(cls, method, url, params=None, headers=None):
-        headers = headers or {}      
+        headers = headers or {}
         data = cls.fromJson(params) if params else {}
         req = RequestWithMethod(method, url, data, headers)
         if verbose:

@@ -276,6 +276,7 @@ class F5ShellDiscoverer():
 
         virtualContent = self.findConfigFileContent(configFilePath, 'virtual')
         if virtualContent:
+            pool = None
             for line in virtualContent.strip().split('\n'):
                 line = line.strip()
                 matcher = re.search(virtualRegex, line)
@@ -295,8 +296,9 @@ class F5ShellDiscoverer():
                 if line == SEPERATE_LINE:
                     virtualHost = VirtualHost(name, ip, port)
                     for cluster in self.clusters:
-                        if cluster.getName() == pool:
+                        if pool and cluster.getName() == pool:
                             cluster.addVirtualHost(name, ip, port)
+                    pool = None
 
 
     def discoverNodes(self, configFilePath):

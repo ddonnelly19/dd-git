@@ -921,15 +921,26 @@ class HostMapper(_vmware_vim_base.PropertiesMapper):
         if portGroups:
             portGroupsByKey = {}
             portGroupKeyByName = {}
+            portGroupPorts_Mac_PG = {}
+            portGroupPorts_Mac_Vswitch = {}
 
             for portGroup in portGroups:
                 key = portGroup.getKey()
                 name = portGroup.getSpec() and portGroup.getSpec().getName()
+                ports = portGroup.getPort()
+                vswitch = portGroup.getVswitch()
+                if ports:
+                    for port in ports:
+                        port_mac = str(port.getMac()[0]).replace(':', '').upper()
+                        portGroupPorts_Mac_PG[port_mac] = portGroup
+                        portGroupPorts_Mac_Vswitch[port_mac] = vswitch
                 portGroupsByKey[key] = portGroup
                 portGroupKeyByName[name] = key
 
             hostObject.portGroupsByKey = portGroupsByKey
             hostObject._portGroupNameToKey = portGroupKeyByName
+            hostObject._portGroupPorts_Mac_PG = portGroupPorts_Mac_PG
+            hostObject._portGroupPorts_Mac_Vswitch = portGroupPorts_Mac_Vswitch
 
     def handleSwitches(self, switchesArray, hostObject):
         switches = switchesArray and switchesArray.getHostVirtualSwitch() or None
@@ -1519,6 +1530,11 @@ class VirtualMachineBuilder(_vmware_vim_base._HasCrossClientHelper):
 
         if vm._hostIsComplete:
             hostOsh.setBoolAttribute('host_iscomplete', 1)
+
+        if hostClass == 'nt':
+            hostOsh.setStringAttribute('os_family', "windows")
+        elif hostClass == 'unix':
+            hostOsh.setStringAttribute('os_family', "unix")
 
         hostName, domainName = self.getHostNameAndDomain(vm)
 
@@ -2374,7 +2390,15 @@ class ConnectedNetDeviceBuilder(_vmware_vim_base._HasCrossClientHelper):
     def createNetDevice(self, pnicCdp):
 
         netDeviceOsh = modeling.createHostOSH(pnicCdp.address, 'netdevice')
-        netDeviceOsh.setAttribute('name', pnicCdp.devId)
+        netdevice_name = pnicCdp.devId
+        #check if the net device name is an fqdn
+        #name attribute has to be set to short name
+        #also check if switch name contains virtual package name
+        if pnicCdp.devId and pnicCdp.devId.find('.') != -1:
+            netdevice_name = pnicCdp.devId[:pnicCdp.devId.find('.')]
+        if netdevice_name and netdevice_name.find('(') != -1:
+            netdevice_name = netdevice_name[:netdevice_name.find('(')]
+        netDeviceOsh.setAttribute('name', netdevice_name)
         netDeviceOsh.setAttribute('discovered_model', pnicCdp.hardwarePlatform)
         netDeviceOsh.setAttribute('discovered_os_version', pnicCdp.softwareVersion)
 

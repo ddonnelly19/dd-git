@@ -9,6 +9,7 @@
             <qualifiers>
                 <qualifier type="application">IBM WebSphere MQ</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
 				<qualifier type="protocol">uda</qualifier> 
                 <qualifier type="os">Windows</qualifier>
             </qualifiers>

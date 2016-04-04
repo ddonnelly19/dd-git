@@ -138,17 +138,18 @@ def processIpPort(Framework, OSHVResult, ipOrDnsOrAlias, port, localShell, dnsSe
         try:
             ipOSH = modeling.createIpOSH(resolvedIp)
             OSHVResult.add(ipOSH)
-            matcher = PORT_PATTERN.matcher(String(port))
-            if matcher.find():
-                purePort = matcher.group(PORT_GROUP_FROM_PATTERN)
-                hostOSH = modeling.createHostOSH(resolvedIp)
-                portOsh = modeling.createServiceAddressOsh(hostOSH, resolvedIp, purePort, modeling.SERVICEADDRESS_TYPE_TCP)
-                portOsh.setAttribute("name", String(port))
-                OSHVResult.add(portOsh)
-            else:
-                errorMessage = 'An invalid (non-numeric) port value was found in the configuration file [' + port + '] and will be skipped'
-                Framework.reportWarning(errorMessage)
-                logger.warn(errorMessage)
+            if port:
+                matcher = PORT_PATTERN.matcher(String(port))
+                if matcher.find():
+                    purePort = matcher.group(PORT_GROUP_FROM_PATTERN)
+                    hostOSH = modeling.createHostOSH(resolvedIp)
+                    portOsh = modeling.createServiceAddressOsh(hostOSH, resolvedIp, purePort, modeling.SERVICEADDRESS_TYPE_TCP)
+                    portOsh.setAttribute("name", String(port))
+                    OSHVResult.add(portOsh)
+                else:
+                    errorMessage = 'An invalid (non-numeric) port value was found in the configuration file [' + port + '] and will be skipped'
+                    Framework.reportWarning(errorMessage)
+                    logger.warn(errorMessage)
         except:
             Framework.reportWarning(logger.prepareJythonStackTrace(''))
             logger.debug('Failed to process ip:[', resolvedIp, '] with port [', port, ']')

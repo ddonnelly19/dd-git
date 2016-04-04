@@ -10,33 +10,34 @@ from applications import IgnoreApplicationException
 class WebsphereServerPluginWindows(Plugin):
     def __init__(self):
         Plugin.__init__(self)
+        self.pattern = r'com\.ibm\.ws\.runtime\.WsServer\s+"?[^"]*"?\s+([^\s]*)\s+([^\s]*)\s+([^\s]*)\s*'
 
     def isApplicable(self, context):
         return 1
 
     def process(self, context):
-        processWebsphere(context, 'java.exe')
+        processWebsphere(context, 'java.exe', self.pattern)
 
 class WebsphereServerPluginUnix(Plugin):
     def __init__(self):
         Plugin.__init__(self)
+        self.pattern = r'com\.ibm\.ws\.runtime\.WsServer\s+"?[^"|\s]*"?\s+([^\s]*)\s+([^\s]*)\s+([^\s]*)\s*'
 
     def isApplicable(self, context):
         return 1
 
     def process(self, context):
-        processWebsphere(context, 'java')
+        processWebsphere(context, 'java', self.pattern)
 
-def processWebsphere(context, processName):
+def processWebsphere(context, processName, pattern):
     wasOsh = context.application.getOsh()
-
     cellName = None
     serverName = None
     process = context.application.getProcess(processName)
     processOriginCmd = process.commandLine
     if processOriginCmd is not None:
         logger.debug('For process id ', process.getPid(), ' found original command line ', processOriginCmd)
-        m = re.search('com.ibm.ws.runtime.WsServer .+?([\w-]+)\s+([\w-]+)\s+([\w-]+)\s*$', processOriginCmd)
+        m = re.search(pattern, processOriginCmd)
         if m is not None:
             cellName = m.group(1)
             serverName = m.group(3)

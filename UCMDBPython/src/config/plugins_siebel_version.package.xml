@@ -23,6 +23,7 @@
             <class>SiebelVersionInformationPluginByNTCMD</class>
             <qualifiers>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
 				<qualifier type="protocol">uda</qualifier> 
 				<qualifier type="os">Windows</qualifier>
 				<qualifier type="application">Siebel Server</qualifier>

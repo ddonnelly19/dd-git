@@ -101,8 +101,10 @@ class Resource(entity.Immutable):
         self.details = details
 
     def __str__(self):
-        return "ms_cluster.Resource(%s, %s, %s)" % (self.name, self.groupName,
-                                                    self.status)
+        rt = "ms_cluster.Resource(%s, %s, %s)" % (self.name, self.groupName, self.status)
+        if isinstance(rt, unicode):
+            rt = rt.encode('utf-8')
+        return rt
     __repr__ = __str__
 
 

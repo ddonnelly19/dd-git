@@ -42,7 +42,7 @@ DDM_LINK_SYSTEM32_NAME = "ddm_link_system32"
 
 class Command:
     'Shell command base class'
-    def __init__(self, line, output=None, returnCode=None):
+    def __init__(self, line, output=None, returnCode=None, cred_id=None, protocol_attrs=None):
         '''@types: str, str, int -> None
         @deprecated
         '''
@@ -57,6 +57,8 @@ class Command:
         self.useSudo = 1
         self.checkErrCode = 1
         self.preserveSudoContext = 0
+        self.cred_id = cred_id
+        self.protocol_attrs = protocol_attrs
 
     def __repr__(self):
         return self.line
@@ -112,13 +114,14 @@ LANG_JAPANESE = Language(Locale.JAPANESE, 'jap', ('MS932',), (1041,), 932)
 LANG_FRENCH = Language(Locale.FRENCH, 'fra', ('Cp1252',), (1036,), 850)
 LANG_ITALIAN = Language(Locale.ITALIAN, 'ita', ('Cp1252',), (1040,), 850)
 LANG_DUTCH = Language(LOCALE_DUTCH, 'nld', ('Cp1252',), (1043,), 850)
-LANG_PORTUGUESE = Language(LOCALE_PORTUGUESE, 'prt', ('Cp1252',), (1046,), 850)
+LANG_PORTUGUESE = Language(LOCALE_PORTUGUESE, 'prt', ('Cp850', 'Cp1252'), (1046,), 850)
 LANG_CHINESE = Language(Locale.CHINESE, 'chn', ('MS936',), (2052,), 936)
 LANG_KOREAN = Language(Locale.KOREAN, 'kor', ('MS949',), (1042,), 949)
+LANG_TRADITIONAL_CHINESE = Language(Locale.TRADITIONAL_CHINESE, 'tch', ('MS950',), (1028,), 950)
 
 LANGUAGES = (LANG_ENGLISH, LANG_GERMAN, LANG_SPANISH, LANG_RUSSIAN,
              LANG_JAPANESE, LANG_FRENCH, LANG_ITALIAN, LANG_PORTUGUESE,
-             LANG_CHINESE, LANG_KOREAN, LANG_DUTCH, LANG_HUNGARIAN)
+             LANG_CHINESE, LANG_KOREAN, LANG_DUTCH, LANG_HUNGARIAN, LANG_TRADITIONAL_CHINESE)
 
 #Used as default language for fallback
 DEFAULT_LANGUAGE = LANG_ENGLISH
@@ -281,7 +284,7 @@ class EncodingContext:
                 for outputHandler in self.outputHandlers:
                     decodedContent = outputHandler.handle(decodedContent)
 
-                decodedContentString = str(String(decodedContent))
+                decodedContentString = unicode(String(decodedContent))
                 if outputMatcher.match(decodedContentString):
                     return (decodedContentString, charset.name())
 
@@ -291,7 +294,7 @@ class EncodingContext:
             logger.debug(msg)
 
         charset = Language.DEFAULT_CHARSET_OBJECT
-        decodedContent = str(String(self.decodeString(charset)))
+        decodedContent = unicode(String(self.decodeString(charset)))
         return (decodedContent, charset.name())
 
     def decodeString(self, charsetObject):
@@ -500,8 +503,7 @@ class ShellFactory:
         except:
             errMsg = 'Failed detecting OS type. Exception received: %s' % (sys.exc_info()[1])
             logger.error(errMsg)
-            #raise Exception(errMsg)
-            return False
+            raise Exception(errMsg)
 
     def isVioServer(self, shellClient):
         '''Determine restricted shell of VIO server installed on AIX
@@ -801,7 +803,7 @@ class Shell:
         """
         raise NotImplemented
 
-    def execCmd(self, cmdLine, timeout=0, waitForTimeout=0, useSudo=1, checkErrCode=1, useCache=0, preserveSudoContext=0):
+    def execCmd(self, cmdLine, timeout=0, waitForTimeout=0, useSudo=1, checkErrCode=1, useCache=0, preserveSudoContext=0, credential_id=None, protocol_attr_map=None):
         """ Executes a shell command and sets the exit status of the command.
         @types: str, int, int, bool, bool, bool -> str
         Issue the given command followed by an echo of its return status, in the last line of the output
@@ -820,8 +822,8 @@ class Shell:
 
         if timeout and timeout < 1000:
             timeout = timeout * self.__defaultCommandTimeout
-        
-        command = Command(cmdLine)
+
+        command = Command(cmdLine, cred_id=credential_id, protocol_attrs=protocol_attr_map)
         command.executionTimeout = timeout
         command.waitForTimeout = waitForTimeout
         command.useSudo = useSudo
@@ -834,7 +836,6 @@ class Shell:
         self.getLastCommandOutputBytes = command.outputInBytes
 
         self.cmdCache.put(cmdLine, command)
-
         return command.output
 
     def _execute(self, command):
@@ -929,7 +930,7 @@ class Shell:
                 encodedContent = String(self.getLastCommandOutputBytes, encoding)
                 handler = self.createOutputHandler(self.lastExecutedCommand)
                 output = handler.handle(encodedContent)
-                return str(String(output))
+                return unicode(String(output))
         return content
 
     def safecat(self, path, forceSudo=0):
@@ -984,7 +985,8 @@ class Shell:
         @deprecated: Will be moved to the private scope
         @raise ValueError: If decoding is not supported for used protocol type
         '''
-        if self.getClientType() == 'ntadmin' or (self.getClientType() == 'uda' and isinstance(self, WinShell)):
+        if self.getClientType() == 'ntadmin' or (self.getClientType() == 'uda' and isinstance(self, WinShell)) or \
+                        self.getClientType() == 'powercmd':
             trimWSString = self.__client.getProperty(AgentConstants.PROP_NTCMD_AGENT_TRIM_WHITESPACE)
             trimWS = 1
 
@@ -1056,6 +1058,17 @@ class CiscoIOSShell(Shell):
     def _set_terminal_length(client, length):
         client.executeCmd('terminal length %s' % length, 0, 1)
 
+    @classmethod
+    def isCisco(cls, client):
+        ''' Check for Cisco IOS shell.
+        @types: Client -> bool
+        @command: show version
+        '''
+        client.executeCmd('terminal length 0', 0, 1)
+        buffer = client.executeCmd('sh ver', 0, 1)
+        return bool(buffer and re.search(cls._CISCO_VER_MARKER, buffer))
+    is_applicable = isCisco
+
     def determineOsLanguage(self):
         self.osLanguage = DEFAULT_LANGUAGE
 
@@ -1099,6 +1112,9 @@ class WinShell(Shell):
     DEFAULT_ENGLISH_CODEPAGE = 437
     DEFAULT_WIN_SHARE = 'admin$\\system32\\drivers\etc'
     __DEFAULT_COMMAND_SEPARATOR = '&'
+    SHELL_COMMAND_PATTERN = '%%SystemRoot%%\\sysnative\\cmd.exe /c "echo . | powershell -EncodedCommand %s"'
+    SHELL_COMMAND_PATTERN_SYSTEM32 = '%%SystemRoot%%\\system32\\cmd.exe /c "echo . | powershell -EncodedCommand %s"'
+    ENCODED_COMMAND_PATTERN = 'powershell.exe -EncodedCommand %s'
 
     def __init__(self, client, protocolName):
         ''' @types: Client, str'''
@@ -1113,6 +1129,7 @@ class WinShell(Shell):
         # set to None in order to properly initialize them upon discovery on particular destination
         self.__ddm_link_system32 = None
         self.__system32 = None
+        self.__powershellCommandPattern = None
 
         Shell.__init__(self, client)
 
@@ -1226,7 +1243,10 @@ class WinShell(Shell):
         '''@types: Command -> Command
         @raise Exception: Command execution does not produced output nor return code
         '''
-        output = self.__client.executeCmd(cmd.line, cmd.executionTimeout, cmd.waitForTimeout)
+        if cmd.cred_id and cmd.protocol_attrs:
+            output = self.__client.executeCmd(cmd.line, cmd.cred_id, cmd.protocol_attrs, cmd.executionTimeout, cmd.waitForTimeout)
+        else:
+            output = self.__client.executeCmd(cmd.line, cmd.executionTimeout, cmd.waitForTimeout)
         cmd.outputInBytes = self.__client.getLastCommandOutputBytes()
         try:
             cmd.returnCode = int(self.getWindowsErrorCode())
@@ -1358,10 +1378,10 @@ class WinShell(Shell):
         """
         system32Line = self.execCmd('dir %SystemRoot% /O:-D | find /I "system32"')
         system32Name = None
-        logger.debug("system32 check RC: (%s) %s" % (self.getLastCmdReturnCode(), system32Line))
         if self.getLastCmdReturnCode() == 0:
-            if system32Line.lower().find("system32") >= 0:                         
-                system32Name = "System32"
+            match = re.search(r'.*\s+(system32)$', system32Line, re.IGNORECASE|re.MULTILINE)
+            if match:
+                system32Name = match.group(1)
 
         if not system32Name:
             raise ValueError('Failed to find system32 folder inside the %SystemRoot%')
@@ -1488,13 +1508,41 @@ class WinShell(Shell):
         '''
         return re.sub('/', '\\\\', folder)
 
+    def executeCmdlet(self, cmdlet, lineWidth=256):
+        if not self.__powershellCommandPattern:
+            self.__powershellCommandPattern = self.SHELL_COMMAND_PATTERN
+            output = self.__exeCmdlet(cmdlet, lineWidth)
+            if self.getLastCmdReturnCode():
+                self.__powershellCommandPattern = self.SHELL_COMMAND_PATTERN_SYSTEM32
+                return self.__exeCmdlet(cmdlet, lineWidth)
+            return output
+        else:
+            return self.__exeCmdlet(cmdlet, lineWidth)
+
+    def __exeCmdlet(self, cmdlet, lineWidth):
+            powershellCommand = self.prepareCommand(cmdlet, self.__powershellCommandPattern, lineWidth)
+            return self.execCmd(powershellCommand, 120000)
+
+    def prepareCommand(self, cmdlet, commandPattern,  lineWidth=128):
+        #encode with "UTF-16LE" first because powershell only supports unicode, which is an encoding for the UTF-16 format using the little endian byte order
+        encodedCmdlet = self.__pipeToOutStringFormat(cmdlet).encode("UTF-16LE").encode("base64")
+
+        #Python str.encode('base64') method wraps lines at 76 characters.Remove all the "\n" from the command
+        encodedCmdlet = re.sub('\n','', encodedCmdlet)
+
+        powershellCommand = commandPattern % encodedCmdlet
+        return powershellCommand
+
+    def __pipeToOutStringFormat(self, cmd):
+        '@types: str, [int] -> str'
+        return '%s |  Format-Table -auto' % cmd
+
     def closeClient(self):
         '''Perform cleaning of temporary data on destination system and close the client'''
         try:
             self.removeSystem32Link()
-        except:
-            pass
-        Shell.closeClient(self)
+        finally:
+            Shell.closeClient(self)
 
 
 class CygwinShell(WinShell):
@@ -1624,11 +1672,7 @@ class PowerShell(WinShell):
         '''Indicates whether passed command line contains command of batch
         command interpreter
         @types: str -> bool'''
-        p = re.search(ur'(dir|echo|\&|%)', cmdline, re.IGNORECASE | re.MULTILINE)
-        logger.debug("Checking console cmd %s: %s" % (cmdline, p))        
-        if p:
-            return 1
-        cmd = cmdline.split()[0].lower()        
+        cmd = cmdline.split()[0].lower()
         for consoleCmd in self.__consoleCommands:
             if re.match('(?<![\w\-])%s$' % consoleCmd, cmd):
                 logger.debug('A console command')
@@ -1637,13 +1681,14 @@ class PowerShell(WinShell):
     def __pipeToOutString(self, cmd, lineWidth=80):
         '@types: str, [int] -> str'
         return '%s | Out-String -width %d' % (cmd, lineWidth)
-    
-    def execEncodeCmd(self, cmdLine, timeout=0, waitForTimeout=0, useSudo=1,\
-                checkErrCode=1, useCache=0, lineWidth=80, pipeToOutString=1, forceCommand=False):
-        return self.execCmd(cmdLine, timeout, waitForTimeout, useSudo, checkErrCode, useCache, lineWidth, pipeToOutString, forceCommand)
+
+    def execEncodeCmd(self, cmd, lineWidth=256):
+        encodedCmd = self.prepareCommand(cmd, self.ENCODED_COMMAND_PATTERN, lineWidth)
+        return self.execCmd(encodedCmd, pipeToOutString=0)
+
 
     def execCmd(self, cmdLine, timeout=0, waitForTimeout=0, useSudo=1,\
-                checkErrCode=1, useCache=0, lineWidth=80, pipeToOutString=1, forceCommand=False):
+                checkErrCode=1, useCache=0, lineWidth=80, pipeToOutString=1):
         ''' Execute command in powershell
         * If current command is cmdlet:
             1. Method passes output object to 'Out-String' cmdlet to get its
@@ -1663,27 +1708,18 @@ class PowerShell(WinShell):
         '''
 
         # PowershellConnector writes its output with utf8 encoding
-        origCmdLine = cmdLine
-        try:
-            isConsoleCommand = self.__isConsoleCommand(cmdLine) or forceCommand
-            if isConsoleCommand:
-                cmdLine = self.__makePowerShellCompatible(cmdLine)
-            elif pipeToOutString:
-                cmdLine = self.__pipeToOutString(cmdLine, lineWidth)
-            cmdLine = self.__makePowerShellCompatibleWmicQuery(cmdLine)
-            cmdLine = PowerShell.__INVOKE_COMMAND_SCRIPT_BLOCK % cmdLine
-            output = Shell.execCmd(self, cmdLine, timeout, waitForTimeout, useSudo,
-                                   checkErrCode, useCache)
-            if isConsoleCommand:
-                output = self.__fixEncoding(self.__powershellConsoleCharsetName,
-                                            self.__consoleCharsetName, output)
-            ##elif not self.getLastCmdReturnCode() or not output:
-            ##    raise ValueError()
-        except:
-            if not forceCommand and origCmdLine.find("Invoke-Command") <=-1:
-                logger.warn("forcing command in CMD mode")
-                return self.execCmd(origCmdLine, timeout, waitForTimeout, useSudo, checkErrCode, useCache, lineWidth, pipeToOutString, True)
-            
+        isConsoleCommand = self.__isConsoleCommand(cmdLine)
+        if isConsoleCommand:
+            cmdLine = self.__makePowerShellCompatible(cmdLine)
+        elif pipeToOutString:
+            cmdLine = self.__pipeToOutString(cmdLine, lineWidth)
+        cmdLine = self.__makePowerShellCompatibleWmicQuery(cmdLine)
+        cmdLine = PowerShell.__INVOKE_COMMAND_SCRIPT_BLOCK % cmdLine
+        output = Shell.execCmd(self, cmdLine, timeout, waitForTimeout, useSudo,
+                               checkErrCode, useCache)
+        if isConsoleCommand:
+            output = self.__fixEncoding(self.__powershellConsoleCharsetName,
+                                        self.__consoleCharsetName, output)
         return output
 
     def execLocalScript(self, path, timeout=0, waitForTimeout=0, useSudo=1,
@@ -2028,7 +2064,7 @@ class UnixShell(Shell):
             except:
                 logger.warn('Failed to get PrivilegedModeExecutionPolicy')
         return self.__useCustomPrivilegedModeExecutionPolicy
-    
+
     def __getSudoSuPolicy(self):
         if self.__sudoSuPolicy is None:
             try:
@@ -2041,27 +2077,27 @@ class UnixShell(Shell):
             except:
                 self.__sudoSuPolicy = UnixShell.ONLY_SUDO_POLICY
         return self.__sudoSuPolicy
-    
+
     def __executeCommandWithCustomMode(self, command):
         from shell_execmode import get_privileged_mode
-        
+
         def get_cred_attr_fn(cred_id, attribute_name):
             protocol = self.__getProtocolManager().getProtocolById(cred_id)
             return protocol.getProtocolAttribute(attribute_name)
-        
+
         priveleged_mode = get_privileged_mode(self, self.getCredentialId(), get_cred_attr_fn)
         priveleged_mode.enter()
         try:
             return self.__executeCommand(command)
         finally:
             priveleged_mode.exit()
-        
+
     def __shouldRunInPrivMode(self, command):
         protocol = self.__getProtocolManager().getProtocolById(self.getCredentialId())
         enter_cmd = protocol.getProtocolAttribute('protocol_pe_generic_enter_cmd')
         exit_cmd = protocol.getProtocolAttribute('protocol_pe_generic_exit_cmd')
         return not(command.line.strip() in (enter_cmd.strip(), exit_cmd.strip())) and self.__shouldRunAsSuperUser(command.line)
-    
+
     def _execute(self, command):
         '@types: Command -> Command'
         #We always expect new line after command execution but there are systems which do not append new line after command output buffer.
@@ -2069,7 +2105,7 @@ class UnixShell(Shell):
         #For this purpose we use ERROR_CODE_PREFIX
         if self.__shouldUseCustomPrivilegedModeExecutionPolicy() and self.__shouldRunInPrivMode(command):
             return self.__executeCommandWithCustomMode(command)
-        
+
         sudoSuPolicy = self.__getSudoSuPolicy()
         cmd = command.line
         if command.useSudo:
@@ -2098,10 +2134,14 @@ class UnixShell(Shell):
         sudoCommands = self.__client.getSudoCommands()
         if sudoCommands:
             splitCommands = string.split(sudoCommands, ',')
-            if '*' in splitCommands:
+            splitCommandsTrim = []
+            for splitCommand in splitCommands:
+                if splitCommand.strip():
+                    splitCommandsTrim.append(splitCommand)
+            if '*' in splitCommandsTrim:
                 self.__sudoCommandsArray = ['.*']
             else:
-                self.__sudoCommandsArray = splitCommands
+                self.__sudoCommandsArray = splitCommandsTrim
 
     def __prepareCmdForSudo(self, cmd, preserveSudoContext = 0):
         '@types: str -> str'

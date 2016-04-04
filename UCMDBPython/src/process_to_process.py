@@ -305,8 +305,7 @@ class ProcessToProcess:
         if logger.isDebugEnabled():
             logger.debug('Known Listening Ports:', ports)
         if (ports == None) or (len(ports) == 0):
-            portsSet.add('*')
-            return portsSet
+            return None
         if (ports == '*'):
             portsSet.add('*')
             return portsSet

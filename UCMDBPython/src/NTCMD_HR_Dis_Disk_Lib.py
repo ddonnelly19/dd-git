@@ -7,6 +7,8 @@ import wmiutils
 
 # MAM Imports
 from com.hp.ucmdb.discovery.library.common import CollectorsParameters
+from appilog.common.system.types.vectors import ObjectStateHolderVector
+from appilog.common.system.types import ObjectStateHolder
 
 # increase timeout for diskinfo.exe to 1 minute in order to give
 # it a chance to complete
@@ -132,4 +134,236 @@ def discoverDiskByWmic(shell, OSHVec, hostOSH):
         diskOsh = modeling.createDiskOSH(hostOSH, diskName, diskType, size=diskSize, name=diskProviderName,
                                          usedSize=diskUsedSize)
         OSHVec.add(diskOsh)
+
     return 1
+
+def discoverPhysicalDiskByWmi(shell, OSHVec, hostOSH):
+    wmiProvider = wmiutils.getWmiProvider(shell)
+    queryBuilder = wmiProvider.getBuilder('Win32_DiskDrive')
+    queryBuilder.addWmiObjectProperties('DeviceID', 'SerialNumber', 'Size')
+
+    wmiAgent = wmiProvider.getAgent()
+
+    diskDevices = []
+    try:
+        diskDevices = wmiAgent.getWmiData(queryBuilder)
+    except:
+        logger.debugException('Failed getting physical disk via wmi')
+
+    for diskDevice in diskDevices:
+        diskOsh = ObjectStateHolder("disk_device")
+        diskName = diskDevice.DeviceID and diskDevice.DeviceID.strip() or None
+        if diskName:
+            diskOsh.setStringAttribute("name", diskName.upper())
+        else:
+            continue
+        diskSerialNumber = diskDevice.SerialNumber and diskDevice.SerialNumber.strip() or None
+        if diskSerialNumber:
+            diskOsh.setStringAttribute("serial_number", diskSerialNumber)
+        diskOsh.setStringAttribute("disk_type", "fixed_disk")
+        diskSize = diskDevice.Size and diskDevice.Size.strip() or None
+        # Byte to MB
+        if diskSize:
+            diskSize = int(diskSize)/0x100000
+            diskOsh.setIntegerAttribute("disk_size", diskSize)
+        diskOsh.setContainer(hostOSH)
+        OSHVec.add(diskOsh)
+
+#below is only for windows 2008 and 2012
+
+def discoveriSCSISessionToDiskMap(wmiProvider):
+    queryBuilder = wmiProvider.getBuilder('MSFT_iSCSISessionToDisk')
+    queryBuilder.addWmiObjectProperties('Disk',  'iSCSISession')
+    wmicAgent = wmiProvider.getAgent()
+
+    associations = []
+    map = {}
+    try:
+        associations = wmicAgent.getWmiData(queryBuilder)
+    except:
+        logger.debugException('Failed getting session to disk map via wmic')
+        return map
+
+    for association in associations:
+        disk = association.Disk and association.Disk.strip() or ''
+        disk = disk.split("=")[1].strip('"')
+        if disk.find("\\\\\\\\")==0:
+            disk = disk.replace("\\\\","\\")
+        disk = disk.replace('&amp;','&')
+        session = association.iSCSISession
+        session = session.split("=")[1].strip('"')
+        disks = map.get(session) or []
+        disks.append(disk)
+        map[session] = disks
+    return map
+
+def discoverPartitionToDiskMap(wmiProvider):
+    queryBuilder = wmiProvider.getBuilder('MSFT_DiskToPartition')
+    queryBuilder.addWmiObjectProperties('Disk',  'Partition')
+    wmicAgent = wmiProvider.getAgent()
+
+    associations = []
+    map = {}
+    try:
+        associations = wmicAgent.getWmiData(queryBuilder)
+    except:
+        logger.debugException('Failed getting disk to partition map via wmi')
+        return map
+
+    for association in associations:
+        disk = association.Disk and association.Disk.strip() or ''
+        disk = disk.split("=")[1].strip("\"")
+        disk = disk.replace('&amp;', '&')
+        partition = association.Partition
+        partition = partition.split("=")[1].strip("\"")
+        partitions = map.get(disk) or []
+        partitions.append(partition)
+        map[disk] = partitions
+    return map
+
+def discoverPartitionToVolumeMap(wmiProvider):
+    queryBuilder = wmiProvider.getBuilder('MSFT_PartitionToVolume')
+    queryBuilder.addWmiObjectProperties( 'Partition', 'Volume')
+    wmicAgent = wmiProvider.getAgent()
+    associations = []
+    map = {}
+    try:
+        associations = wmicAgent.getWmiData(queryBuilder)
+    except:
+        logger.debugException('Failed getting partition to volume map via wmic')
+        return map
+
+    for association in associations:
+        partition = association.Partition
+        partition = partition.split("=")[1].strip("\"")
+        volume = association.Volume
+        volume = volume.split("=")[1].strip("\"")
+        partitions = map.get(volume) or []
+        partitions.append(partition)
+        map[volume] = partitions
+
+    return map
+
+def discoverPhysicalVolumes(wmiProvider,OSHVec, hostOSH):
+    queryBuilder = wmiProvider.getBuilder('MSFT_Disk')
+    queryBuilder.addWmiObjectProperties('ObjectId', 'Path', 'FriendlyName', 'SerialNumber','Number', 'Size')
+    wmicAgent = wmiProvider.getAgent()
+    idToOshMap = {}
+    numberToOshMap = {}
+    try:
+        phyVolumes = wmicAgent.getWmiData(queryBuilder)
+    except:
+        logger.debugException('Failed getting partition to volume map via wmi')
+        return idToOshMap
+
+    for volume in phyVolumes:
+        id = volume.ObjectId and volume.ObjectId.strip() or ''
+        id = id.replace('&amp;','&')
+        name = volume.Path and volume.Path.strip() or ''
+        name = name.replace('&amp;','&')
+        description = volume.FriendlyName
+        serialNumber = volume.SerialNumber
+        number = volume.Number
+        size = volume.Size
+        phyVolumeOsh = ObjectStateHolder("physicalvolume")
+        phyVolumeOsh.setStringAttribute("name", name)
+        phyVolumeOsh.setStringAttribute("description", description)
+        phyVolumeOsh.setStringAttribute("serial_number", serialNumber)
+        phyVolumeOsh.setStringAttribute("volume_id", id)
+        phyVolumeOsh.setDoubleAttribute("volume_size", _bytesToMB(size))
+        phyVolumeOsh.setContainer(hostOSH)
+        OSHVec.add(phyVolumeOsh)
+        idToOshMap[id] = phyVolumeOsh
+        numberToOshMap[number] = phyVolumeOsh
+
+    return idToOshMap, numberToOshMap
+
+def discoverDiskMountPoints(wmiProvider, OSHVec, hostOSH, phyVolumeNumberToOshMap={}):
+    queryBuilder = wmiProvider.getBuilder('MSFT_Partition')
+    queryBuilder.addWmiObjectProperties('AccessPaths',  'DiskId', 'DiskNumber', 'DriveLetter', 'Size')
+    wmicAgent = wmiProvider.getAgent()
+
+    partitionItems = []
+    try:
+        partitionItems = wmicAgent.getWmiData(queryBuilder)
+    except:
+        logger.debugException('Failed getting partition information')
+        return
+
+    for partition in partitionItems:
+        mountedTo = ""
+        mountVolumeName = ""
+        if isinstance(partition.AccessPaths, list):
+            if len(partition.AccessPaths) >= 2:
+                mountedTo = partition.AccessPaths[0]
+                mountVolumeName = partition.AccessPaths[1]
+            else:
+                mountVolumeName = partition.AccessPaths[0]
+        else:
+            items = partition.AccessPaths.split(",")
+            if len(items) >= 2:
+                mountedTo = items[0]
+                mountVolumeName = items[1]
+        pysicalDiskNumber = partition.DiskNumber
+        size = partition.Size
+        if mountedTo:
+            mountedTo = mountedTo.rstrip(":\\")
+            fsOsh = modeling.createFileSystemOSH(hostOSH, mountedTo, "FixedDisk",size=size)
+            OSHVec.add(fsOsh)
+            logicalVolOsh = ObjectStateHolder("logical_volume")
+            logicalVolOsh.setStringAttribute("name", mountVolumeName)
+            logicalVolOsh.setDoubleAttribute("logicalvolume_size",_bytesToMB(size))
+            logicalVolOsh.setContainer(hostOSH)
+            OSHVec.add(logicalVolOsh)
+            OSHVec.add(modeling.createLinkOSH("dependency", fsOsh, logicalVolOsh))
+            phyVolumeOsh = phyVolumeNumberToOshMap.get(pysicalDiskNumber)
+            if phyVolumeOsh:
+                OSHVec.add(modeling.createLinkOSH("usage", logicalVolOsh, phyVolumeOsh))
+
+def discoveriSCSIInfo(shell, OSHVec, hostOSH):
+    wmiProvider = wmiutils.getWmiProvider(shell)
+    queryBuilder = wmiProvider.getBuilder('MSFT_iSCSISession')
+    queryBuilder.addWmiObjectProperties('InitiatorNodeAddress',  'TargetNodeAddress', 'SessionIdentifier')
+    wmicAgent = wmiProvider.getAgent()
+    try:
+        wmicAgent.setNamespace('root/Microsoft/Windows/Storage')
+    except:
+        logger.debug('Cannot change to name space root/Microsoft/Windows/Storage for iSCSI discovery')
+        return
+
+    try:
+        sessionItems = []
+        try:
+            sessionItems = wmicAgent.getWmiData(queryBuilder)
+        except:
+            logger.debugException('Failed getting iSCSI information')
+            return
+
+        sessionToDiskMap = discoveriSCSISessionToDiskMap(wmiProvider)
+        phyVolumeIdToOshMap, phyVolumeNumberToOshMap = discoverPhysicalVolumes(wmiProvider, OSHVec,hostOSH)
+        discoverDiskMountPoints(wmiProvider, OSHVec,hostOSH, phyVolumeNumberToOshMap)
+        for session in sessionItems:
+            initiatorOsh = None
+            targetOsh = None
+            if session.InitiatorNodeAddress:
+                initiatorOsh = ObjectStateHolder("iscsi_adapter")
+                initiatorOsh.setStringAttribute("iqn", session.InitiatorNodeAddress)
+                initiatorOsh.setContainer(hostOSH)
+                OSHVec.add(initiatorOsh)
+
+            if session.TargetNodeAddress:
+                targetOsh = ObjectStateHolder("iscsi_adapter")
+                targetOsh.setStringAttribute("iqn", session.TargetNodeAddress)
+                OSHVec.add(targetOsh)
+
+            if initiatorOsh and targetOsh:
+                OSHVec.add( modeling.createLinkOSH('usage' , initiatorOsh, targetOsh))
+
+            sessionId = session.SessionIdentifier
+            disks = sessionToDiskMap.get(sessionId) or {}
+            for disk in disks:
+                diskOsh = phyVolumeIdToOshMap.get(disk)
+                if diskOsh and targetOsh:
+                    OSHVec.add(modeling.createLinkOSH('dependency', diskOsh, targetOsh))
+    finally:
+        wmicAgent.setNamespace() #set back to default

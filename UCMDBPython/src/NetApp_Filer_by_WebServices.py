@@ -147,7 +147,8 @@ def buildLUNOsh(lun, hostOSH, volumeOshDict, lunOshDict):
 
             if volumeOshDict:
                 volumeOsh = volumeOshDict.get(volumeName, None)
-                resultVector.add(modeling.createLinkOSH("dependency", lunOsh, volumeOsh))
+                if volumeOsh:
+                    resultVector.add(modeling.createLinkOSH("dependency", lunOsh, volumeOsh))
         else:
             netapp_webservice_utils.debugPrint(1, '[' + SCRIPT_NAME + ':buildLUNOsh] Insufficient information to build LOGICALVOLUME CI for lun with UUID <%s>' % lunID)
         return resultVector
@@ -171,12 +172,13 @@ def buildISCSIAdapterOsh(iqn, hostOsh, iscsiAdapterRecord=None, scsiOshDict=None
                 logger.debug("scsiOshDict:", scsiOshDict)
                 scsiOshDict[name] = scsiOsh
 
-            addresses = iscsiAdapterRecord.getChildByName('portal-addresses').getChildren()
-            for address in addresses:
-                ip = address.getChildContent('inet-address')
-                ipOsh = modeling.createIpOSH(ip)
-                resultVector.add(ipOsh)
-                resultVector.add(modeling.createLinkOSH('containment', hostOsh, ipOsh))
+            if iscsiAdapterRecord.getChildByName('portal-addresses'):
+                addresses = iscsiAdapterRecord.getChildByName('portal-addresses').getChildren()
+                for address in addresses:
+                    ip = address.getChildContent('inet-address')
+                    ipOsh = modeling.createIpOSH(ip)
+                    resultVector.add(ipOsh)
+                    resultVector.add(modeling.createLinkOSH('containment', hostOsh, ipOsh))
         scsiOsh.setContainer(hostOsh)
         resultVector.add(scsiOsh)
     except:
@@ -260,10 +262,10 @@ class NaFiler:
         self._adminHost = adminhost
         self._vfNets = []
         self._stores = []
-        
+
     def addVfNet(self, vfNetDo):
         self._vfNets.append(vfNetDo)
-        
+
     def addStore(self, storeDo):
         self._stores.append(storeDo)
 
@@ -318,9 +320,9 @@ def getVFilerDetails(localFramework, wsConnection):
         excInfo = logger.prepareJythonStackTrace('')
         logger.warn('[' + SCRIPT_NAME + ':getVFilerDetails] Exception: <%s>' % excInfo)
     return filerDoList
-            
-            
-        
+
+
+
 ##############################################
 ## Get filer details from the filer
 ##############################################
@@ -787,8 +789,8 @@ def getFCAdapter(localFramework, wsConnection, hostOSH):
     fcAdapterRequestElement = NaElement('fcp-adapter-list-info')
     fcAdapterResponseElement = netapp_webservice_utils.wsInvoke(wsConnection, fcAdapterRequestElement)
     if not fcAdapterResponseElement:
-            localFramework.reportWarning('fcp-adapter-list-info information request failed')
-            return None
+        localFramework.reportWarning('fcp-adapter-list-info information request failed')
+        return None
     fciAdapters = fcAdapterResponseElement.getChildByName('fcp-config-adapters').getChildren()
     for fciAdapter in fciAdapters:
         resultVector.addAll(buildFCAdapterOsh(fciAdapter, hostOSH))
@@ -1238,6 +1240,7 @@ def DiscoveryMain(Framework):
     ## Destination and framework properties
     protocolName = 'netapp'
     IP = Framework.getDestinationAttribute('ip_address')
+    credentialId = Framework.getDestinationAttribute('credentialId')
     global CHUNK_SIZE
     CHUNK_SIZE = eval(Framework.getParameter('chunkSize')) or 1000
     getSnapShotInfo = Framework.getParameter('getSnapShotInfo') or 'false'
@@ -1255,35 +1258,30 @@ def DiscoveryMain(Framework):
 
     ## SOAP Connection...
     try:
-        protocols = Framework.getAvailableProtocols(IP, protocolName)
-        ontapiVersion = '0.0'
-        for protocol in protocols:
-            try:
-                if ontapiVersion != '0.0':
-                    continue
-                else:
-                    userName = Framework.getProtocolProperty(protocol, CollectorsConstants.PROTOCOL_ATTRIBUTE_USERNAME)
-                    password = Framework.getProtocolProperty(protocol, CollectorsConstants.PROTOCOL_ATTRIBUTE_PASSWORD)
-                    port = Framework.getProtocolProperty(protocol, CollectorsConstants.PROTOCOL_ATTRIBUTE_PORT) or '443'
-                    protocol = Framework.getProtocolProperty(protocol, "netappprotocol_protocol") or 'https'
-                    wsConnection = netapp_webservice_utils.connect(protocol, IP, port, userName, password, NaServer.SERVER_TYPE_FILER)
-                    if wsConnection:
-                        ## Get soap version
-                        aboutRequestElem = NaElement('system-get-ontapi-version')
-                        aboutResponseElem = netapp_webservice_utils.wsInvoke(wsConnection, aboutRequestElem)
-                        major_version = aboutResponseElem.getChildContent('major-version')
-                        minor_version = aboutResponseElem.getChildContent('minor-version')
-                        ontapiVersion = major_version + '.' + minor_version
-                        wsConnection.setApiVersion(int(major_version), int(minor_version))
-                        netapp_webservice_utils.debugPrint(1, '[' + SCRIPT_NAME + ':DiscoveryMain] Filer ONTAPI version is <%s>' % ontapiVersion)
-                    else:
-                        excInfo = logger.prepareJythonStackTrace('')
-                        logger.debug('[' + SCRIPT_NAME + ':DiscoveryMain] Unable to connect using protocol <%s>! Will try the next one...: <%s>' % (protocol, excInfo))
-                        pass
-            except:
+        protocol = credentialId
+        try:
+            userName = Framework.getProtocolProperty(protocol, CollectorsConstants.PROTOCOL_ATTRIBUTE_USERNAME)
+            password = Framework.getProtocolProperty(protocol, CollectorsConstants.PROTOCOL_ATTRIBUTE_PASSWORD)
+            port = Framework.getProtocolProperty(protocol, CollectorsConstants.PROTOCOL_ATTRIBUTE_PORT) or '443'
+            protocol = Framework.getProtocolProperty(protocol, "netappprotocol_protocol") or 'https'
+            wsConnection = netapp_webservice_utils.connect(protocol, IP, port, userName, password, NaServer.SERVER_TYPE_FILER)
+            if wsConnection:
+                ## Get soap version
+                aboutRequestElem = NaElement('system-get-ontapi-version')
+                aboutResponseElem = netapp_webservice_utils.wsInvoke(wsConnection, aboutRequestElem)
+                major_version = aboutResponseElem.getChildContent('major-version')
+                minor_version = aboutResponseElem.getChildContent('minor-version')
+                ontapiVersion = major_version + '.' + minor_version
+                wsConnection.setApiVersion(int(major_version), int(minor_version))
+                netapp_webservice_utils.debugPrint(1, '[' + SCRIPT_NAME + ':DiscoveryMain] Filer ONTAPI version is <%s>' % ontapiVersion)
+            else:
                 excInfo = logger.prepareJythonStackTrace('')
-                logger.debug('[' + SCRIPT_NAME + ':DiscoveryMain] Exception processing protocol <%s>! Skipping to next one...: <%s>' % (protocol, excInfo))
+                logger.debug('[' + SCRIPT_NAME + ':DiscoveryMain] Unable to connect using protocol <%s>! Exception: <%s>' % (protocol, excInfo))
                 pass
+        except:
+            excInfo = logger.prepareJythonStackTrace('')
+            logger.debug('[' + SCRIPT_NAME + ':DiscoveryMain] Exception processing protocol <%s>! Exception: <%s>' % (protocol, excInfo))
+            pass
 
         ## Should be connected!
         if wsConnection:

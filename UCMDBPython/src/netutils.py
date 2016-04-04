@@ -96,20 +96,17 @@ def isValidIp(ipAddr, filter_client_ip=None):
     @return: true if the IP is valid IPv4 address, else false
     @rtype: Boolean
     """
-    
-    return ip_addr.isValidIpAddress(ipAddr, filter_client_ip=None)
-    
-    #if ipAddr and filter_client_ip and DOMAIN_SCOPE_MANAGER.isClientIp(ipAddr):
-    #    return None
+    if ipAddr and filter_client_ip and DOMAIN_SCOPE_MANAGER.isClientIp(ipAddr):
+        return None
     # in some cases windows machines report such IP address for DHCP Server
     # because of misconfiguration
-    #if ipAddr and ipAddr.strip() == '255.255.255.255':
-    #    return None
+    if ipAddr and ipAddr.strip() == '255.255.255.255':
+        return None
 
-    #if ipAddr and ipAddr.strip() == '0.0.0.0':
-    #    return None
+    if ipAddr and ipAddr.strip() == '0.0.0.0':
+        return None
 
-    #return IPv4.isValidIp(ipAddr)
+    return IPv4.isValidIp(ipAddr)
 
 
 def convertAsciiCodesToHex(asciiSeq):
@@ -226,6 +223,7 @@ def parseNetMask(origmask):
     @return: parsed NetMask address
     @rtype: string
     """
+
     # Clean up any spaces on the ends
     mask = string.strip(origmask)
 
@@ -329,8 +327,7 @@ def isLoopbackIp(ip):
     @return: 1 if the IP is loopback, else 0
     @rtype: int
     """
-    ipaddr = ip_addr.IPAddress(ip)
-    return ipaddr.get_is_loopback()
+    return ip.startswith('127.')
 
 
 def isRoutableIp(ipObj):
@@ -353,9 +350,7 @@ def isLocalIp(ip):
     @return: 1 if the IP is local, else 0
     @rtype: int
     """
-    
-    ipaddr = ip_addr.IPAddress(ip)
-    return ipaddr.get_is_loopback() or ipaddr.get_is_unspecified()
+    return ip.startswith('0.') or ip.startswith('127.')
 
 
 def isPrivateIp(ip):
@@ -373,17 +368,13 @@ def isPrivateIp(ip):
     @return: 1 if the IP belongs to private network, else 0
     @rtype: int
     """
-    
-    return ip_addr.IPAddress(ip).get_is_private()
-    
-    '''
     if ip.startswith('10.') or ip.startswith('192.168.'):
         return 1
     low_172_ip = convertIpToInt('172.16.0.0')
     high_172_ip = convertIpToInt('172.31.255.255')
     int_ip = convertIpToInt(ip)
     return low_172_ip <= int_ip <= high_172_ip
-    '''
+
 
 def getAvailableProtocols(Framework, PROT_TYPE, IP, DOMAIN=None):
     """
@@ -576,12 +567,6 @@ def pingIp(Framework, ipAddress, timeout):
     #we succeeded to connect to the machine
     return 1
 
-def getCIDR(ipAddress, netmask):
-    from appilog.common.utils import SubnetUtils
-    try:
-        return SubnetUtils(ipAddress, netmask).getInfo().getCidrSignature()
-    except:
-        return None
 
 def isIpBroadcast(ipAddress, netmask):
     """
@@ -592,7 +577,6 @@ def isIpBroadcast(ipAddress, netmask):
     @type netmask: string
     @return: boolean
     """
-    '''
     bcast = None
     if ipAddress and netmask and isValidIp(ipAddress):
         netMask = parseNetMask(netmask)
@@ -602,14 +586,7 @@ def isIpBroadcast(ipAddress, netmask):
             if parsedIp == broadcastIp:
                 bcast = 1
     return bcast
-    '''
-    try:
-        ip = ip_addr.IPAddress(ipAddress)
-        ipNet = ip_addr.IPNetwork(getCIDR(ipAddress, netmask))
-       
-        return ip == ipNet.get_broadcast()
-    except:
-        return False
+
 
 def isIpAnycast(ipAddress, interfaceName):
     """
@@ -622,7 +599,6 @@ def isIpAnycast(ipAddress, interfaceName):
     @param interfaceName: name of the network interface
     @type interfaceName: string
     """
-    
     return (ipAddress
             and interfaceName
             and (re.match('lo.*', interfaceName, re.IGNORECASE)
@@ -1017,7 +993,9 @@ class ServiceEndpointBuilder(BaseEndpointBuilder):
         address = endpoint.getAddress()
         if not isinstance(address, (ip_addr.IPv4Address, ip_addr.IPv6Address)):
             address = ip_addr.IPAddress(address)
-        ipServerOSH = ObjectStateHolder('ip_service_endpoint')        
+        ipServerOSH = ObjectStateHolder('ip_service_endpoint')
+        uri = "%s:%s" % (address, endpoint.getPort())
+        ipServerOSH.setAttribute('ipserver_address', uri)
         ipServerOSH.setAttribute('network_port_number', endpoint.getPort())
         if endpoint.getProtocolType() == ProtocolType.TCP_PROTOCOL:
             portType = ('tcp', 1)
@@ -1028,46 +1006,15 @@ class ServiceEndpointBuilder(BaseEndpointBuilder):
         ipServerOSH.setAttribute('port_type', portType[0])
         ipServerOSH.setEnumAttribute('ipport_type', portType[1])
         ipServerOSH.setAttribute('bound_to_ip_address', str(address))
-        #self.__setServiceNames(ipServerOSH, endpoint)
-        
-        portInst = None
-        try:
-            portInst = ConfigFilesManagerImpl.getInstance()
-            portConfig = portInst.getConfigFile(CollectorsParameters.KEY_COLLECTORS_SERVERDATA_PORTNUMBERTOPORTNAME)
-            
-            if endpoint.getProtocolType() == ProtocolType.UDP_PROTOCOL:
-                portType = 17
-                portTypeName = 'udp'
-            else:
-                portType = 6 
-                portTypeName = 'tcp'           
-             
-            sv = StringVector()        
-            serviceName = portConfig.getPortNameByNumberAndType(endpoint.getPort(), portTypeName)
-            if serviceName:                
-                ipServerOSH.setStringAttribute('ip_service_name', serviceName)
-                sv.add(serviceName)
-            else:
-                ipServerOSH.setAttribute('ip_service_name', None)             
-            
-            try:
-                sv.addAll()       
-                for portDesc in portConfig.getPortNames(portType, int(endpoint.getPort()), str(endpoint.getAddress())):
-                    sv.add(portDesc)
-            except:
-                pass 
-            
-            ipServerOSH.setListAttribute('service_names', sv.toStringArray())        
-        except:
-            logger.warnException("Cannot set port names for %s: " % endpoint)
-            pass
-        
-        
-        
-        
+        self.__setServiceNames(ipServerOSH, endpoint)
         return ipServerOSH
 
-    #def __setServiceNames(self, ipServerOSH, endpoint):
+    def __setServiceNames(self, ipServerOSH, endpoint):
+        if endpoint.getPortType():
+            serviceName = str(endpoint.getPortType())
+            ipServerOSH.setStringAttribute('ip_service_name', serviceName)
+            serviceNamesList = StringVector((serviceName,))
+            ipServerOSH.setAttribute('service_names', serviceNamesList)
 
     def setNameAttr(self, ipEndpointOSH, value):
         ipEndpointOSH.setAttribute('name', value)
@@ -1468,7 +1415,6 @@ class __IPProtocols:
 from com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles import IPProtocols as JIPProtocols
 
 IPPROTOCOLS = __IPProtocols(JIPProtocols)
-
 
 
 class __DomainScopeManager:

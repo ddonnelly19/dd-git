@@ -351,6 +351,7 @@ class Module(_HasOsh):
         self.serialNumber = None
         self.hardwareRevision = None
         self.firmwareVersion = None
+        self.slotType = None
         
         _HasOsh.__init__(self)
     
@@ -624,6 +625,57 @@ class DeviceConfigBuilder(object):
 
 
 
+class FanBuilder(object):
+
+    def build(self, module):
+        if module is None:
+            raise ValueError("module is None")
+
+        fanOsh = ObjectStateHolder("fan")
+        fanOsh.setStringAttribute('name', module.slot)
+        fanOsh.setStringAttribute('serial_number', module.serialNumber)
+        fanOsh.setIntegerAttribute('fan_index', int(module.slotNumber))
+
+        return fanOsh
+
+
+
+class PowerSupplyBuilder(object):
+
+    def build(self, module):
+        if module is None:
+            raise ValueError("module is None")
+
+        powerSupplyOsh = ObjectStateHolder("power_supply")
+        powerSupplyOsh.setStringAttribute('name', module.slot)
+        powerSupplyOsh.setStringAttribute('serial_number', module.serialNumber)
+        powerSupplyOsh.setIntegerAttribute('power_supply_index', int(module.slotNumber))
+
+        return powerSupplyOsh
+
+
+
+class DeviceModuleBuilder(object):
+
+    def getModuleBuilder(self, module):
+        if module and module.slotType:
+            if module.slotType.lower() == 'fan':
+                return FanBuilder()
+            elif module.slotType.lower() == 'power':
+                return PowerSupplyBuilder()
+            else:
+                logger.debug('Special module type not handled:', module.slotType)
+        return HardwareBoardBuilder()
+
+    def build(self, module):
+        if module is None:
+            raise ValueError("module is None")
+
+        moduleBuilder = self.getModuleBuilder(module)
+        return moduleBuilder.build(module)
+
+
+
 class HardwareBoardBuilder:
     
     _INVALID_SERIALS = (
@@ -750,11 +802,13 @@ class NaReporter:
         
         self.bulkThreshold = 10000
         self.reportDeviceConfigs = False
+        self.reportDeviceModules = False
         
         self._deviceBuilder = self._createDeviceBuilder()
         self._interfaceBuilder = self._createInterfaceBuilder()
         self._layerTwoBuilder = self._createLayerTwoBuilder()
         self._configBuilder = self._createConfigBuilder()
+        self._moduleBuilder = self._createModuleBuilder()
         self._hardwareBoardBuilder = self._createHardwareBoardBuilder()
         self._portBuilder = self._createPortBuilder()
         self._vlanBuilder = self._createVlanBuilder()
@@ -766,7 +820,12 @@ class NaReporter:
     def setReportDeviceConfigs(self, reportDeviceConfigs):
         ''' bool -> None '''
         self.reportDeviceConfigs = reportDeviceConfigs
-        
+
+
+    def setReportDeviceModules(self, reportDeviceModules):
+        ''' bool -> None '''
+        self.reportDeviceModules = reportDeviceModules
+
 
     def _createDeviceBuilder(self):
         return DeviceBuilder()
@@ -783,7 +842,9 @@ class NaReporter:
     def _createConfigBuilder(self):
         return DeviceConfigBuilder()
     
-    
+    def _createModuleBuilder(self):
+        return DeviceModuleBuilder()
+
     def _createHardwareBoardBuilder(self):
         return HardwareBoardBuilder()
     
@@ -890,8 +951,27 @@ class NaReporter:
         
         vector.add(configOsh)
         return configOsh
-             
-    
+
+
+    def reportDeviceModule(self, module, device, vector):
+        ''' Modules, Device, OSHV -> OSH? '''
+#        REPORT_MODULE_TYPE = ('fan', 'power')
+#        if module.slotType and not module.slotType.lower() in REPORT_MODULE_TYPE:
+#            return None
+        moduleOsh = module.getOsh()
+        if moduleOsh is None:
+            deviceOsh = device and device.getOsh()
+            if deviceOsh is None:
+                raise ValueError("device OSH is None")
+
+            moduleOsh = self._moduleBuilder.build(module)
+            moduleOsh.setContainer(deviceOsh)
+            module.setOsh(moduleOsh)
+
+        vector.add(moduleOsh)
+        return moduleOsh
+
+
     def reportHardwareBoard(self, board, device, vector):
         ''' Module, Device, OSHV -> OSH? '''
         boardOsh = board.getOsh()
@@ -913,7 +993,16 @@ class NaReporter:
         if not port or not boardsBySlot:
             return None
 
-        return boardsBySlot.get(port._parsedBoardIndex)
+        board = boardsBySlot.get(unicode(port._parsedBoardIndex))
+        if not board:
+            board = boardsBySlot.get(port.getName())
+        if not board:
+            board = boardsBySlot.get('slot ' + unicode(port.slotNumber))
+        if not board:
+            for hwboard in boardsBySlot.values():
+                if hwboard.slotNumber == port._parsedBoardIndex:
+                    return hwboard
+        return board
     
     
     def reportPort(self, port, device, vector):
@@ -1126,6 +1215,9 @@ class NaReporter:
         if self.reportDeviceConfigs and device.config and device.config.content:
             self.reportDeviceConfig(device.config, device, vector)
 
+        if self.reportDeviceModules and device.modulesBySlot:
+            for module in device.modulesBySlot.values():
+                self.reportDeviceModule(module, device, vector)
 
     def reportConnectivity(self, port, remotePort, vector):
         ''' Port, Port, OSHV -> None '''

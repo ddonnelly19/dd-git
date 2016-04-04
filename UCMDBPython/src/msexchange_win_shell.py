@@ -10,9 +10,15 @@ class AddSnapInException(Exception): pass
 
 ## exchange server version mapping
 exchange_version_mapping = {
-    "15":"2013",
-    "14":"2010",
-    "8":"2007"
+    "15.1":"2016",
+    "15.0":"2013",
+    "14.2":"2010 SP2",
+    "14.1":"2010 SP1",
+    "14.0":"2010",
+    "8.3":"2007 SP3",
+    "8.2":"2007 SP2",
+    "8.1":"2007 SP1",
+    "8.0":"2007"
 }
 class ExchangeBaseDiscoverer:
     _QUERY_ATTRIBUTE_NAME_TO_DO_ATTRIBUTE_NAME_MAP = {'Name' : 'name',
@@ -97,7 +103,7 @@ class ExchangeBaseDiscoverer:
                 if match:
                     exchangeServer.buildNumber = match.group(1)
                 ## parse the build version
-                match_version = re.search("Version\s+(\d+)+(.*)", exchangeServer.adminDisplayVersion)
+                match_version = re.search("Version\s+(.*)\s(\(Build\s+(.*))", exchangeServer.adminDisplayVersion)
                 if match_version:
                     exchangeServer.version = match_version.group(1)
 

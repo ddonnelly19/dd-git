@@ -302,7 +302,8 @@ def getIPOSHV(Framework, ip, netmask = None, dnsServers=None, failPing=False, fa
                         raise ValueError("No reply from ping")
                     logger.debug("ping result for %s: %s" % (ip, ipsResult))
             except:
-                logger.reportWarning("No reply from ping")
+                ipsResult = [ip]
+                #logger.reportWarning("No reply from ping")
                 logger.warnException("Error pinging address %s: " % (ip))                
                 flag = True          
             
@@ -338,7 +339,7 @@ def getIPOSHV(Framework, ip, netmask = None, dnsServers=None, failPing=False, fa
                 dnsName, alias = getHostNamesFromShell(pingedIp,localShell,dnsServers)  
                                 
                 if not dnsName:
-                    logger.reportWarning("Cannot resolve hostname")
+                    #logger.reportWarning("Cannot resolve hostname")
                     if failDns:
                         raise ValueError("Cannot find FQDN for IP")
                 

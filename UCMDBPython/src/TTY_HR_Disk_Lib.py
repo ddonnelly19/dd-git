@@ -274,4 +274,10 @@ def disWinOS(hostOsh, shell):
     resultVector = ObjectStateHolderVector()
     if not NTCMD_HR_Dis_Disk_Lib.discoverDiskByWmic(shell, resultVector, hostOsh):
         NTCMD_HR_Dis_Disk_Lib.discoverDisk(shell, resultVector, hostOsh)
+    NTCMD_HR_Dis_Disk_Lib.discoverPhysicalDiskByWmi(shell, resultVector, hostOsh)
+    return resultVector
+
+def disWinOSiSCSIInfo(hostOsh, shell):
+    resultVector = ObjectStateHolderVector()
+    NTCMD_HR_Dis_Disk_Lib.discoveriSCSIInfo(shell, resultVector, hostOsh)
     return resultVector

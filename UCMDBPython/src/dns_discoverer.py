@@ -24,8 +24,6 @@ import shell_interpreter
 import netutils
 from java.lang import Exception as JException
 from appilog.common.system.types.vectors import ObjectStateHolderVector
-from appilog.common.system.types import ObjectStateHolder
-import modeling
 
 
 RecordType = dns.ResourceRecord.Type
@@ -37,12 +35,12 @@ class DnsDiscoverer:
         @raise ZoneListException: Failed zone listing'''
         raise NotImplementedError()
 
-    def listRecords(self, domain, dnsServer, *types):
+    def listRecords(self, domain, *types):
         '''@types: str, seq[str] -> seq[ResourceRecord]
         @raise DiscoveryException: Failed listing of records'''
         raise NotImplementedError()
 
-    def transferZone(self, dnsServer, zone, *types):
+    def transferZone(self, zone, *types):
         '''@types: Zone, seq[str] -> seq[ResourceRecord]
         @raise ZoneTransferException: Failed zone transfer'''
         raise NotImplementedError()
@@ -54,7 +52,6 @@ class DnsDiscovererByShell(DnsDiscoverer):
         r'@types: shellutils.Shell, str'
         self.shell = shell
         self.nameServerAddress = dnsServerAddress
-        logger.debug("dnsServerAddress: %s %s" % (self.nameServerAddress, dnsServerAddress))
         self._onInit()
 
     def _onInit(self):
@@ -107,7 +104,7 @@ class WindowsDnsDiscovererByShell(DnsDiscovererByShell):
                 logger.warn('Unexpected "reg" command output format: %s' % line)
         return zones
 
-    def listRecords(self, domain, dnsServer, *types):
+    def listRecords(self, domain, *types):
         '''@types: str, seq[str] -> seq[ResourceRecord]
 
         @command: nslookup -type=any <domain> <name server address>
@@ -124,9 +121,7 @@ class WindowsDnsDiscovererByShell(DnsDiscovererByShell):
                     default TTL = 3600 (1 hour)
             dc05-2.domain1.domain.com   internet address = 144.43.98.22
         '''
-        if not dnsServer:
-            dnsServer = ''
-        rc, output = self._execCommand('nslookup -type=any %s %s' % (domain, self.nameServerAddress or dnsServer))
+        rc, output = self._execCommand('nslookup -type=any %s %s' % (domain, self.nameServerAddress))
         if rc != 0:
             raise dns.DiscoveryException("Failed command execution to list records for specified domain", output)
         return self._parseNslookupListDomainRecordsOutput(domain, output)
@@ -153,7 +148,7 @@ class WindowsDnsDiscovererByShell(DnsDiscovererByShell):
                     logger.warn("Failed to create record (%s). %s" % (line, e))
             else:  # SOA record
                 soaRegexpPattern = '\s*(%s)\s*=\s*(.*?)$'
-                # mark as primary name server
+                #mark as primary name server
                 matchObj = re.match(soaRegexpPattern % 'primary name server', line)
                 if matchObj:
                     primaryNameServer = matchObj.group(2)
@@ -163,7 +158,7 @@ class WindowsDnsDiscovererByShell(DnsDiscovererByShell):
                     adminMail = matchObj.group(2)
                     continue
                 # available attributes
-                # ttl, expire, retry, serial, refresh
+                #ttl, expire, retry, serial, refresh
         if primaryNameServer:
             try:
                 soaRecord = dns.SoaResourceRecord(domain, primaryNameServer,
@@ -173,7 +168,7 @@ class WindowsDnsDiscovererByShell(DnsDiscovererByShell):
                 logger.warn("Failed to create SOA record. %s" % e)
         return records
 
-    def transferZone(self, zone, dnsServer, *types):
+    def transferZone(self, zone, *types):
         '''@types: Zone, seq[str] -> seq[ResourceRecord]
         @raise ZoneTransferException: if zone transfer failed
 
@@ -190,18 +185,13 @@ class WindowsDnsDiscovererByShell(DnsDiscovererByShell):
          am-fs                          CNAME  fs-02.domain.hp.com
 
         '''
-        nameServer = ''
-        if dnsServer:
-            nameServer = '- %s' % dnsServer 
-        if self.nameServerAddress:
-            nameServer = '- %s' % self.nameServerAddress
-        cmd = '(echo ls -d %s) | nslookup %s & echo.' % (zone.name, nameServer)
+        cmd = '(echo ls -d %s) | nslookup - %s & echo.' % (zone.name, self.nameServerAddress)
         rc, buffer = self._execCommand(cmd)
         if rc != 0 or buffer.count("Can't list domain"):
             logger.error("Cannot transfer zone %s. %s" % (zone.name, buffer));
             raise dns.ZoneTransferException("Cannot transfer zone records", buffer)
         records = self._parseNslookupZoneTransferOutput(buffer)
-        # if types are specified - filter records by specified types
+        #if types are specified - filter records by specified types
         if types:
             records = filter(lambda r, types=types: r.type in types, records)
         return records
@@ -211,9 +201,9 @@ class WindowsDnsDiscovererByShell(DnsDiscovererByShell):
         for line in buffer.strip().splitlines():
             if not line:
                 continue
-            matchObj = re.search("([^\s]+?)\.?"  # name excluding dot
-                                 "\s+([^\s]+)\s+"  # record type
-                                 "(.*)",  # value itself
+            matchObj = re.search("([^\s]+?)\.?"     # name excluding dot
+                                 "\s+([^\s]+)\s+"   # record type
+                                 "(.*)",            # value itself
                                  line)
             if matchObj:
                 (name, _type, cname) = matchObj.groups()
@@ -242,7 +232,7 @@ class UnixDnsDiscovererByShell(DnsDiscovererByShell):
         for path in paths:
             if not path or path in self.__visitedConfigFiles:
                 continue
-            # mark file as visited independently of result
+            #mark file as visited independently of result
             self.__visitedConfigFiles.append(path)
 
             logger.debug("process config file by path: %s" % path)
@@ -285,11 +275,11 @@ class UnixDnsDiscovererByShell(DnsDiscovererByShell):
         if rc == 0 and output:
             for line in output.splitlines():
                 tokens = re.split('\s+', line)
-                # -t <value> is the location of files of zones
+                #-t <value> is the location of files of zones
                 if '-t' in tokens:
                     index = tokens.index('-t')
                     zoneDirPath = len(tokens) > index and tokens[index + 1]
-                # -c <value> is the location of the name server config. file
+                #-c <value> is the location of the name server config. file
                 if '-c' in tokens:
                     index = tokens.index('-c')
                     configFilePath = len(tokens) > index and tokens[index + 1]
@@ -340,7 +330,7 @@ class UnixDnsDiscovererByShell(DnsDiscovererByShell):
             logger.warn(logger.prepareJythonStackTrace("Command failed"))
         else:
             records.extend(self._parseDigOutput(output))
-            # filter records by specified types
+            #filter records by specified types
             if types:
                 records = filter(lambda r, types=types: r.type in types, records)
         return records
@@ -365,9 +355,9 @@ class UnixDnsDiscovererByShell(DnsDiscovererByShell):
         @raise ZoneListException'''
 
         zones = []
-        # obtain name server configuration from process command line
+        #obtain name server configuration from process command line
         (zoneDirPath, configFilePath) = self.__obtainConfigurationFromProcess()
-        # parsing configuration file to get zone names
+        #parsing configuration file to get zone names
         paths = [configFilePath, '/etc/named.conf', '/etc/namedb/named.conf']
         zones.extend(self.__obtainZonesFromNSConfigFiles(*paths))
         logger.debug("list of zones after config file processing: %s" % zones)
@@ -381,20 +371,20 @@ class UnixDnsDiscovererByShell(DnsDiscovererByShell):
                 raise dns.ZoneListException('Failed to obtain zone information')
         return zones
 
-    def listRecords(self, domain, dnsServer, *types):
+    def listRecords(self, domain, *types):
         '''List all records related to the <domain> of specified <types>
         @types: str, seq[str] -> seq[ResourceRecord]
 
         @command: dig @<name server address> <domain> ANY
         '''
 
-        digCmd = r"""dig @%s %s ANY """ % (dnsServer or self.nameServerAddress, domain)
+        digCmd = r"""dig @%s %s ANY """ % (self.nameServerAddress, domain)
         records = self.__listRecordsByDig(digCmd, *types)
         if not records:
             raise dns.DiscoveryException("Failed list records for domain")
         return records
 
-    def transferZone(self, zone, dnsServer, *types):
+    def transferZone(self, zone, *types):
         ''' All records for <zone> of type in <types> will be transfered.
         @types: str, seq[str], bool -> seq[ResourceRecord]
 
@@ -402,14 +392,14 @@ class UnixDnsDiscovererByShell(DnsDiscovererByShell):
         @command: dig @<name server address> <domain> axfr
         '''
 
-        digCmd = 'dig @%s %s axfr ' % (dnsServer or self.nameServerAddress, zone.name)
+        digCmd = 'dig @%s %s axfr ' % (self.nameServerAddress, zone.name)
         records = self.__listRecordsByDig(digCmd, *types)
         if not records:
             raise dns.ZoneTransferException("Failed transfer zone resource records")
         return records
 
 
-def createDiscovererByShell(shell, dnsServerAddress):
+def createDiscovererByShell(shell, dnsServerAddress='localhost'):
     r'''Factory method for the proper discoverer implementation based on
     the provided shell type
     For Unix OS system variable PATH extended to include more wide range of
@@ -420,23 +410,25 @@ def createDiscovererByShell(shell, dnsServerAddress):
     '''
     cls = None
     if shell.isWinOs():
-        return WindowsDnsDiscovererByShell(shell, dnsServerAddress)
+        cls = WindowsDnsDiscovererByShell
+    else:
+        environment = shell_interpreter.Factory().create(shell).getEnvironment()
+        environment.appendPath('PATH', '/usr/sbin')
+        cls = UnixDnsDiscovererByShell
+    return cls(shell, dnsServerAddress)
 
-    environment = shell_interpreter.Factory().create(shell).getEnvironment()
-    environment.appendPath('PATH', '/usr/sbin')
-    return UnixDnsDiscovererByShell(shell, dnsServerAddress)
 
 class _MapWalker:
-    '''Contains helper method to process mapping of name to record according
+    ''''Contains helper method to process mapping of name to record according
     to some programmatical logic. For instance for provided alias find all
     referenced address records'''
 
     def __init__(self, nameToRecord):
         '@types: dict[str, ResourceRecord]'
         self.__map = nameToRecord
-        # mark elements which have IPs
+        #mark elements which have IPs
         self.__aliasToAddrRecord = {}
-        # mark elements which have been visited
+        #mark elements which have been visited
         self.__visited = {}
 
     def findAddressRecords(self, record):
@@ -451,16 +443,16 @@ class _MapWalker:
 
         addresses = []
         if record.type == RecordType.CNAME:
-            # mark record as visited
+            #mark record as visited
             self.__visited[record] = None
-            # resolve canonical resource
+            #resolve canonical resource
             name = record.cname
             records = self.__map.get(name.lower())
             if not records:
                 subDomainName = name[:name.find('.')]
                 records = self.__map.get(subDomainName.lower()) or ()
             for r in records:
-                # check for cycles or visited records
+                #check for cycles or visited records
                 if r not in self.__visited:
                     buffer = self.findAddressRecords(r)
                     if buffer:
@@ -471,10 +463,7 @@ class _MapWalker:
 
 def _isIpInProbeRange(ip):
     '@types: str -> bool'
-    try:
-        return not netutils.DOMAIN_SCOPE_MANAGER.isIpOutOfScope(ip)
-    except:
-        return False
+    return not netutils.DOMAIN_SCOPE_MANAGER.isIpOutOfScope(ip)
 
 
 class ZoneTopology:
@@ -500,7 +489,6 @@ def reportTopologies(zoneTopologies, includeOutscopeIPs=0,
 
     for topology in zoneTopologies:
         zone = topology.zone
-        logger.debug("building zone: %s" % str(zone.name))
         zoneOsh = zoneBuilder.buildZone(zone)
         vector.add(zoneOsh)
 
@@ -514,65 +502,22 @@ def reportTopologies(zoneTopologies, includeOutscopeIPs=0,
 
         for records in nameToRecords.values():
             for record in records:
-                # record type is an alias
+                #record type is an alias
                 if record.type == RecordType.CNAME:
                     v = _reportAliasRecord(record, zone, zoneOsh, mapWalker,
                                            includeOutscopeIPs,
                                            isBrokenAliasesReported, reporter)
                     v and vector.addAll(v)
-                # record type is an address
+                #record type is an address
                 elif (record.type in (RecordType.A, RecordType.AAAA)
-                      and includeOutscopeIPs or (_isIpInProbeRange(record.cname))):
-                    # build resource records with FQDN
+                      and (_isIpInProbeRange(record.cname)
+                           or includeOutscopeIPs)):
+                    #build resource records with FQDN
                     record = recordWithFqdn(record, zone)
                     (ipOsh, recordOsh, vec) = reporter.reportAddressRecord(record, zoneOsh)
                     vector.addAll(vec)
-                elif record.type == RecordType.NS:
-                    vector.addAll(_reportNSRecord(record, zoneOsh, "NS"))
-                elif record.type == RecordType.SOA:
-                    vector.addAll(_reportNSRecord(record, zoneOsh, "SOA"))
-                elif record.type == RecordType.MX:
-                    vector.addAll(_reportMXRecord(record, zoneOsh))
     return vector
 
-def _reportNSRecord(record, zoneOsh, type):  
-    vec = ObjectStateHolderVector()
-    nameserver = record.cname.lower().strip(".")  
-    osh = ObjectStateHolder('dns_record')
-    osh.setStringAttribute("data_name", nameserver)      
-    osh.setAttribute("type", type)
-    osh.setContainer(zoneOsh)
-    vec.add(osh)    
-    ipAddress = netutils.getHostAddress(nameserver)
-    hostOsh = modeling.createHostOSH(ipAddress, 'node', None, nameserver)
-    ipOsh = modeling.createIpOSH(ipAddress)
-    dnsOsh = modeling.createDnsOsh(ipAddress, hostOsh)
-    vec.add(modeling.createLinkOSH('containment', hostOsh, ipOsh))
-    vec.add(modeling.createLinkOSH('realization', osh, ipOsh))
-    #vec.add(modeling.createLinkOSH('usage', dnsOsh, ipOsh))
-    vec.add(dnsOsh)                    
-      
-    return vec
-
-def _reportMXRecord(record, zoneOsh):  
-    vec = ObjectStateHolderVector()
-    nameserver = record.cname.lower().strip(".")  
-    osh = ObjectStateHolder('dns_record')
-    osh.setStringAttribute("data_name", nameserver)      
-    osh.setAttribute("type", "MX")
-    osh.setContainer(zoneOsh)
-    vec.add(osh)    
-    ipAddress = netutils.getHostAddress(nameserver)
-    hostOsh = modeling.createHostOSH(ipAddress, 'node', None, nameserver)
-    ipOsh = modeling.createIpOSH(ipAddress)
-    dnsOsh = modeling.createApplicationOSH("mail_server", None, hostOsh, None, None)
-    dnsOsh.setAttribute("application_ip", ipAddress)
-    vec.add(modeling.createLinkOSH('containment', hostOsh, ipOsh))
-    vec.add(modeling.createLinkOSH('realization', osh, ipOsh))
-    #vec.add(modeling.createLinkOSH('usage', dnsOsh, ipOsh))
-    vec.add(dnsOsh)                    
-      
-    return vec
 
 def _reportAliasRecord(record, zone, zoneOsh, mapWalker, includeOutscopeIPs,
                        isBrokenAliasesReported, reporter):
@@ -585,7 +530,7 @@ def _reportAliasRecord(record, zone, zoneOsh, mapWalker, includeOutscopeIPs,
     vec = None
     if aRecords:
         for aRecord in aRecords:
-            # skip IPs that are out of bound of Probe range
+            #skip IPs that are out of bound of Probe range
             ip = aRecord.cname
             if (_isValidIp(ip)
                 and (_isIpInProbeRange(ip)
@@ -602,62 +547,35 @@ def _reportAliasRecord(record, zone, zoneOsh, mapWalker, includeOutscopeIPs,
     return vec
 
 
-def discoverDnsZoneTopologies(dnsDiscoverer, zoneList, protocolName, transferZones=True, dnsServer=None):
+def discoverDnsZoneTopologies(dnsDiscoverer, zoneList, protocolName):
     r'''DnsDiscoverer, seq[str], str -> seq[_ZoneTopology]
     @note: make error reporting to the UI
     '''
 
     topologies = []
-    try:       
-        zoneList = set(zoneList)
+    try:
         zoneList = zoneList and map(dns.Zone, zoneList)
         zones = zoneList or dnsDiscoverer.listZones()
         isError = 0
-        logger.info("Zones: %s" % len(zones))
         for zone in zones:
             if (dns.isLocalhostZone(zone)
                 or dns.isReverseZone(zone)
                 or dns.isRootZone(zone)):
                 continue
-            flag2 = True
-            
+            topology = ZoneTopology(zone)
             try:
-                logger.info('transfer zone: %s' % zone)
-                types = (RecordType.A,  # IPv4 address
+                logger.debug('transfer zone: %s' % zone)
+                types = (RecordType.A,      # IPv4 address
                          RecordType.CNAME,  # Alias
-                         RecordType.AAAA)  # IPv6 address
-                records = dnsDiscoverer.transferZone(zone, dnsServer, *types)
-                if len(records) > 0:                       
-                    topology = ZoneTopology(zone)
-                    topology.records.extend(records)
-                    topologies.append(topology)
-                    flag2=False
-            except:
-                logger.warnException('Failed to transfer zone "%s": ' % zone)                   
+                         RecordType.AAAA)   # IPv6 address
+                records = dnsDiscoverer.transferZone(zone, *types)
+                topology.records.extend(records)
+            except dns.DiscoveryException, dde:
+                logger.warn('Failed to transfer zone "%s"' % zone)
+                logger.debugException(str(dde))
                 isError = 1
-                flag2 = True
-            if flag2 and transferZones:
-                try:
-                    flag = False
-                    records = dnsDiscoverer.listRecords(zone.name, dnsServer, None)
-                    
-                    if len(records) > 1:
-                        for record in records:
-                            if record.type == RecordType.SOA:
-                                zone2 = dns.Zone(record.name, record.cname, record.adminMail)
-                                flag = True
-                                topology = ZoneTopology(zone2)
-                                topology.records.extend(records)
-                                topologies.append(topology)                        
-                                logger.info('building zone: %s (%s) (%s)' % (zone2.name, zone2.soa, len(records)))
-                            elif record.type == RecordType.NS and transferZones and not dnsServer:
-                                logger.debug("trying to transfer zone %s from %s" % (zone.name, record.cname))
-                                topologies.extend(discoverDnsZoneTopologies(dnsDiscoverer, [zone.name], protocolName, False, record.cname))               
-                        if not flag:
-                            logger.warn("No SOA building zone: %s (%s)" % (zone, len(records)))
-                except:
-                    logger.warnException('Error building zone: %s' % zone)         
-           
+            else:
+                topologies.append(topology)
         if isError:
             errCode = errorcodes.FAILED_TRANSFER_DNS_ZONE
             message = "Failed to transfer zone records for one or more zones"

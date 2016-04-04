@@ -162,7 +162,7 @@ def processContainerInfo(shell, skipDockerVolume, filesystemDict, containerInspe
     json = _JSONs()
     jsonOutput = json.loads(containerInspectOutput)
     inspectJsonObj = jsonOutput[0]
-    containerPorts = None
+
     imageName = containerInfo[1]
     containerName = containerInfo[2]
     if len(containerInfo) == 4:
@@ -170,16 +170,15 @@ def processContainerInfo(shell, skipDockerVolume, filesystemDict, containerInspe
     else:
         portsArray = []
         ports = inspectJsonObj['NetworkSettings']['Ports']
-        if ports:
-            port_keys = ports.keys()
-            port_keys.sort()
-            for port in port_keys:
-                if ports[port]:
-                    if ports[port][0]['HostIp'] and ports[port][0]['HostPort']:
-                        portsArray.append(ports[port][0]['HostIp'] + ':' + ports[port][0]['HostPort'] + ' -> ' + port)
-                else:
-                    portsArray.append(port)
-            containerPorts = ', '.join(portsArray)
+        port_keys = ports.keys()
+        port_keys.sort()
+        for port in port_keys:
+            if ports[port]:
+                if ports[port][0]['HostIp'] and ports[port][0]['HostPort']:
+                    portsArray.append(ports[port][0]['HostIp'] + ':' + ports[port][0]['HostPort'] + ' -> ' + port)
+            else:
+                portsArray.append(port)
+        containerPorts = ', '.join(portsArray)
 
     # get container related image
     containerId = inspectJsonObj['Id']

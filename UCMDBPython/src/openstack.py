@@ -52,6 +52,7 @@ class Tenant:
     def __init__(self, name, id = None):
         self.name = name
         self.id = id
+        self.credential_id = None
 
     def report(self):
         tenant_osh = ObjectStateHolder('openstack_tenant')

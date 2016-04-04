@@ -52,6 +52,8 @@ def _getSupportedShellProtocols(Framework):
                 supportedProtocols.append(ClientsConsts.SSH_PROTOCOL_NAME)
             elif protocol.strip().lower() == ClientsConsts.TELNET_PROTOCOL_NAME.lower():
                 supportedProtocols.append(ClientsConsts.TELNET_PROTOCOL_NAME)
+            elif protocol.strip().lower() == 'powercmd':
+                supportedProtocols.append('powercmd')
             elif protocol.strip().lower() == ClientsConsts.NTCMD_PROTOCOL_NAME.lower():
                 supportedProtocols.append(ClientsConsts.NTCMD_PROTOCOL_NAME)
             else:
@@ -59,7 +61,8 @@ def _getSupportedShellProtocols(Framework):
     else:
         supportedProtocols = [ClientsConsts.SSH_PROTOCOL_NAME,
                               ClientsConsts.TELNET_PROTOCOL_NAME,
-                              ClientsConsts.NTCMD_PROTOCOL_NAME]
+                              ClientsConsts.NTCMD_PROTOCOL_NAME,
+                              'powercmd']
 
     # empty means last (other possible values - first, last, none)
     udaConnectionOrder = (Framework.getParameter('udaConnectionOrder') or 'last')

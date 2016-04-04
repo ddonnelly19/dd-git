@@ -1146,7 +1146,6 @@ class UnixDiscoverer:
                     return 1
     
     def addResultsToVector(self, vector, ttyObj, nat_ip = None):
-        logger.debug("adding results to vector")
         self.hostDataObject.build()
         self.hostDataObject.addResultsToVector(vector)
         if self.hostDataObject.getIpsCount() > 0:
@@ -2014,6 +2013,7 @@ class LinuxDiscoverer(UnixDiscoverer):
     OS_FLAVOR_FILE_TO_REGEX = (
        ('/etc/SuSE-release', '\s*(SUSE[\sa-yA-Y\_]+?)\s(\d+)',),
        ('/etc/oracle-release', '^(.*?)\s*([R|r]elease.*?)($|(\s+\(.*))',),
+       ('/etc/enterprise-release', '^(.*?)\s*([R|r]elease.*?)($|(\s+\(.*))',),
        ('/etc/redhat-release', '^(.*?)\s*([R|r]elease.*?)($|(\s+\(.*))',),
     )
 
@@ -2074,6 +2074,8 @@ class LinuxDiscoverer(UnixDiscoverer):
             self.hostDataObject.setOsArchitecture('64-bit')
         elif output and re.search('i686|i386', output):
             self.hostDataObject.setOsArchitecture('32-bit')
+        elif output and re.search('ia64', output):
+            self.hostDataObject.setOsArchitecture('ia64')
         else:
             logger.warn('Failed detecting OS Architecture')
 
@@ -2489,6 +2491,18 @@ class HpuxDiscoverer(UnixDiscoverer):
         self.discoverOsDomainName()
         self.discoverDefaultGateway()
         self.discoverOsFlavor()
+        self.discoverOsArchitecture()
+
+    def discoverOsArchitecture(self):
+        output = self.getCommandsOutput(['uname -a'])
+        if output and re.search('x86_64', output):
+            self.hostDataObject.setOsArchitecture('64-bit')
+        elif output and re.search('i686|i386', output):
+            self.hostDataObject.setOsArchitecture('32-bit')
+        elif output and re.search('ia64', output):
+            self.hostDataObject.setOsArchitecture('ia64')
+        else:
+            logger.warn('Failed detecting OS Architecture')
 
     def discoverHostModel(self):
         output = self.getCommandsOutput(['model', '/usr/bin/model'])
@@ -3074,7 +3088,6 @@ def isValidHostname(machine_name):
         hostnameInvalid = (re.search(r"[\s',]", machine_name)
                            or re.match("localhost", machine_name))
         return not hostnameInvalid
-    return False
 
 
 def getMachineName(client):

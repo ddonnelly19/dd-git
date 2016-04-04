@@ -259,7 +259,9 @@ class WmicQueryBuilder(BaseWmiQueryBuilder):
         @types: str -> void
         """
         if namespace:
-            self._namespace = namespace
+            if namespace.find("\\\\", 0,2) < 0:
+                namespace = '\\\\'+namespace
+            self._namespace = namespace.replace('/','\\')
 
     def useSplitListOutput(self, value):
         self._splitListOutput = value
@@ -298,8 +300,11 @@ class WmicQueryBuilder(BaseWmiQueryBuilder):
     def _parseAsList(self, fieldValue):
         resultList = []
         if fieldValue:
-            resultList = re.split('[\,\"]+', fieldValue.replace('{', '').replace('}', ''))
-        return map(lambda elem: elem.strip(), resultList)
+            if fieldValue.find(',')<0:
+                resultList = re.split('[\,\"]+', fieldValue.replace('{', '').replace('}', ''))
+            else:
+                resultList = re.split('\,\s*\"*', fieldValue.strip(' {}'))
+        return map(lambda elem: elem.strip('"'), resultList)
 
     def parseResults(self, output, separator='='):
         resultItems = []
@@ -455,6 +460,9 @@ class _Agent:
     def executeWmiQuery(self, queryBuilder, timeout=0):
         raise NotImplemented
 
+    def setNamespace(self, ns=None):
+        raise NotImplemented
+
     def close(self):
         raise NotImplemented
 
@@ -474,6 +482,13 @@ class WmiAgent(_Agent):
         resultSet = self.wmiClient.executeQuery(query)  # @@CMD_PERMISION wmi protocol execution
         return queryBuilder.parseResults(resultSet)
 
+    def setNamespace(self, ns=None):
+        default_ns = "root/cimv2"
+        if ns is None:
+            self.wmiClient.setNamespace(default_ns)
+        else:
+            self.wmiClient.setNamespace(ns)
+
     def close(self):
         self.wmiClient.close()
 
@@ -491,8 +506,12 @@ class WmicAgent(_Agent):
     def __init__(self, shell):
         '@types: Shell -> None'
         self.shell = shell
+        self.namespace = None
         globalSettings = GeneralSettingsConfigFile.getInstance()
         self.useIntermediateFile = globalSettings.getPropertyBooleanValue(WmicAgent.__PROPERTY_NAME_USE_INTERMEDIATE_FILE, 0)
+
+    def setNamespace(self, ns=None):
+        self.namespace = ns
 
     def getWmiData(self, queryBuilder, timeout=0):
         """
@@ -511,7 +530,12 @@ class WmicAgent(_Agent):
         @types: WmicQueryBuilder[, int = 0] -> str
         @raise ValueError: if WMIC query execution failed
         """
+
+        if self.namespace and len(self.namespace) > 0:
+            queryBuilder.setNamespace(self.namespace)
+
         query = queryBuilder.buildQuery()
+
         result = self.shell.execCmd(query, timeout)  # @@CMD_PERMISION wmi protocol execution
         errorCode = self.shell.getLastCmdReturnCode()
         if errorCode:
@@ -586,6 +610,10 @@ class WmiPowerShellAgent(_Agent):
     def __init__(self, shell):
         '@types: shellutils.PowerShell -> None'
         self.shell = shell
+        self.namespace = None
+
+    def setNamespace(self, ns=None):
+        self.namespace = ns
 
     def getWmiData(self, queryBuilder, timeout=0):
         output = self.executeWmiQuery(queryBuilder, timeout)
@@ -596,6 +624,9 @@ class WmiPowerShellAgent(_Agent):
         @types: PowerShelWmilQueryBuilder[, int = 0] -> str
         @raise ValueError: if query execution failed
         """
+        if self.namespace and len(self.namespace)>0:
+            queryBuilder.setNamespace(self.namespace)
+
         query = queryBuilder.buildQuery()
         output = self.shell.execCmd(query, timeout, lineWidth=100)  # @@CMD_PERMISION wmi protocol execution
         errorCode = self.shell.getLastCmdReturnCode()
@@ -664,7 +695,7 @@ def getWmiProvider(client):
     clientType = client.getClientType()
     if clientType == 'wmi':
         return WmiAgentProvider(client)
-    if (clientType == 'ntadmin') or (clientType == 'ssh') or (clientType == 'uda'):
+    if (clientType == 'ntadmin') or (clientType == 'ssh') or (clientType == 'uda') or clientType == 'powercmd':
         return WmicProvider(client)
     if clientType == 'powershell':
         return PowerShellWmiProvider(client)

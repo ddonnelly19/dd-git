@@ -122,11 +122,8 @@ class ShellTcpDiscoverer(TcpDiscoverer):
         
     def _filterEndpointsByPorts(self, endpoints, connections):
         result = []
-        cfg_file = self.framework.getConfigFile(CollectorsParameters.KEY_COLLECTORS_SERVERDATA_PORTNUMBERTOPORTNAME)
-        ports = [port.getPortNumber() for port in cfg_file.getPorts(PortType.TCP)]
-        filtered_connections = [x for x in connections if x and x.dstPort in ports]
         connections_map = {}
-        [connections_map.update({str(x.srcPort): x}) for x in filtered_connections]
+        [connections_map.update({str(x.srcPort): x}) for x in connections]
         for endpoint in endpoints:
             local_endpoints = endpoint.getEndpoints()
             filtered = []
@@ -195,6 +192,9 @@ def reportProcessToPort(hostId, processes, endpoints):
         remotes = key_to_endpoints_map.get(process.getPid())
         if remotes:
             for remote in remotes:
+                if not netutils.isValidIp(remote.getAddress()):
+                    logger.debug(remote, ' is not a valid ip')
+                    continue
                 builder = netutils.ServiceEndpointBuilder()
                 reporter = netutils.EndpointReporter(builder)
                 nodeOsh = reporter.reportHostFromEndpoint(remote)
@@ -207,14 +207,9 @@ def reportProcessToPort(hostId, processes, endpoints):
     return vector
 
 def StepMain(Framework):
-    hasResults = Framework.getState().getProperty(DependenciesDiscoveryConsts.NEXT_HOP_PROVIDERS_RESULT_PROPERTY)
-    if hasResults:
-        logger.debug('Skip TCP connection discovery since already have results from configuration files')
-        Framework.setStepExecutionStatus(WorkflowStepStatus.SUCCESS)
-        return
 
     OSHVResult = ObjectStateHolderVector()
-    logger.debug('Cannot find next-hop from configuration files, try to discover by TCP connections.')
+    logger.debug('Try to discover by TCP connections.')
     protocol = Framework.getDestinationAttribute('Protocol')
     process_cmd_lines = Framework.getTriggerCIDataAsList('process_cmdline')
     hostId = Framework.getDestinationAttribute('hostId')

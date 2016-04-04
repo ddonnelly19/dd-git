@@ -2372,14 +2372,42 @@ class TopologyReporter(_HasCrossClientHelper):
                 if not vm: continue
 
                 for vnicKey, vnic in vm.virtualNicsByKey.items():
-                    networkReference = self._getNetworkReferenceFromVirtualNic(vnic)
-                    if networkReference is None:
-                        continue
-                    network = networksByReference.get(wrapMoref(networkReference))
-                    networkName = network and network.name
+                    mac = vnic.getMacAddress()
+                    portGroup = host._portGroupPorts_Mac_PG.get(mac)
 
-                    portGroupKey = host._portGroupNameToKey.get(networkName)
-                    portGroupOsh = host.portGroupOshByKey.get(portGroupKey)
+                    if portGroup:
+                        portGroupOsh = ObjectStateHolder('vmware_port_group')
+                        vswitch = host._portGroupPorts_Mac_Vswitch.get(mac)
+                        m = re.match('key-vim.host.[Vv]irtual[Ss]witch-([\w\-]+)', vswitch)
+                        if m:
+                            vswitch = m.group(1)
+                        uuid = host._uuid
+                        if not uuid: raise ValueError, "cannot find UUID of ESX server while creating virtual switch"
+                        compositeKey = "_".join([uuid, vswitch])
+                        hostKey = _getMd5OfString(compositeKey)
+                        vswitchOsh = modeling.createCompleteHostOSH('vmware_virtual_switch', hostKey)
+                        vswitchOsh.setAttribute('name', vswitch)
+                        spec = portGroup.getSpec()
+                        if spec is not None:
+                            name = spec.getName()
+                            if name:
+                                portGroupOsh.setStringAttribute('data_name', name)
+                                portGroupOsh.setContainer(vswitchOsh)
+                            else:
+                                raise ValueError, "Cannot find name for port group"
+
+                            vlanId = spec.getVlanId()
+                            if vlanId is not None:
+                                portGroupOsh.setIntegerAttribute('vlan_id', vlanId)
+                    else:
+                        networkReference = self._getNetworkReferenceFromVirtualNic(vnic)
+                        if networkReference is None:
+                            continue
+                        network = networksByReference.get(wrapMoref(networkReference))
+                        networkName = network and network.name
+
+                        portGroupKey = host._portGroupNameToKey.get(networkName)
+                        portGroupOsh = host.portGroupOshByKey.get(portGroupKey)
 
                     vnicOsh = vm.virtualNicOshByKey.get(vnicKey)
 

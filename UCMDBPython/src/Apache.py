@@ -1114,6 +1114,7 @@ class ApacheConfigDiscoverer:
 
     MODULE_PROXY_NAME = 'proxy_module'
     MODULE_PROXY_BALANCER_NAME = 'proxy_balancer_module'
+    CONFIG_FILE_INCLUDE_MAX_DEPTH = 10
 
     def __init__(self, mainConfigPath, shellUtils, hostOsh, framework, processDiscoverer, resourceFactory):
         self.shellUtils = shellUtils
@@ -1146,6 +1147,7 @@ class ApacheConfigDiscoverer:
 
         self.listenAddressToOsh = {}
         self.includeConfigFileObjects = []
+        self.discoveredConfigFiles = []
         self.vhostProcessors = []
 
         self.loadedModulesMap = {}
@@ -1169,18 +1171,39 @@ class ApacheConfigDiscoverer:
         self.discoverServerRoot()
         self.discoverIsIhs()
         self.discoverVersion()
-        self.parseConfigFile(self.mainConfigFileObject)
-        self.discoverIncludes(self.mainConfigFileObject)
+
+        self.discoverConfigFile(self.mainConfigFileObject)
 
         for includeConfigFileObject in self.includeConfigFileObjects:
-            self.parseConfigFile(includeConfigFileObject)
+            if includeConfigFileObject.path in self.discoveredConfigFiles:
+                continue
+            self.discoverConfigFile(includeConfigFileObject)
             self.discoverJkWorkersFile(includeConfigFileObject)
-
 
         self.discoverWebApplications()
 
         self.createApacheOsh()
         self.updateApacheOsh()
+
+    def discoverConfigFile(self, configFileObject, configFileList = None, includeDepth = 0):
+        configFileLoadSequence = []
+        # If max recursion depth is reached stop discovering deeper
+        if includeDepth > self.CONFIG_FILE_INCLUDE_MAX_DEPTH:
+            return
+        currentIncludeDepth = includeDepth + 1
+        if configFileList != None:
+            configFileLoadSequence.extend(configFileList)
+        logger.debug('parse config file: ', configFileObject.path)
+        configFileLoadSequence.append(configFileObject.path)
+        self.discoveredConfigFiles.append(configFileObject.path)
+        self.parseConfigFile(configFileObject)
+        includedConfigFileObjects = self.discoverIncludes(configFileObject)
+        for includedConfigFileObject in includedConfigFileObjects:
+            # Avoid circular include
+            if includedConfigFileObject.path in configFileLoadSequence:
+                continue
+            self.discoverConfigFile(includedConfigFileObject, configFileLoadSequence, currentIncludeDepth)
+            self.discoverJkWorkersFile(includedConfigFileObject)
 
     def parseConfigFile(self, configFileObject):
         self.parseListenAddresses(configFileObject)
@@ -1197,6 +1220,17 @@ class ApacheConfigDiscoverer:
     def discoverServerRoot(self):
         # ServerRoot from config file has priority
         serverRoot = getAttribute(self.mainConfigFileObject.contentNoComments, 'ServerRoot')
+        # check if ServerRoot is defined as a variable
+        variableMatch =  re.match(r'\"\${(.*)}\"', serverRoot)
+        if variableMatch:
+            definedVariables = getAttributeList(self.mainConfigFileObject.contentNoComments, 'Define')
+            if definedVariables:
+                for definedVariable in definedVariables:
+                    matcher = re.match(r"(.+)\s+(.+)", definedVariable)
+                    if matcher and variableMatch.group(1) == matcher.group(1):
+                        serverRoot = matcher.group(2)
+                        logger.debug("find serverRoot definition, value is:", matcher.group(2))
+                        break
         if serverRoot:
             self.serverRootWrapper = self.resourceFactory.createPathWrapper(serverRoot)
         else:
@@ -1245,6 +1279,7 @@ class ApacheConfigDiscoverer:
                 return match.group(1)
 
     def discoverIncludes(self, configFileObject):
+        includedConfigFileObjects = []
         includeDirs = getAttributeList(configFileObject.contentNoComments, 'include')
         includesProcessor = self.resourceFactory.createIncludesDiscoverer(self.serverRootWrapper)
 
@@ -1259,6 +1294,8 @@ class ApacheConfigDiscoverer:
 
                 for includeObject in includes:
                     self.includeConfigFileObjects.append(includeObject)
+                    includedConfigFileObjects.append(includeObject)
+        return includedConfigFileObjects
 
     def discoverJkWorkersFile(self, configFileObject):
         includeDirs = getAttributeList(configFileObject.contentNoComments, 'JkWorkersFile')

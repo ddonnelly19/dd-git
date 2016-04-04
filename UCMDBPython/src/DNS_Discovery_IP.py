@@ -9,6 +9,6 @@ def DiscoveryMain(Framework):
     dnsServers =   Framework.getTriggerCIDataAsList('dns_servers')    
     netmask =Framework.getTriggerCIData('netmask') or None    
  
-    OSHVResult = pi_utils.getIPOSHV(Framework, ip, netmask, dnsServers, True)
+    OSHVResult = pi_utils.getIPOSHV(Framework, ip, netmask, dnsServers, False)
    
     return OSHVResult

@@ -107,7 +107,7 @@ def discoverClientInRange(Framework, client, probeRange, excludePatterns=None):
             pingResult = normalize(pingResult)
             if len(pingResult) > 0:
                 logger.debug("Result Collected IPs in range: ", pingResult)
-                clientDiscovery(Framework, "".join(pingResult))
+                clientDiscovery(Framework, pingResult[0])
             ipForICMPList = []
         else:
             filteredIpCount += 1

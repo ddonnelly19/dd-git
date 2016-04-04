@@ -9,6 +9,7 @@
             <qualifiers>
                 <qualifier type="application">HP UCMDB Probe</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -26,6 +27,7 @@
                 <qualifier type="application">HP UCMDB Server on Windows</qualifier>
                 <qualifier type="application">HP UCMDB Server on Unix</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -43,6 +45,7 @@
                 <qualifier type="application">HP UCMDB Server 9_10 on Windows</qualifier>
                 <qualifier type="application">HP UCMDB Server 9_10 on Unix</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">powershell</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                 <qualifier type="protocol">uda</qualifier>
@@ -61,6 +64,7 @@
             <qualifiers>
                 <qualifier type="application">HP Quality Center</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -78,6 +82,7 @@
             <qualifiers>
                 <qualifier type="application">HP PPM Center</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -95,6 +100,7 @@
             <qualifiers>
                 <qualifier type="application">HP Network Node Manager</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -112,6 +118,7 @@
             <qualifiers>
                 <qualifier type="application">HP Service Manager</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -129,6 +136,7 @@
             <qualifiers>
                 <qualifier type="application">HP RUM</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -145,6 +153,7 @@
             <qualifiers>
                 <qualifier type="application">HP RUM Probe</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -163,6 +172,7 @@
                 <qualifier type="application">HP OpenView Operations for Windows</qualifier>
                 <qualifier type="application">HP OpenView Agent for Windows</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -179,6 +189,7 @@
             <qualifiers>
                 <qualifier type="application">HP OpenView Operations for Unix</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -196,6 +207,7 @@
                 <qualifier type="application">HP OpenView Agent for Windows</qualifier>
                 <qualifier type="application">HP OpenView Agent for Unix</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                 <qualifier type="protocol">telnet</qualifier>
@@ -212,6 +224,7 @@
             <qualifiers>
                 <qualifier type="application">HP Operations Agent</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                 <qualifier type="protocol">telnet</qualifier>
@@ -228,6 +241,7 @@
             <qualifiers>
                 <qualifier type="application">HP WebInspect</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -244,6 +258,7 @@
             <qualifiers>
                 <qualifier type="application">HP QAInspect</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -260,6 +275,7 @@
             <qualifiers>
                 <qualifier type="application">HP AMP</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -281,6 +297,7 @@
                 <qualifier type="application">HP BAC DPS Server on Windows</qualifier>
                 <qualifier type="application">HP BAC DPS Server on Unix</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -298,6 +315,7 @@
             <qualifiers>
                 <qualifier type="application">HP TransactionVision</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -315,6 +333,7 @@
             <qualifiers>
                 <qualifier type="application">HP Load Runner</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -333,6 +352,7 @@
                 <qualifier type="application">HP SiteScope Server</qualifier>
                 <qualifier type="application">HP SiteScope Server by java process</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                   <qualifier type="protocol">telnet</qualifier>
@@ -350,6 +370,7 @@
             <qualifiers>
                 <qualifier type="application">HP Diagnostics Probe</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                   <qualifier type="protocol">telnet</qualifier>

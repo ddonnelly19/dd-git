@@ -820,6 +820,7 @@ __queryClassByClientType = {
                       ClientsConsts.DDM_AGENT_PROTOCOL_NAME: NtcmdShellProvider,
                       ClientsConsts.SSH_PROTOCOL_NAME: NtcmdShellProvider,
                       ClientsConsts.TELNET_PROTOCOL_NAME: NtcmdShellProvider,
+                      'powercmd': NtcmdShellProvider,
                       ClientsConsts.WMI_PROTOCOL_NAME: WmiProvider,
                       PowerShell.PROTOCOL_TYPE: PowerShellProvider
                       }

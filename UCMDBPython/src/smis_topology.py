@@ -33,6 +33,33 @@ def DiscoveryMain(Framework):
                 client = cim_discover.createClient(Framework, ipAddress, namespace, credentialsId)
                 
                 logger.debug('Connected to namespace "%s"' % namespace)
+                storageFabricDiscoverer = smis_discoverer.getStorageFabricDiscoverer(namespace)
+                if storageFabricDiscoverer:
+                    storageFabrics = storageFabricDiscoverer.discover(client)
+                    switch2FabricLinksDiscover = smis_discoverer.getSwitch2FabricLinksDiscoverDiscoverer(namespace)
+                    switch2FabricMap = {}
+                    if switch2FabricLinksDiscover:
+                        switch2FabricMap = switch2FabricLinksDiscover.discover(client)
+
+                    fcSwitchs = []
+                    hosts = []
+                    switchDiscoverer = smis_discoverer.getSwitchComputerSystemDiscoverer(namespace)
+                    if switchDiscoverer:
+                        (fcSwitchs, hosts) = switchDiscoverer.discover(client)
+
+                    fcPorts = []
+                    fcPortsDiscover = smis_discoverer.getFcPortDiscoverer(namespace)
+                    if fcPortsDiscover:
+                        fcPorts = fcPortsDiscover.discover(client)
+
+                    connections = {}
+                    portConnectionDiscover = smis_discoverer.getFCPortConnectionsDiscover(namespace)
+                    if portConnectionDiscover:
+                        connections = portConnectionDiscover.discover(client)
+                    topoBuilder = smis.TopologyBuilder()
+                    OSHVResult.addAll(topoBuilder.reportFcSwitchTopolopy(storageFabrics,fcSwitchs,hosts,fcPorts,switch2FabricMap,connections))
+                    return OSHVResult
+
                 systemDiscoverer = smis_discoverer.getStorageSystemDiscoverer(namespace)
                 storageSystems = systemDiscoverer.discover(client)
                 storageProcessorDiscoverer = smis_discoverer.getStorageProcessorDiscoverer(namespace)

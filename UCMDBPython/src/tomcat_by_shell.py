@@ -1,10 +1,21 @@
 #coding=utf-8
 import re
+import os
+import sys
+import traceback
 
 import logger
 import modeling
 
 import file_mon_utils
+import shellutils
+
+from java.lang import String
+from java.io import ByteArrayInputStream
+
+from org.jdom.input import SAXBuilder
+from org.xml.sax.ext import EntityResolver2
+from org.xml.sax import InputSource
 
 from java.io import File
 from java.util import HashMap
@@ -12,8 +23,45 @@ import jdbc as jdbcModule
 
 from appilog.common.system.types import ObjectStateHolder
 from appilog.common.system.types.vectors import ObjectStateHolderVector
+from com.hp.ucmdb.discovery.library.communication.downloader.cfgfiles import GeneralSettingsConfigFile
+from com.hp.ucmdb.discovery.library.common import CollectorsParameters
+
 import netutils
 
+class XMLExternalEntityResolver(EntityResolver2):
+    SEPARATOR_WIN = "\\"
+    SEPARATOR_UNIX = "/"
+
+    def __init__(self, xmlFileMonitor, remotePath, shellUtils ):
+        logger.debug("XMLExternalEntityResolver created." )
+        self.fileMonitor = xmlFileMonitor
+        self.shellUtils = shellUtils
+        self.remotePath = os.path.dirname(remotePath)
+
+        if self.shellUtils.isWinOs():
+            self.fsSeparator = self.SEPARATOR_WIN
+        else:
+            self.fsSeparator = self.SEPARATOR_UNIX
+
+    def getExternalSubset(self, name, baseURI):
+        return None
+
+    def resolveEntity(self, name, publicId, baseURI, systemId):
+        logger.debug("XMLExternalEntityResolver resolveEntity, name : ",
+                     name, ", publicId: ", publicId, ", baseURI: ", baseURI, ", systemId: ", systemId )
+
+        try:
+            filename = systemId
+            logger.debug('resolveEntity, file name: ', filename, ", path: ", self.remotePath)
+            strContent = String( self.fileMonitor.getFileContent(self.remotePath + self.fsSeparator + filename ) )
+            return InputSource( ByteArrayInputStream( strContent.getBytes() ) )
+        except Exception, ex:
+            logger.debug("XMLExternalEntityResolver Exception: ", ex )
+        except:
+            pass
+
+        logger.debug("XMLExternalEntityResolver, uses default DTD resolver")
+        return None
 
 class JdbcResource:
     def __init__(self, name, type, driverClass, url, maxActive):
@@ -334,7 +382,7 @@ class TomcatDiscoverer(file_mon_utils.FileMonitorEx):
 
         dnsResolver = _DnsResolverDecorator(netutils.JavaDnsResolver(), self.destinationIp)
         reporter = jdbcModule.DnsEnabledJdbcTopologyReporter(
-                        jdbcModule.DataSourceBuilder(), dnsResolver)
+            jdbcModule.DataSourceBuilder(), dnsResolver)
 
         class Container:
             def __init__(self, osh):
@@ -379,6 +427,43 @@ class TomcatDiscoverer(file_mon_utils.FileMonitorEx):
                 return 0
         return 1
 
+    def loadXmlFile(self, path, container = None, fileContent = None):
+        'str, osh, str -> Document'
+        saxBuilder = SAXBuilder()
+        globalSettings = GeneralSettingsConfigFile.getInstance()
+        #loadExternalDTD = globalSettings.getPropertyBooleanValue('loadExternalDTD', 1)
+        loadExternalDTD = 1
+        saxBuilder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", loadExternalDTD)
+        logger.debug("loadXmlFile, loadExternalDTD: ", loadExternalDTD, ", path: ", path )
+        if loadExternalDTD :
+            saxBuilder.setEntityResolver( XMLExternalEntityResolver( self.fileMonitor, str(path), self.shellUtils ) )
+            saxBuilder.setFeature("http://xml.org/sax/features/use-entity-resolver2", 1)
+
+        doc = None
+        try:
+            fileContent = fileContent or self.fileMonitor.getFileContent(path)
+            if fileContent:
+                try:
+                    strContent = String(fileContent)
+                    strContent = String(strContent.substring(0, strContent.lastIndexOf('>') + 1))
+                    doc = saxBuilder.build(ByteArrayInputStream(strContent.getBytes()))
+                    if container is not None:
+                        cfOSH = self.createCF(container, path, fileContent)
+                        if cfOSH is not None:
+                            self.OSHVResult.add(cfOSH)
+                except:
+                    logger.debugException('Failed to load xml file:', path)
+
+                    excMsg = traceback.format_exc()
+                    logger.debug( excMsg )
+
+        except:
+            logger.debugException('Failed to get content of file:', path)
+
+            excMsg = traceback.format_exc()
+            logger.debug( excMsg )
+
+        return doc
 
 def DiscoveryMain(Framework):
     OSHVResult = ObjectStateHolderVector()
@@ -394,8 +479,9 @@ def DiscoveryMain(Framework):
                 if configFile and configFile != 'NA':
                     try:
                         discoverer.discoverTomcat(configFile)
-                    except Exception:
-                        logger.debug('Failed to parse:', configFile)
+                    except Exception, ex:
+                        logger.info('Failed to parse:', configFile)
+                        logger.info("Exception: ", ex )
                     else:
                         isDiscoverySuccess = 1
         except:

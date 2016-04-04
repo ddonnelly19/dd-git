@@ -4,7 +4,7 @@
         all paths should be relative to the $PROBE_INSTALL/root/lib/collectors/probeManager/discoveryResources/ folder
         and should be semicolon separated
     -->
-    <property name="AdditionalClasspath">db/oracle/*.*;db/mssqlserver/*.*;db/db2/*.*;db/db2/9.x/*.*;db/db2/8.x/*.*;db/sybase/*.*;AtriumPushAdapter/*.*;AS400/*.*;http/*.*;Service-Now/*.*;cim/*.*;vcloud/*.*</property>
+    <property name="AdditionalClasspath">db/oracle/*.*;db/mssqlserver/*.*;db/maxdb/*.*;db/hanadb/*.*;db/db2/*.*;db/db2/9.x/*.*;db/db2/8.x/*.*;db/sybase/*.*;AtriumPushAdapter/*.*;AS400/*.*;http/*.*;Service-Now/*.*;cim/*.*;vcloud/*.*</property>
 
     <!--
         Lists patterns for localized Windows Virtual interface description which must not take part in the Host Key creation process.
@@ -21,9 +21,9 @@
 
     <!-- 
         Indicates whether the data present in configutaion files of SAP Application Servers is trustable in for used database reporting
-        Affects Host Application Jobs, SAP ABAP Topology by SAP JCO
-        false - do not report databases based on config files content
-        true - report databases based on config files content
+    	Affects Host Application Jobs, SAP ABAP Topology by SAP JCO
+    	false - do not report databases based on config files content
+    	true - report databases based on config files content
     -->
     <property name="reportSapAppServerDatabase">false</property>
     <!--
@@ -120,7 +120,7 @@
         If operating system name of the host contains value from one of these lists its 'host_isdesktop' is set accordingly.
         Otherwise value of 'host_isdesktop' attribute is left empty.
      -->
-    <property name="desktopOperatingSystems">Windows XP, Windows 7, Vista, Windows 8, Windows 10</property>
+    <property name="desktopOperatingSystems">Windows 2000, Windows XP, Windows 7, Vista</property>
     <property name="serverOperatingSystems">Windows NT, Windows 2003, Windows 2008, Linux, AIX, SunOS, HP-UX</property>
 
     <!--
@@ -167,10 +167,10 @@
             'Other'
             'UNKNOWN'
     -->
-    <property name="discoveredStorageTypes">FixedDisk, Local hard disk, Network</property>
+    <property name="discoveredStorageTypes">FixedDisk, NetworkDisk</property>
 
     <!--Application signature-->
-    <property name="discovereAllListenPorts">true</property>
+    <property name="discovereAllListenPorts">false</property>
 
     <!--Paths to search tnsnames.ora file (including tnsnames.ora itself, comma separated)-->
     <!--property name="tnsnamesFilePaths">c:\temp\tnsnames.ora</property-->
@@ -292,6 +292,8 @@
         <db2>com.ibm.db2.jcc.DB2Driver</db2>
         <mysql>com.mysql.jdbc.Driver</mysql>
         <postgresql>org.postgresql.Driver</postgresql>
+        <MaxDB>com.sap.dbtech.jdbc.DriverSapDB</MaxDB>
+        <HanaDB>com.sap.db.jdbc.Driver</HanaDB>
     </property>
 
     <!--
@@ -313,6 +315,8 @@
         <db2>jdbc:db2://%%ipaddress%%:%%protocol_port%%/%%sqlprotocol_dbname%%</db2>
         <mysql>jdbc:mysql://address=(protocol=tcp)(host=%%ipaddress%%)(port=%%protocol_port%%)/%%sqlprotocol_dbname%%</mysql>
         <postgresql>jdbc:postgresql://%%ipaddress%%:%%protocol_port%%/%%sqlprotocol_dbname%%</postgresql>
+        <MaxDB>jdbc:sapdb://%%ipaddress%%:%%protocol_port%%/%%sqlprotocol_dbname%%?reconnect=off</MaxDB>
+        <HanaDB>jdbc:sap://%%ipaddress%%:%%protocol_port%%/?reconnect=off</HanaDB>
         <!--
             This section works for oracle database only
         -->
@@ -448,7 +452,7 @@
     <property name="allowCaliperOnHPUX">false</property>
 
     <!--The protocol connection order for Host Connection by Shell job-->
-    <property name="protocolConnectionOrder">ssh,telnet,ntadmin</property>
+    <property name="protocolConnectionOrder">ssh,telnet,ntadmin,powercmd</property>
 
     <!--Whether to enable label function for normalization engine .-->
     <property name="enableNormalizationRuleLabel">false</property>

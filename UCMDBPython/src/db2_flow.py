@@ -146,7 +146,8 @@ def create_client(framework, cred_id, ip_address, dbname, port, *args):
     client = None
     properties = Properties()
 
-    properties.setProperty("ip_address", ip_address)
+    if ip_address:
+        properties.setProperty("ip_address", ip_address)
     properties.setProperty(Protocol.SQL_PROTOCOL_ATTRIBUTE_DBNAME,
                            dbname)
     properties.setProperty(Protocol.PROTOCOL_ATTRIBUTE_PORT,

@@ -10,7 +10,7 @@ import logger
 from file_topology import PathNotFoundException
 from file_info_discoverers import WindowsFileInfoDiscovererByBatch,\
     LinuxFileInfoDiscovererByPerl, SunOSFileInfoDiscovererByPerl,\
-    UnixFileInfoDiscovererByPerl
+    UnixFileInfoDiscovererByPerl, PowerShellFileInfoDiscovererByBatch
 import file_topology
 import entity
 
@@ -26,6 +26,8 @@ def createFileSystem(shell):
     @rtype: FileSystem
     '''
     if shell.isWinOs():
+        if shell.getClientType() == "powershell":
+            return PowerShellFileSystem(shell)
         return WindowsFileSystem(shell)
     else:
         return UnixFileSystem(shell)
@@ -137,7 +139,7 @@ class FileSystem:
         '''
         raise NotImplemented
 
-    def getFile(self, path, fileAttrs=[]):
+    def getFile(self, path, fileAttrs=[], includeAll=0):
         '''Returns file by specified path.
         Only specified file attributes are discovered.
         If no attributes specified, then file_topology.BASE_FILE_ATTRIBUTES is used.
@@ -147,6 +149,9 @@ class FileSystem:
         @type path: str
         @param fileAttrs: list of file attributes to be discovered
         @type fileAttrs: list(FileAttrs)
+        @param includeAll: whether get file with SYSTEM and HIDDEN attributes,
+        only valid for Windows platform, will be ignored under Unices
+        @type path: bool
         @return: list of discovered File objects
         @rtype: list(File)
         @raises PathNotFoundException if specified path is not valid
@@ -178,10 +183,25 @@ class FileSystem:
         '''
         raise NotImplemented
 
+    def moveFile(self, srcPath, dstPath):
+        '''move file from source path to destination path
+        str, str
+        '''
+        raise NotImplemented
+
+    def removeFile(self, path):
+        '''remove file from path
+        str
+        '''
+        raise NotImplemented
+
     def isDirectory(self, path):
         attr = [file_topology.FileAttrs.IS_DIRECTORY]
         file_info = self.getFile(path, attr)
         return file_info and file_info.isDirectory
+
+    def getTempFolder(self):
+        raise NotImplemented
 
 
 __DISCOVERER_BY_OS_TYPE = {
@@ -223,7 +243,7 @@ class UnixFileSystem(FileSystem):
         files = perlFileDiscoverer.getFiles(path)
         return self.filter(files,  filters)
 
-    def getFile(self, path, fileAttrs=[]):
+    def getFile(self, path, fileAttrs=[], includeAll=0):
         '''Retrieves file by specified path
         str -> File
         @raises PathNotFoundException if specified path is not valid
@@ -233,6 +253,26 @@ class UnixFileSystem(FileSystem):
         path = self.__normalizePath(path)
         return perlFileDiscoverer.getFile(path)
 
+    def getTempFolder(self):
+        if self.exists("$TMPDIR"):
+            return "$TMPDIR" + self.FileSeparator
+        elif self.exists("/temp"):
+            return "/temp" + self.FileSeparator
+        return "/tmp" + self.FileSeparator
+
+    def moveFile(self, srcPath, dstPath):
+        '''move file from source path to destination path
+        str, str
+        '''
+        moveCMD = 'mv -f \"' +srcPath+ '\" \"' +dstPath+ '\"'
+        self._shell.execCmd(moveCMD)
+
+    def removeFile(self, path):
+        '''remove file from path
+        str
+        '''
+        removeCMD = 'rm -f \"' +path+ '\"'
+        self._shell.execCmd(removeCMD)
 
 class WindowsFileSystem(FileSystem):
 
@@ -267,7 +307,7 @@ class WindowsFileSystem(FileSystem):
             return self.filter(files,  filters)
         raise PathNotFoundException(path)
 
-    def getFile(self, path, fileAttrs=[]):
+    def getFile(self, path, fileAttrs=[], includeAll=0):
         '''Retrieves file by specified path
         str -> File
         @raises PathNotFoundException if specified path is not valid
@@ -275,9 +315,44 @@ class WindowsFileSystem(FileSystem):
         '''
         path = self.__normalizePath(path)
         batchFileRetriever = WindowsFileInfoDiscovererByBatch(self._shell, fileAttrs)
-        if (batchFileRetriever.exists(path)):
+        if (batchFileRetriever.exists(path, includeAll)):
             return batchFileRetriever.getFile(path)
         raise PathNotFoundException(path)
+
+    def getTempFolder(self):
+        return "%temp%" + self.FileSeparator
+
+    def moveFile(self, srcPath, dstPath):
+        '''move file from source path to destination path
+        str, str
+        '''
+        moveCMD = 'del \"' +dstPath+ '\" & copy /Y \"' +srcPath+ '\" \"' +dstPath+ '\" & del \"' +srcPath+ '\"'
+        self._shell.execCmd(moveCMD)
+
+    def removeFile(self, path):
+        '''remove file from path
+        str
+        '''
+        removeCMD = 'del \"' + path + '\"'
+        self._shell.execCmd(removeCMD)
+
+class PowerShellFileSystem(WindowsFileSystem):
+    def __init__(self, shell):
+        FileSystem.__init__(self, shell)
+        self.FileSeparator = '\\'
+        logger.debug('PowerShellFileSystem created successfully')
+
+    def __normalizePath(self, path):
+        r''' @types: str -> str
+        @raise ValueError: Path to wrap with quotes is empty
+        '''
+        return _NT_PATH.normalizePath(_NT_PATH.wrapWithQuotes(path))
+
+    def exists(self, path):
+        '''Checks whether path exists or not
+        str -> bool
+        '''
+        return PowerShellFileInfoDiscovererByBatch(self._shell).exists(self.__normalizePath(path))
 
 
 def getPathToolByShell(shell):

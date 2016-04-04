@@ -5,6 +5,7 @@ import file_system
 import ip_addr
 import fptools
 import shellutils
+import logger
 
 class ClusterCmd:
     class ExecuteException(Exception):
@@ -41,9 +42,13 @@ class ClusterCmd:
         self.__shell = shell
         if binPath:
             self.__cmd = binPath + "CLUSTER"
+            self._use_cmd = True
         else:
             self.__cmd = ""
+            self._use_cmd = None
         self.__bundle = bundle
+
+        self.__cmdlets_prefix = ''
 
     def getLastCommandOutput(self):
         r'@types: -> str'
@@ -58,9 +63,10 @@ class ClusterCmd:
         self.__lastCommandOutput = output
         if self.__shell.getLastCmdReturnCode() == 0:
             return output
-        raise ClusterCmd.ExecuteException()
 
     def __execCmdlets(self, cmdline):
+        cmdline = ''.join((self.__cmdlets_prefix, cmdline))
+        logger.debug("cmdline:", cmdline)
         if isinstance(self.__shell, shellutils.PowerShell):
             output = self.__shell.execEncodeCmd(cmdline)
         else:
@@ -68,10 +74,18 @@ class ClusterCmd:
         self.__lastCommandOutput = output
         if self.__shell.getLastCmdReturnCode() == 0:
             return output
-        raise ClusterCmd.ExecuteException()
 
     def isUsingCmd(self):
-        return self.__cmd and len(self.__cmd)
+        if self._use_cmd is None:
+            output = self.__shell.execCmd('CLUSTER /VER')
+            if output and output.strip() and self.__shell.getLastCmdReturnCode() == 0:
+                self.__cmd = "CLUSTER"
+                self._use_cmd = True
+                return 1
+            else:
+                self._use_cmd = False
+        else:
+            return self._use_cmd
 
 
     def __execPropertiesCmd(self, className=None, name=None, *properties):
@@ -175,16 +189,21 @@ class ClusterCmd:
     def findNodes(self):
         r'@types: MsClusterClient -> list[Node]'
         nodes = []
-        compiled = re.compile('(\S+)\s+(\d+)')
+        endOfHeader = 0
+        compiled = re.compile('(\S+)\s+(\S+)')
         if self.isUsingCmd():
             clusterNodeBuffer = self.__exec('NODE')
         else:
             clusterNodeBuffer = self.__execCmdlets('Get-ClusterNode')
         # split the entire buffer to the set of lines with appropriate data
         for nodeEntry in clusterNodeBuffer.splitlines():
-            match = compiled.search(nodeEntry)
-            if match:
-                nodes.append(ms_cluster.Node(match.group(1).strip()))
+            if (nodeEntry.find('-----') != -1) and (endOfHeader == 0):
+                endOfHeader = 1
+                continue
+            if endOfHeader == 1:
+                match = compiled.search(nodeEntry)
+                if match:
+                    nodes.append(ms_cluster.Node(match.group(1).strip()))
         return nodes
 
     def getHostAddressesbyNetinterface(self, nodeName):
@@ -267,7 +286,9 @@ class ClusterCmd:
         r'@types: -> ms_cluster.Cluster'
         endOfHeader = 0
         output = self.__execCmdlets('Get-Cluster')
-
+        if self.__shell.getLastCmdReturnCode():
+            self.__cmdlets_prefix = "Import-Module FailoverClusters;"
+            output = self.__execCmdlets('Get-Cluster')
         charsetName = self.__shell.getCharsetName()
         if charsetName:
             self.__shell.useCharset(charsetName)
@@ -276,7 +297,8 @@ class ClusterCmd:
                 endOfHeader = 1
                 continue
             if endOfHeader == 1:
-                return ms_cluster.Cluster(line.strip())
+                if line.strip():
+                    return ms_cluster.Cluster(line.strip())
 
     def getResourceGroups(self):
         r'@types: -> list[ResourceGroup]'
@@ -346,25 +368,27 @@ class ClusterCmd:
     def getResourcesByGroup(self, groupName):
         r'@types: str -> list[Resource]'
         resources = []
+        groupName = groupName.strip()
         output = self.__exec('RESOURCE | find " %s "' % groupName)
         reg = '(.*)\s+' + re.escape(groupName)
-        for line in output.splitlines():
-            if line and line.find(groupName) != -1:
-                m = re.search(reg, line)
-                if m:
-                    name = m.group(1).strip()
-                    resources.append(ms_cluster.Resource(name, groupName))
+        if output:
+            for line in output.splitlines():
+                if line and line.find(groupName) != -1:
+                    m = re.search(reg, line)
+                    if m:
+                        name = m.group(1).strip()
+                        resources.append(ms_cluster.Resource(name, groupName))
         return resources
 
     def getResourcesByGroupByPowerShell(self, groupName):
         resources = []
-        output = self.__execCmdlets("Get-ClusterResource | Where-Object {$_. OwnerGroup -match '%s'}" % groupName)
-        reg = '((\s?\S+)+)\s+'
+        output = self.__execCmdlets("Get-ClusterResource | Where-Object {$_.OwnerGroup -match '%s'}" % groupName)
         for line in output.splitlines():
             if line and line.find(groupName) != -1:
-                matches = re.findall(reg, line)
-                name = matches[0][0]
-                status = matches[1][0]
+                reg = '([\s\S]*?)(\S+\s+)%s([\s\S]*?)' % groupName
+                match = re.match(reg, line)
+                name = match.group(1).strip()
+                status = match.group(2).strip()
                 resources.append(ms_cluster.Resource(name, groupName, status))
         return resources
 
@@ -439,16 +463,21 @@ class ClusterCmd:
         match = re.search(pattern, content)
         if match:
             return match.group(1).strip()
+        return content
 
 
 def createClusterCmd(shell, bundle):
     r'@types: shellutils.Shell, ResourceBundle -> ClusterCmd'
-    binPath = '%SystemRoot%\\sysnative\\'
+    binPath = ''
     fs = file_system.createFileSystem(shell)
-    if (not (shell.is64BitMachine() and fs.exists(binPath + "cluster.exe"))):
-        binPath = "%SystemRoot%\\system32\\"
-        if (not (fs.exists(binPath + "cluster.exe"))):
-            binPath = ""
+    is64bit = shell.is64BitMachine()
+    if is64bit and fs.exists( '%SystemRoot%\\sysnative\\cluster.exe' ):
+        #this is a 64 bit destination with cluster.exe present
+        binPath = '%SystemRoot%\\sysnative\\'
+    elif not is64bit and fs.exists( '%SystemRoot%\\system32\\cluster.exe' ):
+        #this ia 32 bit destination with cluster.exe available
+        binPath = '%SystemRoot%\\system32\\'
+
     return ClusterCmd(shell, binPath, bundle)
 
 def resolveNetworkName(networkName, dnsResolver):

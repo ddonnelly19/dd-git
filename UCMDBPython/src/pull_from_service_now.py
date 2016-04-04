@@ -258,6 +258,8 @@ class ServiceNowSourceSystem(AbstractSourceSystem):
             links = []
             for sourceEnd2Ci in self.__sourceEnd2CIs:
                 parentId = sourceEnd2Ci.getValue(self.__referenceAttribute)
+                if parentId is None:
+                    logger.info("Cannot retrieve SourceEnd1 with SourceEnd2 <%s> and referenceAttribute <%s>" % (sourceEnd2Ci, self.__referenceAttribute))
                 links.append(SimpleLink(ReferenceLinkMapping.REFERENCE_LINK_NAME, parentId, sourceEnd2Ci.getId()))
             return links
 

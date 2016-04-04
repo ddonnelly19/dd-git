@@ -127,7 +127,7 @@ def setObjectVectorByResStringArray(objectVector, ipsResult, virtualMode, netAdd
         if isVirtual:
             # Create Ip OSH
             replyIpOSH = modeling.createIpOSH(replyIp, netMask)
-            replyIpOSH.setBoolAttribute("isvirtual", True)
+
             # Create a depend  link and set end1(pingedIp) and end2(replyIp)
             newDependLink = modeling.createLinkOSH('depend', pingedIpOSH, replyIpOSH)
 

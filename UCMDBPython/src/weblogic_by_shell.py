@@ -215,10 +215,14 @@ def DiscoveryMain(Framework):
             if not rootDirPath:
                 continue
             try:
-                logger.debug("Discover topology for the domain in %s" % rootDirPath)
-                domainLayout = weblogic_discoverer.createDomainLayout(fs, rootDirPath)
-                # at this point we have layout of version corresponding to version of platform
-                parser = weblogic_discoverer.createDomainConfigParserByLayout(domainLayout, loadExternalDtd)
+                try:
+                    logger.debug("Discover topology for the domain in %s" % rootDirPath)
+                    domainLayout = weblogic_discoverer.createDomainLayout(fs, rootDirPath)
+                    # at this point we have layout of version corresponding to version of platform
+                    parser = weblogic_discoverer.createDomainConfigParserByLayout(domainLayout, loadExternalDtd)
+                except (Exception, JException):
+                    logger.warnException("Failed to process domain in %s" % rootDirPath)
+                    continue
                 try:
                     domainDescriptorFile = domainLayout.getFileContent(
                                 domainLayout.getDomainConfigFilePath()

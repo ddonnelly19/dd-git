@@ -8,7 +8,8 @@
             <class>SapIgsPlugin</class>
             <qualifiers>
                 <qualifier type="application">SAP Internet Graphics Service</qualifier>
-                <qualifier type="protocol">ntadmin</qualifier> 
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">telnet</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">powershell</qualifier>

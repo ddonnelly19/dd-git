@@ -177,16 +177,16 @@
         <process name="db2agent" ports="None" cmdline="" description="Coordinator agent for all connection requests from client applications." />
         <attribute name="database_dbtype" value="db2" type="string" />
     </Application-Component>
-    <Application-Component name="Microsoft DNS Server" category="Network" vendor="microsoft_corp" supported_versions="5.x, 4.x">
-        <process name="dns.exe" description="Enables DNS clients to resolve DNS names by answering DNS queries and dynamic DNS update requests." ports="53,None" cmdline="" />
+    <Application-Component app_id="Very Secure FTP Daemon" name="VsFtpD" category="Network" supported_versions="1.x, 2.x" vendor="">
+        <process name="vsftpd" ports="All" cmdline="" description="Very Secure FTP Daemon main process" />
     </Application-Component>
     <Application-Component name="SAP Internet Graphics Service" category="Enterprise App" vendor="sap_ag" supported_versions="7.x">
         <process name="igswdserv.exe" description="SAP IGS Management Service" required="true" />
         <process name="igsmux.exe" description="SAP IGS Multiplexer Process" />
         <process name="igspw.exe" description="SAP IGS Port Watcher Process" />
     </Application-Component>
-    <Application-Component app_id="Very Secure FTP Daemon" name="VsFtpD" category="Network" supported_versions="1.x, 2.x" vendor="">
-        <process name="vsftpd" ports="All" cmdline="" description="Very Secure FTP Daemon main process" />
+    <Application-Component name="Microsoft DNS Server" category="Network" vendor="microsoft_corp" supported_versions="5.x, 4.x">
+        <process name="dns.exe" description="Enables DNS clients to resolve DNS names by answering DNS queries and dynamic DNS update requests." ports="53,None" cmdline="" />
     </Application-Component>
     <Application-Component name="SAP CCMS Agent Unix" category="Enterprise App" vendor="sap_ag" supported_versions="7.x">
         <process name="saposcol" description="Operating system collector" />
@@ -197,21 +197,18 @@
         <process name="FileZilla Server.exe" description="FileZilla FTP server main process" ports="20,21,None" cmdline="" />
         <process name="FileZilla Server" description="FileZilla FTP server main process" ports="20,21,None" cmdline="" />
     </Application-Component>
-    <Application-Component app_id="TNS Listener old style" name="TNS Listener" category="Database" ci_type="oracle_listener" vendor="oracle_corp">
-        <process name="oracle-tns-listener" main-process="true" ports="oracle,1522,None" cmdline="" description="Process associated with Oracle TNS Listener from Oracle." />
-        <parse-rule id="listener_name_pr" name="cmdline">.*?oracle-tns-listener\s+(\w+)\s.*</parse-rule>
-        <attribute name="name" value="${listener_name_pr(1)}" type="string" />
-    </Application-Component>
     <Application-Component app_id="Glassfish 2.x on Windows" name="Glassfish AS" category="J2EE Server" ci_type="glassfishas" supported_versions="1.x, 2.x, 3.x" vendor="oracle_corp">
         <process name="java.exe" main-process="true" ports="all" cmdline="com.sun.enterprise.server.PELaunch">
             <service-endpoint-name>glassfish</service-endpoint-name>
         </process>
     </Application-Component>
+    <Application-Component app_id="TNS Listener old style" name="TNS Listener" category="Database" ci_type="oracle_listener" vendor="oracle_corp">
+        <process name="oracle-tns-listener" main-process="true" ports="oracle,1522,None" cmdline="" description="Process associated with Oracle TNS Listener from Oracle." />
+        <parse-rule id="listener_name_pr" name="cmdline">.*?oracle-tns-listener\s+(\w+)\s.*</parse-rule>
+        <attribute name="name" value="${listener_name_pr(1)}" type="string" />
+    </Application-Component>
     <Application-Component name="Microsoft Cluster SW" ci_type="cluster_software" category="Cluster" vendor="microsoft_corp" supported_versions="5.x">
         <process name="clussvc.exe" ports="3343,None" cmdline="" description="Main Microsoft Cluster Process" />
-    </Application-Component>
-    <Application-Component name="HP Data Flow Probe" category="Configuration Management Software" vendor="hewlett_packard_co" supported_versions="7.x, 8.x, 9.x, 10.x">
-        <process name="discovery_probe.exe" ports="1977,1742,1978,8453,8454,None" cmdline="" required="true" main-process="true" />
     </Application-Component>
     <Application-Component app_id="SAP ABAP Application Server (Dialog)" name="SAP ABAP Application Server" ci_type="sap_r3_server" category="Enterprise App" vendor="sap_ag" supported_versions="6.4, 7.0" installedSoftwareName="SAP Application Server.*">
         <!-- Component to represent dialog instance, not central instance or central services -->
@@ -226,6 +223,9 @@
         <attribute name="instance_name" value="${abap_dialog(4)}${abap_dialog(5)}" type="string" />
         <attribute name="instance_number" value="${abap_dialog(5)}" type="string" />
         <attribute name="instance_nr" value="${abap_dialog(5)}" type="string" />
+    </Application-Component>
+    <Application-Component name="HP Data Flow Probe" category="Configuration Management Software" vendor="hewlett_packard_co" supported_versions="7.x, 8.x, 9.x, 10.x">
+        <process name="discovery_probe.exe" ports="1977,1742,1978,8453,8454,None" cmdline="" required="true" main-process="true" />
     </Application-Component>
     <Application-Component app_id="Oracle by oracle.exe process" name="Oracle DB" category="Database" ci_type="oracle" supported_versions="9i, 10g, 11g" vendor="oracle_corp">
         <!--Oracle process runs with SID as command line parameter-->
@@ -247,6 +247,16 @@
     <Application-Component app_id="Oracle VM Manager" name="Oracle VM Manager" ci_type="oracle_vm_manager" category="Virtualization" vendor="oracle_corp" supported_versions="3.2.1">
         <process name="java" main-process="true" ports="ovm_manager_cli_ssh" cmdline="com.oracle.ovm.cli.CLIMain" description="Java process running OVM CLI application" />
     </Application-Component>
+    <Application-Component app_id="VMware vCloud Director" name="VMware vCloud Director" ci_type="vmware_vcloud_director" category="Virtualization" vendor="v_mware_inc" supported_versions="1.5">
+        <process name="java" ports="all" cmdline="/opt/vmware/vcloud-director/" required="true" />
+        <process name="privbind" ports="None" cmdline="/opt/vmware/vcloud-director/" />
+    </Application-Component>
+    <Application-Component app_id="Jboss instance on Unix" name="JBoss AS" category="J2EE Server" ci_type="jbossas" supported_versions="3.x, 4.x, 5.x, 6.x" vendor="jboss_group_llc">
+        <process name="java" main-process="true" ports="jboss-port,rmi,None" cmdline="org.jboss.Main" />
+    </Application-Component>
+    <Application-Component app_id="HP Network Node Manager" name="HP Network Node Manager" category="Network Management Software" vendor="hewlett_packard_co" supported_versions="7.x, 8.x, 9.x">
+        <process name="nnmaction" startswith="true" ports="None" main-process="true" description="runtime for NNM" />
+    </Application-Component>
     <Application-Component app_id="SAP Web Dispatcher" name="SAP Web Dispatcher" category="Enterprise App" vendor="sap_ag" ci_type="sap_webdispatcher" supported_versions="6.40, 7.00-7.30">
         <process name="sapwebdisp" startswith="true" main-process="true" ports="All" description="SAP Web Dispatcher" />
         <process name="wd.sap" startswith="true" main-process="true" ports="All" description="SAP Web Dispatcher" />
@@ -258,35 +268,20 @@
         <attribute name="name" value="${instance_profile_name_group(2)}${instance_profile_name_group(3)}" type="string" />
         <attribute name="number" value="${instance_profile_name_group(3)}" type="string" />
     </Application-Component>
-    <Application-Component app_id="Jboss instance on Unix" name="JBoss AS" category="J2EE Server" ci_type="jbossas" supported_versions="3.x, 4.x, 5.x, 6.x" vendor="jboss_group_llc">
-        <process name="java" main-process="true" ports="jboss-port,rmi,None" cmdline="org.jboss.Main" />
-    </Application-Component>
-    <Application-Component app_id="VMware vCloud Director" name="VMware vCloud Director" ci_type="vmware_vcloud_director" category="Virtualization" vendor="v_mware_inc" supported_versions="1.5">
-        <process name="java" ports="all" cmdline="/opt/vmware/vcloud-director/" required="true" />
-        <process name="privbind" ports="None" cmdline="/opt/vmware/vcloud-director/" />
-    </Application-Component>
-    <Application-Component app_id="HP Network Node Manager" name="HP Network Node Manager" category="Network Management Software" vendor="hewlett_packard_co" supported_versions="7.x, 8.x, 9.x">
-        <process name="nnmaction" startswith="true" ports="None" main-process="true" description="runtime for NNM" />
-    </Application-Component>
-    <Application-Component app_id="HP SiteScope Server" name="HP SiteScope Server" category="Monitoring" vendor="hewlett_packard_co" supported_versions="8.x, 9.x, 10x, 11x">
-        <process name="SiteScope" startswith="true" main-process="true" ports="None,8888" required="true" />
-        <process name="mdrv.exe" ports="None" />
-        <process name="perfex.exe" ports="None" />
-    </Application-Component>
     <Application-Component app_id="Oracle VM Agent" name="Oracle VM Agent" category="Virtualization" vendor="oracle_corp" supported_versions="3.2.1">
         <process name="ovmwatch" main-process="true" description="Oracle VM Manager communicates with this process to create and manage guests on an Oracle VM Server" />
     </Application-Component>
     <Application-Component app_id="HP Diagnostics Probe" name="HP Diagnostics Probe" category="Diagnostics" vendor="hewlett_packard_co" supported_versions="7.x, 8.x, 9.x">
         <process name="java" startswith="true" ports="None" cmdline="com.mercury.diagnostics.client.product.impl.profiler.ProfilerApp" />
     </Application-Component>
+    <Application-Component app_id="HP SiteScope Server" name="HP SiteScope Server" category="Monitoring" vendor="hewlett_packard_co" supported_versions="8.x, 9.x, 10x, 11x">
+        <process name="SiteScope" startswith="true" main-process="true" ports="None,8888" required="true" />
+        <process name="mdrv.exe" ports="None" />
+        <process name="perfex.exe" ports="None" />
+    </Application-Component>
     <Application-Component app_id="HP PPM Center" name="HP PPM Center" category="Project and Portfolio Management" vendor="hewlett_packard_co" supported_versions="7.x, 8.x, 9.x">
         <process name="java" startswith="true" ports="All" main-process="true" required="true" cmdline="-Dcom.kintana.core.server.SERVER_NAME" description="java runtime for PPM" />
         <process name="ksvc.exe" description="PPM service" />
-    </Application-Component>
-    <Application-Component app_id="HP UCMDB Server on Unix" name="HP UCMDB Server" category="Configuration Management Software" vendor="hewlett_packard_co" supported_versions="7.x, 8.x">
-        <process name="MercuryAS" ports="1098,1099,None" cmdline="" required="true" />
-        <process name="mercury_mam" ports="None" cmdline="" />
-        <process name="scheduler" ports="None" cmdline="" required="true" />
     </Application-Component>
     <Application-Component app_id="HP BSM DPS Server" name="HP BSM DPS Server" category="HP BSM" vendor="hewlett_packard_co">
         <!-- common processes  -->
@@ -311,19 +306,10 @@
         <process name="hpbsm_opr-backend" startswith="true" ports="all" cmdline="" />
         <process name="hpbsm_bizImpact" startswith="true" ports="all" cmdline="" />
     </Application-Component>
-    <Application-Component app_id="IBM Security Access Manager" name="IBM Security Access Manager" ci_type="isam_web" vendor="ibm_corp" supported_versions="6.x, 7.x, 8.x">
-        <process name="webseald.exe" main-process="true" required="false" ports="All,None" description="Main process of WebSEAL" />
-        <process name="webseald" main-process="true" required="false" ports="All,None" description="Main process of WebSEAL" />
-        <process name="pdwebpimgrd" main-process="false" required="false" ports="None" description="Security Access Manager Plug-in for Web Servers" />
-        <process name="pdwebpi" main-process="false" required="false" ports="None" description="The authorization server process" />
-        <process name="pdwebpimgrd.exe" main-process="false" required="false" ports="None" description="Security Access Manager Plug-in for Web Servers" />
-        <process name="pdwebpi.exe" main-process="false" required="false" ports="None" description="The authorization server process" />
-    </Application-Component>
-    <Application-Component app_id="IBM Policy Server" name="IBM Policy Server" ci_type="isam_policy_server" vendor="ibm_corp" supported_versions="">
-        <process name="pdmgrd.exe" main-process="true" required="false" ports="None" description="Main process of Policy Server" />
-        <process name="pdmgrd" main-process="true" required="false" ports="None" description="Main process of Policy Server" />
-        <process name="pdacld.exe" main-process="false" required="false" ports="None" description="Access List managing process of Policy Director" />
-        <process name="pdacld" main-process="false" required="false" ports="None" description="Access List managing process of Policy Director" />
+    <Application-Component app_id="HP UCMDB Server on Unix" name="HP UCMDB Server" category="Configuration Management Software" vendor="hewlett_packard_co" supported_versions="7.x, 8.x">
+        <process name="MercuryAS" ports="1098,1099,None" cmdline="" required="true" />
+        <process name="mercury_mam" ports="None" cmdline="" />
+        <process name="scheduler" ports="None" cmdline="" required="true" />
     </Application-Component>
     <Application-Component app_id="IBM DB2 on Windows" name="IBM DB2 Instance" ci_type="db2_instance" category="Database" vendor="ibm_corp" supported_versions="9.1, 9.5, 9.7, 9.8, 10.1" installedSoftwareName="DB2.*Server.*">
         <clustered-application />
@@ -345,10 +331,19 @@
     <Application-Component app_id="Logical Domains Manager" name="Logical Domains Manager" category="Virtualization" vendor="oracle_corp" supported_versions="1.x, 2.x">
         <process name="ldmd" ports="None" cmdline="" required="true" />
     </Application-Component>
-    <Application-Component app_id="HP Service Manager" name="HP Service Manager" vendor="hewlett_packard_co" supported_versions="7.x, 8.x, 9.x">
-        <process name="sm.exe" description="service manager runtime" main-process="true" />
-        <process name="smservice.exe" description="service manager runtime" main-process="true" />
-        <process name="ServiceManager.exe" description="service manager runtime" main-process="true" />
+    <Application-Component app_id="IBM Security Access Manager" name="IBM Security Access Manager" ci_type="isam_web" vendor="ibm_corp" supported_versions="6.x, 7.x, 8.x">
+        <process name="webseald.exe" main-process="true" required="false" ports="All,None" description="Main process of WebSEAL" />
+        <process name="webseald" main-process="true" required="false" ports="All,None" description="Main process of WebSEAL" />
+        <process name="pdwebpimgrd" main-process="false" required="false" ports="None" description="Security Access Manager Plug-in for Web Servers" />
+        <process name="pdwebpi" main-process="false" required="false" ports="None" description="The authorization server process" />
+        <process name="pdwebpimgrd.exe" main-process="false" required="false" ports="None" description="Security Access Manager Plug-in for Web Servers" />
+        <process name="pdwebpi.exe" main-process="false" required="false" ports="None" description="The authorization server process" />
+    </Application-Component>
+    <Application-Component app_id="IBM Policy Server" name="IBM Policy Server" ci_type="isam_policy_server" vendor="ibm_corp" supported_versions="">
+        <process name="pdmgrd.exe" main-process="true" required="false" ports="None" description="Main process of Policy Server" />
+        <process name="pdmgrd" main-process="true" required="false" ports="None" description="Main process of Policy Server" />
+        <process name="pdacld.exe" main-process="false" required="false" ports="None" description="Access List managing process of Policy Director" />
+        <process name="pdacld" main-process="false" required="false" ports="None" description="Access List managing process of Policy Director" />
     </Application-Component>
     <Application-Component name="IBM DB2" category="Database" vendor="ibm_corp" supported_versions="7.x, 8.x, 9.x" installedSoftwareName="DB2.*Server.*" app_id="IBM DB2">
         <!--Since this signature is deprecated all processes were removed-->
@@ -359,6 +354,11 @@
         <process name="wischeduler" description="HP Application Security Center WebInspect Scheduler" />
         <process name="wi.exe" main-process="true" description="HP Application Security Center WebInspect GUI client" />
         <process name="webinspect.exe" main-process="true" description="HP Application Security Center WebInspect GUI client" />
+    </Application-Component>
+    <Application-Component app_id="HP Service Manager" name="HP Service Manager" vendor="hewlett_packard_co" supported_versions="7.x, 8.x, 9.x">
+        <process name="sm.exe" description="service manager runtime" main-process="true" />
+        <process name="smservice.exe" description="service manager runtime" main-process="true" />
+        <process name="ServiceManager.exe" description="service manager runtime" main-process="true" />
     </Application-Component>
     <Application-Component app_id="HP QAInspect" name="HP QAInspect" category="Automated Software Quality Tools" vendor="hewlett_packard_co" supported_versions="3.x - 9.x">
         <process name="qainspect.exe" main-process="true" description="HP QAInspect client" />
@@ -403,7 +403,7 @@
         <attribute name="category" value="Explorer" type="string" />
     </Application-Component>
     <Application-Component app_id="SAP TREX Instance" name="SAP TREX Instance" ci_type="sap_trex_instance" category="Enterprise App" vendor="sap_ag" supported_versions="7.00-7.30">
-        <process name="TRX.sap" startswith="true" ports="None" description="SAP TREX Instance" />
+        <process name="TRX.sap" startswith="true" main-process="true" ports="None" description="SAP TREX Instance" />
         <process name="TREXDaemon" startswith="true" ports="None" description="SAP TREX Daemon" />
         <!-- Ports enabled as name server serves as meta-data source -->
         <process name="TREXNameServer" startswith="true" ports="None" description="TREX Daemon" />
@@ -417,10 +417,6 @@
     <Application-Component app_id="HP Quality Center" name="HP Quality Center" category="Change Management Software" vendor="hewlett_packard_co" supported_versions="7.x, 8.x, 9.x, 10.x, 11,x">
         <process name="QCJavaService.exe" main-process="true" description="HP Quality Center Service" />
     </Application-Component>
-    <Application-Component name="Squid" category="Caching proxy" supported_versions="2.x, 3.x" vendor="squid-cache.org">
-        <process name="squid.exe" description="Squid proxy process" ports="squid, None" cmdline="" />
-        <process name="squid" description="Squid proxy process" ports="squid, None" cmdline="" />
-    </Application-Component>
     <Application-Component app_id="SAP Message Server" name="SAP Message Server" ci_type="sap_message_server" category="Enterprise App" vendor="sap_ag" supported_versions="6.4, 7.0">
         <!-- Message server launched from the profile of (A)SCS or central instance -->
         <clustered-application />
@@ -432,6 +428,10 @@
     <Application-Component app_id="Microsoft Operations Manager Agent" name="Microsoft Operations Manager Agent" category="Management" vendor="microsoft_corp" supported_versions="2005" installedSoftwareName="Microsoft\s+Operations\s+Manager\s+2005\s+Agent">
         <process name="MOMService.exe" ports="None" cmdline="" description="Microsoft Operations Manager service process" />
         <process name="MOMHost.exe" ports="None" cmdline="" description="Microsoft Operations Manager worker process" />
+    </Application-Component>
+    <Application-Component name="Squid" category="Caching proxy" supported_versions="2.x, 3.x" vendor="squid-cache.org">
+        <process name="squid.exe" description="Squid proxy process" ports="squid, None" cmdline="" />
+        <process name="squid" description="Squid proxy process" ports="squid, None" cmdline="" />
     </Application-Component>
     <Application-Component name="SAP ITS Manager" category="Enterprise App" vendor="sap_ag" supported_versions="6.4, 7.0">
         <process name="mmanager.exe" ports="None" cmdline="" description="SAP ITS Manager main process" />
@@ -450,6 +450,13 @@
         <process name="mfevtps.exe" description="Provides validation trust protection services" ports="None" cmdline="" />
         <process name="scanner" description="Provides anti-virus protection" ports="None" cmdline="LinuxShield" />
     </Application-Component>
+    <Application-Component app_id="Maxdb on Unix" ci_type="maxdb" name="SAP MaxDB" category="Database" supported_versions="7.x" vendor="sap_ag">
+        <clustered-application />
+        <process name="kernel" main-process="true" required="true" ports="all" description="Database system kernel. Each database instance has its own core process." />
+        <!-- On Unix and Linux, a new child process is started for each database connection. -->
+        <process name="vserver" ports="all" description="SAP MaxDB X Server(communication server)" />
+        <process name="dbmsrv" ports="all" description="DBM Server." />
+    </Application-Component>
     <Application-Component name="BusinessObjects Crystal Reports XI" app_id="BO Crystal Reports" ci_type="bobj_service" category="Business Intelligence" supported_versions="12.0" vendor="sap_ag">
         <process name="crcache.exe" cmdline="-documentType CrystalEnterprise.Report" ports="None" required="true" description="Crystal Reports Cache Server. Caches recently executed Crystal reports to reduce database requests." />
         <process name="crproc.exe" cmdline="-documentType CrystalEnterprise.Report" ports="None" required="true" description="Crystal Reports Processing Server. Runs Crystal report queries and returns data to Crystal Reports Cache Server." />
@@ -459,13 +466,6 @@
         <attribute name="category" value="Crystal Reports" type="string" />
         <parse-rule id="version" name="cmdline" method="search">.*BusinessObjects Enterprise (\d+\.\d+).*</parse-rule>
         <attribute name="version" value="${version(1)}" type="string" />
-    </Application-Component>
-    <Application-Component app_id="Maxdb on Unix" ci_type="maxdb" name="SAP MaxDB" category="Database" supported_versions="7.x" vendor="sap_ag">
-        <clustered-application />
-        <process name="kernel" main-process="true" required="true" ports="all" description="Database system kernel. Each database instance has its own core process." />
-        <!-- On Unix and Linux, a new child process is started for each database connection. -->
-        <process name="vserver" ports="all" description="SAP MaxDB X Server(communication server)" />
-        <process name="dbmsrv" ports="all" description="DBM Server." />
     </Application-Component>
     <Application-Component name="MSSQL DB" category="Database" ci_type="sqlserver" vendor="microsoft_corp" supported_versions="2000, 2005, 2008" installedSoftwareName="Microsoft SQL Server.*">
         <clustered-application />
@@ -514,17 +514,17 @@
         <process name="sapcar.exe" startswith="true" ports="all" description="Configuration tool" />
         <process name="saphostexec.exe" main-process="true" ports="all" description="SAP Host Agent" />
     </Application-Component>
+    <Application-Component app_id="Microsoft MQ" ci_type="msmqmanager" name="Microsoft MQ Manager" category="Messaging" vendor="microsoft_corp" supported_versions="3.x">
+        <process name="mqsvc.exe" ports="All" cmdline="" description="Microsoft Message Queueing" />
+        <process name="mqtgsvc.exe" ports="All" cmdline="" description="Microsoft MQ Triggers" />
+        <process name="mqdssvc.exe" ports="All" cmdline="" description="Microsoft MQ Manager" />
+    </Application-Component>
     <Application-Component app_id="TNS Listener unix" name="TNS Listener" category="Database" ci_type="oracle_listener" vendor="oracle_corp">
         <process name="tnslsnr" main-process="true" ports="oracle,1522,None" cmdline="" description="Process associated with Oracle TNS Listener from Oracle.">
             <application-ip-source />
         </process>
         <parse-rule id="listener_name_pr" name="cmdline">.*?tnslsnr\s+(\w+)\s.*</parse-rule>
         <attribute name="name" value="${listener_name_pr(1)}" type="string" />
-    </Application-Component>
-    <Application-Component app_id="Microsoft MQ" ci_type="msmqmanager" name="Microsoft MQ Manager" category="Messaging" vendor="microsoft_corp" supported_versions="3.x">
-        <process name="mqsvc.exe" ports="All" cmdline="" description="Microsoft Message Queueing" />
-        <process name="mqtgsvc.exe" ports="All" cmdline="" description="Microsoft MQ Triggers" />
-        <process name="mqdssvc.exe" ports="All" cmdline="" description="Microsoft MQ Manager" />
     </Application-Component>
     <Application-Component name="Microsoft Hyper-V Hypervisor" category="Virtualization" vendor="microsoft_corp">
         <process name="vmms.exe" ports="None" cmdline="" />
@@ -563,6 +563,7 @@
         <parse-rule id="enq_pf" name="cmdline">^.+pf="?(.+?[\\\\|/])([\w-]+)"?[ ]*$</parse-rule>
         <attribute name="name" value="${enq_pf(2)}" type="string" />
     </Application-Component>
+    <Application-Component name="Sybase DB" ci_type="sybase" category="Database" vendor="sybase_inc" supported_versions="10.x, 11.x, 12.x,15.x" installedSoftwareName="SQLServer.*" discover="false" />
     <Application-Component name="SAP HanaDB" app_id="HANA Database" ci_type="hana_instance" category="Database" supported_versions="1.0, 1.5" vendor="sap_ag" installedSoftwareName="Hana Db Server.*">
         <process name="HDB.sap" main-process="true" startswith="true" ports="all" description="Link to HDB Daemon" required="true" />
         <process name="sapstart" ports="None" cmdline="_HDB" description="The startsap and stopsap scripts start the R/3 System with the sapstart program." main-process="true" />
@@ -658,12 +659,6 @@
         <process name="hpbsm_nanny_manager" startswith="true" />
         <process name="hpbsm_tv_analyzer" startswith="true" />
     </Application-Component>
-    <Application-Component name="SAP NetWeaver" category="Enterprise App" vendor="sap_ag" supported_vesions="6.4, 7.0" installedSoftwareName="SAP Application Server.*">
-        <!-- all processes are removed from this signature due to several reasons
-        1) new signatures added that exaclty match different types of software that is interesting for business like abap, java application servers, different kinds of agents, webdispatcher etc
-        2) version discovered by related plugins are relevant only to services that serve discovered products
-    -->
-    </Application-Component>
     <Application-Component app_id="TIBCO Adapter" name="Tibco Adapter" discover="true" category="Enterprise App" vendor="tibco" ci_type="tibco_adapter">
         <process name="adbagent" description="Tibco DB Adapter" required="false" main-process="true" />
         <process name="admqs" description="Tibco StatusMQ Adapter" required="false" main-process="true" />
@@ -685,6 +680,12 @@
         <attribute name="binding_name" type="string" value="${r3(2)}" />
         <attribute name="application_path" type="string" value="${r2(1)}" />
     </Application-Component>
+    <Application-Component name="SAP NetWeaver" category="Enterprise App" vendor="sap_ag" supported_vesions="6.4, 7.0" installedSoftwareName="SAP Application Server.*">
+        <!-- all processes are removed from this signature due to several reasons
+        1) new signatures added that exaclty match different types of software that is interesting for business like abap, java application servers, different kinds of agents, webdispatcher etc
+        2) version discovered by related plugins are relevant only to services that serve discovered products
+    -->
+    </Application-Component>
     <Application-Component name="Active Directory Application Mode" ci_type="adam" category="Enterprise App" vendor="microsoft_corp">
         <parse-rule id="instance_name" name="cmdline">.+\s+-sn:([\w-]+).*</parse-rule>
         <process name="dsamain.exe" main-process="true" ports="ldap,636,None" required="true" cmdline="" description="Main AD Application Mode process" />
@@ -692,20 +693,6 @@
     </Application-Component>
     <Application-Component app_id="HP UCMDB Server 9_10 on Unix" name="HP UCMDB Server" category="Configuration Management Software" vendor="hewlett_packard_co" supported_versions="9.x, 10.x">
         <process name="ucmdb_server" ports="1098,1099,None" cmdline="" required="true" />
-    </Application-Component>
-    <Application-Component app_id="SAP ABAP Central Services" name="SAP ABAP Central Services" ci_type="abap_sap_central_services" category="Enterprise App" vendor="sap_ag" supported_versions="6.4, 7.0" installedSoftwareName="SAP Application Server.*">
-        <clustered-application />
-        <parse-rule id="conf_file_abap_cs" name="cmdline">^.+pf="?((.+?[\\\\|/])(\w+)(_ASCS)(\d+)_([\w-]+))"?.*$</parse-rule>
-        <process name="msg_server.exe" main-process="true" ports="sap_msg_service,None" cmdline="_ASCS" startswith="true" description="SAP Message Server process" />
-        <process name="ms.sap" main-process="true" ports="sap_msg_service,None" cmdline="_ASCS" startswith="true" description="SAP Message Server process" />
-        <process name="enserver.exe" main-process="true" ports="None" cmdline="_ASCS" description="SAP Enqueue Server process" />
-        <process name="en.sap" startswith="true" main-process="true" ports="None" cmdline="_ASCS" description="SAP Enqueue Server process" />
-        <attribute name="name" value="${conf_file_abap_cs(6)}_${conf_file_abap_cs(3)}_${conf_file_abap_cs(5)}" type="string" />
-        <attribute name="sid" value="${conf_file_abap_cs(3)}" type="string" />
-        <attribute name="sap_instance_profile" value="${conf_file_abap_cs(1)}" type="string" />
-        <attribute name="instance_number" value="${conf_file_abap_cs(5)}" type="string" />
-        <attribute name="instance_nr" value="${conf_file_abap_cs(5)}" type="string" />
-        <attribute name="instance_name" value="ASCS${conf_file_abap_cs(5)}" type="string" />
     </Application-Component>
     <Application-Component app_id="HP Operations Agent" name="HP Operations Agent" vendor="hewlett_packard_co" supported_versions="11.x">
         <process name="ovbbccb" description="HTTP / HTTPS communication controller" />
@@ -729,6 +716,20 @@
         <attribute name="sap_instance_profile" value="${j2ee_scs(1)}" type="string" />
         <attribute name="instance_nr" value="${j2ee_scs(4)}" type="string" />
         <attribute name="instance_name" value="SCS${j2ee_scs(4)}" type="string" />
+    </Application-Component>
+    <Application-Component app_id="SAP ABAP Central Services" name="SAP ABAP Central Services" ci_type="abap_sap_central_services" category="Enterprise App" vendor="sap_ag" supported_versions="6.4, 7.0" installedSoftwareName="SAP Application Server.*">
+        <clustered-application />
+        <parse-rule id="conf_file_abap_cs" name="cmdline">^.+pf="?((.+?[\\\\|/])(\w+)(_ASCS)(\d+)_([\w-]+))"?.*$</parse-rule>
+        <process name="msg_server.exe" main-process="true" ports="sap_msg_service,None" cmdline="_ASCS" startswith="true" description="SAP Message Server process" />
+        <process name="ms.sap" main-process="true" ports="sap_msg_service,None" cmdline="_ASCS" startswith="true" description="SAP Message Server process" />
+        <process name="enserver.exe" main-process="true" ports="None" cmdline="_ASCS" description="SAP Enqueue Server process" />
+        <process name="en.sap" startswith="true" main-process="true" ports="None" cmdline="_ASCS" description="SAP Enqueue Server process" />
+        <attribute name="name" value="${conf_file_abap_cs(6)}_${conf_file_abap_cs(3)}_${conf_file_abap_cs(5)}" type="string" />
+        <attribute name="sid" value="${conf_file_abap_cs(3)}" type="string" />
+        <attribute name="sap_instance_profile" value="${conf_file_abap_cs(1)}" type="string" />
+        <attribute name="instance_number" value="${conf_file_abap_cs(5)}" type="string" />
+        <attribute name="instance_nr" value="${conf_file_abap_cs(5)}" type="string" />
+        <attribute name="instance_name" value="ASCS${conf_file_abap_cs(5)}" type="string" />
     </Application-Component>
     <Application-Component app_id="Microsoft SharePoint" name="Microsoft SharePoint" vendor="microsoft_corp">
         <process name="owstimer.exe" ports="None" description="Microsoft Windows SharePoint Services Timer" />
@@ -816,6 +817,9 @@
         <process name="nsd.exe" ports="None" cmdline="" description="Lotus Domino Diagnostics." />
         <!-- service process -->
     </Application-Component>
+    <Application-Component name="Symantec pcAnywhere Gateway" category="Remote Management" vendor="symantec_corp" installedSoftwareName="Symantec\s+pcAnywhere\s+Gateway.*" supported_versions="10.x, 11.x, 12.x" discover="false">
+        <process name="AWGateway.exe" description="Symantec pcAnywhere Gateway Service" ports="5631,None" cmdline="" />
+    </Application-Component>
     <Application-Component app_id="HP BAC GW Server on Unix" name="HP BAC GW Server" category="HP BAC" vendor="hewlett_packard_co">
         <process name="MercuryAS" ports="1098,1099,None" cmdline="" />
         <process name="schedulergw" ports="" cmdline="" required="true" />
@@ -826,18 +830,13 @@
         <process name="mercury_wde" ports="" cmdline="" />
         <process name="mercury_db_loader" ports="" cmdline="" />
     </Application-Component>
-    <Application-Component name="Symantec pcAnywhere Gateway" category="Remote Management" vendor="symantec_corp" installedSoftwareName="Symantec\s+pcAnywhere\s+Gateway.*" supported_versions="10.x, 11.x, 12.x" discover="false">
-        <process name="AWGateway.exe" description="Symantec pcAnywhere Gateway Service" ports="5631,None" cmdline="" />
+    <Application-Component app_id="WebSphere Liberty Core on Unix" name="WebSphere Liberty Core Server" category="J2EE Server" ci_type="j2eeserver" supported_versions="8.x" vendor="ibm_corp">
+        <parse-rule id="r1" name="cmdline">(.*)ws-server.jar\s(\S+)</parse-rule>
+        <process name="java" main-process="true" ports="websphere,websphere_jmx,None" cmdline="ws-server.jar" />
+        <attribute name="name" value="${r1(2)}" type="string" />
     </Application-Component>
     <Application-Component name="Microsoft DHCP Server" category="Network" vendor="microsoft_corp" supported_versions="5.x, 4.x">
         <process name="tcpsvcs.exe" description="Performs TCP/IP configuration for DHCP clients, including dynamic assigment of IP addresses." ports="None" cmdline="" />
-    </Application-Component>
-    <Application-Component app_id="HP OpenView Agent for Unix" name="HP OpenView Agent" vendor="hewlett_packard_co" supported_versions="7.x, 8.x, 9.x">
-        <process name="opcctla" description="Control Agent" />
-        <process name="opcmsga" description="Message Agent" />
-        <process name="opcacta" description="Action Agent" />
-        <process name="ovcd" description="HP OpenView Ctrl Service" />
-        <process name="opcmsgi" description="Message Interceptor" />
     </Application-Component>
     <Application-Component app_id="Weblogic on Unix" name="WebLogic AS" category="J2EE Server" installedSoftwareName="BEA WebLogic.*" ci_type="weblogicas" supported_versions="6.x, 7.x, 8.x, 9.x, 10.x" vendor="bea_systems_ltd">
         <parse-rule id="r1" name="cmdline">.+?-Dweblogic.Name=(\")?([\w_-]+).+</parse-rule>
@@ -845,6 +844,13 @@
             <service-endpoint-name>weblogic</service-endpoint-name>
         </process>
         <attribute name="name" value="${r1(2)}" type="string" />
+    </Application-Component>
+    <Application-Component app_id="HP OpenView Agent for Unix" name="HP OpenView Agent" vendor="hewlett_packard_co" supported_versions="7.x, 8.x, 9.x">
+        <process name="opcctla" description="Control Agent" />
+        <process name="opcmsga" description="Message Agent" />
+        <process name="opcacta" description="Action Agent" />
+        <process name="ovcd" description="HP OpenView Ctrl Service" />
+        <process name="opcmsgi" description="Message Interceptor" />
     </Application-Component>
     <Application-Component name="Red Hat Cluster Suite" ci_type="cluster_software" category="Cluster" vendor="red_hat" supported_versions="6.x" installedSoftwareName="cman-*">
         <process name="corosync" main-process="true" required="true" ports="None" cmdline="" description="Linux cluster manager process." />
@@ -969,6 +975,11 @@
         <process name="Microsoft.Exchange.Pop3.exe" ports="None" cmdline="" description="Microsoft Exchange Pop3 worker." />
         <process name="Microsoft.Exchange.Imap4.exe" ports="None" cmdline="" description="Microsoft Exchange Imap4 worker." />
     </Application-Component>
+    <Application-Component name="Microsoft IIS WebServer" ci_type="iis" category="Web Server" vendor="microsoft_corp" installedSoftwareName="\s*IIS\s+.*" supported_versions="5.1, 6.0, 7.0, 8.0, 8.5">
+        <process name="inetinfo.exe" ports="all,None" cmdline="" description="Microsoft Internet Information Service process." />
+        <process name="w3wp.exe" ports="None" cmdline="" description="Microsoft Internet Information Service worker process." />
+        <process name="svchost.exe" ports="None" cmdline="svchost.exe -k iissvcs" />
+    </Application-Component>
     <Application-Component name="BusinessObjects Enterprise XI" app_id="BO Enterprise" ci_type="bobj_service" category="Business Intelligence" supported_versions="12.0" vendor="sap_ag">
         <!-- Framework servers - provide back-end core system services that form the foundation of the BusinessObjects Enterprise Business Intelligence platform. -->
         <process name="CMS.exe" main-process="true" ports="all" description="Maintains a database of information about BusinessObjects Enterprise system." />
@@ -981,11 +992,6 @@
         <parse-rule id="name" name="cmdline" method="search">.*\-name\s+(.+)\.cms\s+.*</parse-rule>
         <attribute name="name" value="${name(1)}" type="string" />
         <attribute name="category" value="Core Services" type="string" />
-    </Application-Component>
-    <Application-Component name="Microsoft IIS WebServer" ci_type="iis" category="Web Server" vendor="microsoft_corp" installedSoftwareName="\s*IIS\s+.*" supported_versions="5.1, 6.0, 7.0, 8.0, 8.5">
-        <process name="inetinfo.exe" ports="all,None" cmdline="" description="Microsoft Internet Information Service process." />
-        <process name="w3wp.exe" ports="None" cmdline="" description="Microsoft Internet Information Service worker process." />
-        <process name="svchost.exe" ports="None" cmdline="svchost.exe -k iissvcs" />
     </Application-Component>
     <Application-Component app_id="Sybase DB on Windows" name="Sybase DB" ci_type="sybase" category="Database" vendor="sybase_inc" supported_versions="10.x, 11.x, 12.x,15.x" installedSoftwareName="SQLServer.*">
         <clustered-application />
@@ -1048,6 +1054,11 @@
             <service-endpoint-name>glassfish</service-endpoint-name>
         </process>
     </Application-Component>
+    <Application-Component app_id="WebSphere Liberty Core on Windows" name="WebSphere Liberty Core Server" category="J2EE Server" ci_type="j2eeserver" supported_versions="8.x" vendor="ibm_corp">
+        <parse-rule id="r1" name="cmdline">(.*)start\s(\S+)</parse-rule>
+        <process name="javaw.exe" main-process="true" ports="websphere,websphere_jmx,None" cmdline="ws-server.jar" />
+        <attribute name="name" value="${r1(2)}" type="string" />
+    </Application-Component>
     <Application-Component app_id="Sybase DB on Unix" name="Sybase DB" ci_type="sybase" category="Database" vendor="sybase_inc" supported_versions="10.x, 11.x, 12.x,15.x" installedSoftwareName="SQLServer.*">
         <clustered-application />
         <process name="dataserver" main-process="true" ports="sybase,None" cmdline="" description="Main Sybase Data Server." />
@@ -1055,7 +1066,6 @@
         <process name="backupserver" ports="" cmdline="" description="Backup Sybase Server." />
         <!-- Job Scheduler Agent -->
         <process name="jsagent" ports="" cmdline="" description="Job Scheduler Agent" />
-        <process name="repserver" ports="" cmdline="" />
         <process name="sybmultbuf" ports="" cmdline="" />
         <!-- service processes -->
         <attribute name="database_dbtype" type="string" value="sybase" />

@@ -80,7 +80,7 @@ class DNSResolver:
                 ipaddr = re.search(matchPat, buffer, re.S)
                 if ipaddr:
                     return ipaddr.group(1).strip()
-    
+
     def resolveNSLookupAliasBased(self, name = None):
         dnsName = name or self.dnsName
         if dnsName:
@@ -93,7 +93,7 @@ class DNSResolver:
                 ipaddrList = re.findall(matchPat, buffer, re.S)
                 if ipaddrList:
                     return ipaddrList
-        
+
     def resolveHostsFile(self):
         cmd = None
         if self.shell.isWinOs():
@@ -122,13 +122,13 @@ class DNSResolver:
         hostName = self.shell.execCmd('hostname')
         if not hostName or not hostName.strip()or self.shell.getLastCmdReturnCode() != 0:
             return None
-        return hostName.lower()
+        return hostName.lower().strip()
 
     def __getDomainName(self):
         domainName = self.shell.execCmd('domainname')
         if not domainName or not domainName.strip() or self.shell.getLastCmdReturnCode() != 0:
             return None
-        return domainName.lower()
+        return domainName.lower().strip()
 
     def __resolveIpByHostnameNonLinux(self):
         hostName = self.__getHostname()
@@ -137,7 +137,7 @@ class DNSResolver:
         if hostName and hostName.find(".") != -1:
             ipAddr = self.resolveNSLookup(hostName)
         elif domainName:
-        # if not dot in hostname this is not a FQDN, so we'll try to build it
+            # if not dot in hostname this is not a FQDN, so we'll try to build it
             ipAddr = self.resolveNSLookup(hostName + "." + domainName)
         return ipAddr
 
@@ -320,11 +320,11 @@ class EnvConfigurator:
 class OracleEnvConfig:
     CONFIG_SUFFIX = '/network/admin/'
     BIN_DIR_SUFFIX='/bin/'
-    
+
     def __init__(self, shell):
         self.shell = shell
         self.oracleHome = None
-    
+
     def setOracleHomeEnvVar(self, rawOracleHome):
         raise ValueError, "Not implemented"
 
@@ -334,13 +334,13 @@ class OracleEnvConfig:
         if match:
             oracleHome = match.group(1)
         return oracleHome
-    
+
     def getOracleHome(self):
         return self.oracleHome
-    
+
     def getConfigPath(self):
         return self.oracleHome + OracleEnvConfig.CONFIG_SUFFIX
-    
+
     def getOracleBinDir(self):
         return self.oracleHome + OracleEnvConfig.BIN_DIR_SUFFIX
 
@@ -352,9 +352,9 @@ class UnixOracleEnvConfig(OracleEnvConfig):
         if not rawOracleHome:
             raise ValueError, "No ORACLE_HOME passed to the UnixOracleEnvConfig class"
         self.oracleHome = self.normalizeOracleHome(rawOracleHome)
-        
+
         self.shell.execCmd('ORACLE_HOME=%s;export ORACLE_HOME' % self.oracleHome)
-        
+
 class WindowsOracleEnvConfig(OracleEnvConfig):
     def __init__(self, shell):
         OracleEnvConfig.__init__(self, shell)
@@ -363,18 +363,18 @@ class WindowsOracleEnvConfig(OracleEnvConfig):
         if not rawOracleHome:
             raise ValueError, "No ORACLE_HOME passed to the WindowsOracleEnvConfig class"
         self.oracleHome = self.normalizeOracleHome(rawOracleHome)
-        
+
         self.shell.execCmd('set ORACLE_HOME=%s' % self.oracleHome)
-        
+
 class SrvctlBasedDiscoverer:
     def __init__(self, shell, envConf):
         self.__shell = shell
         self.__envConf = envConf
-        
+
     def __parseDatabases(self, output):
         if output and output.strip():
             return [x.strip() for x in re.split('[\r\n]+', output) if x.strip()]
-        
+
     def getDatabases(self):
         binDir = self.__envConf.getOracleBinDir()
         result = []
@@ -390,15 +390,43 @@ class SrvctlBasedDiscoverer:
             resultList = re.findall('Instance\s+([\w\-\.]+)\s+is\s+running\s+on\s+node\s+([\w\-\.]+)', output)
             if resultList:
                 for resultLine in resultList:
-                    results.append({'Node' : resultLine[1], 'Instance' : resultLine[0], 'ip' : None})
+                    results.append({'Node' : resultLine[1] and resultLine[1].strip(), 'Instance' : resultLine[0], 'ip' : None})
         return results
-        
+
+    def fixOraBinPath(self, output):
+        binPath = None
+
+        try:
+            if isinstance(output, unicode):
+                output = output.encode('ascii', 'ignore')
+
+            strPattern = 'run the program from '
+            idx = output.find(strPattern)
+
+            if idx >= 0:
+                binPath = output[idx + len(strPattern) : ]
+                binPath = re.sub('\.[\r\n]+', '', binPath)
+
+                if self.__shell.isWinOs():
+                    binPath += ORACLE_BIN_DIR_WINDOWS;
+                else:
+                    binPath += ORACLE_BIN_DIR_UNIX;
+        except:
+            logger.warn('failed to correct the Oracle bin path %s', output)
+
+        return binPath
+
     def getInstancesWithNodes(self, serviceName):
         if not serviceName:
             raise ValueError('Service Name is not set')
         binDir = self.__envConf.getOracleBinDir()
         if binDir:
             output = self.__shell.execCmd('%ssrvctl status database -d %s' % (binDir, serviceName))
+            if self.__shell.getLastCmdReturnCode() != 0 and output and ('PRCD-1229' in output):
+                binDir = self.fixOraBinPath(output)
+                logger.debug('New dir of srvctl is %s' % binDir)
+                output = self.__shell.execCmd('%ssrvctl status database -d %s' % (binDir, serviceName))
+
             if self.__shell.getLastCmdReturnCode() == 0 and output:
                 return self.__parseService(output)
 

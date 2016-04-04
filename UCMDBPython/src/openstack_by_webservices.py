@@ -44,58 +44,69 @@ def DiscoveryMain(Framework):
 
     for protocol in protocols:
         try:
-            identity = Framework.getProtocolProperty(protocol, CollectorsConstants.PROTOCOL_ATTRIBUTE_USERNAME)
+            username = Framework.getProtocolProperty(protocol, CollectorsConstants.PROTOCOL_ATTRIBUTE_USERNAME)
             credential = Framework.getProtocolProperty(protocol, CollectorsConstants.PROTOCOL_ATTRIBUTE_PASSWORD)
 
-            keystoneApi = buildApi('openstack-keystone', endpoint, identity, credential, KeystoneApi)
+            keystoneApi = buildApi('openstack-keystone', endpoint, username, credential, KeystoneApi)
             logger.debug('keystoneApi:', keystoneApi)
 
             tenant_discover = openstack_discoverer.TenantDiscoverer(keystoneApi)
             tenants = tenant_discover.discover()
             if tenants:
-                openstack_software = openstack.OpenStack(ip, credentials_id=protocol)
+                openstack_software = openstack.OpenStack(ip)
                 openstack_osh, openstack_vector = openstack_software.report()
                 OSHVResult.addAll(openstack_vector)
             else:
                 continue
 
             for tenant in tenants:
-                tenant_osh = tenant.report()
-                OSHVResult.add(tenant_osh)
-                OSHVResult.add(modeling.createLinkOSH("composition", openstack_osh, tenant_osh))
+                try:
+                    logger.debug("connecting to tenant:", tenant.name)
+                    tenant_osh = tenant.report()
+                    OSHVResult.add(tenant_osh)
+                    OSHVResult.add(modeling.createLinkOSH("composition", openstack_osh, tenant_osh))
 
-                identity = tenant.name + ":" + identity
+                    identity = tenant.name + ":" + username
 
-                novaApi = buildApi('openstack-nova', endpoint, identity, credential, NovaApi)
-                cinderApi = buildApi('openstack-cinder', endpoint, identity, credential, CinderApi)
-                glanceApi = buildApi('openstack-glance', endpoint, identity, credential, GlanceApi)
-                neutronApi = buildApi('openstack-neutron', endpoint, identity, credential, NeutronApi)
+                    novaApi = buildApi('openstack-nova', endpoint, identity, credential, NovaApi)
+                    cinderApi = buildApi('openstack-cinder', endpoint, identity, credential, CinderApi)
+                    glanceApi = buildApi('openstack-glance', endpoint, identity, credential, GlanceApi)
+                    neutronApi = buildApi('openstack-neutron', endpoint, identity, credential, NeutronApi)
 
-                regions = novaApi.getConfiguredRegions()
-                for tmp_region in regions:
-                    logger.debug("region:", tmp_region)
-                    region = openstack.Region(tmp_region)
-                    region_osh = region.report(tenant_osh)
-                    OSHVResult.add(region_osh)
+                    regions = novaApi.getConfiguredRegions()
+                    if regions:
+                        tenant_osh.setStringAttribute('credentials_id', protocol)
 
-                    OSHVResult.addAll(getZones(novaApi, region.name, region_osh, zoneOshDict))
-                    logger.debug("zoneOshDict:", zoneOshDict)
+                    for tmp_region in regions:
+                        logger.debug("region:", tmp_region)
+                        region = openstack.Region(tmp_region)
+                        region_osh = region.report(tenant_osh)
+                        OSHVResult.add(region_osh)
 
-                    OSHVResult.addAll(getImages(glanceApi, region.name, region_osh))
-                    OSHVResult.addAll(getHypervisors(novaApi, region.name, region_osh))
-                    OSHVResult.addAll(getVms(novaApi, region.name, region_osh, serverOshDict))
+                        OSHVResult.addAll(getZones(novaApi, region.name, region_osh, zoneOshDict))
+                        logger.debug("zoneOshDict:", zoneOshDict)
 
-                    OSHVResult.addAll(getVolumes(cinderApi, region.name, region_osh, zoneOshDict, serverOshDict))
-                    logger.debug("serverOshDict:", serverOshDict)
+                        OSHVResult.addAll(getImages(glanceApi, region.name, region_osh))
+                        OSHVResult.addAll(getHypervisors(novaApi, region.name, region_osh))
+                        OSHVResult.addAll(getVms(novaApi, region.name, region_osh, serverOshDict))
 
-                    OSHVResult.addAll(getNetworks(neutronApi, region.name, region_osh, networkOshDict, openstack_osh))
-                    logger.debug("networkOshDict:", networkOshDict)
+                        OSHVResult.addAll(getVolumes(cinderApi, region.name, region_osh, zoneOshDict, serverOshDict))
+                        logger.debug("serverOshDict:", serverOshDict)
 
-                    OSHVResult.addAll(getPorts(neutronApi, region.name, serverOshDict, networkOshDict))
+                        OSHVResult.addAll(getNetworks(neutronApi, region.name, region_osh, networkOshDict, openstack_osh))
+                        logger.debug("networkOshDict:", networkOshDict)
 
-                    OSHVResult.addAll(getSubnets(neutronApi, region.name, networkOshDict, openstack_osh))
+                        OSHVResult.addAll(getPorts(neutronApi, region.name, serverOshDict, networkOshDict))
 
-                    OSHVResult.addAll(getFlavors(novaApi, region.name, region_osh))
+                        OSHVResult.addAll(getSubnets(neutronApi, region.name, networkOshDict, openstack_osh))
+
+                        OSHVResult.addAll(getFlavors(novaApi, region.name, region_osh))
+                except:
+                    strException = str(sys.exc_info()[1])
+                    excInfo = logger.prepareJythonStackTrace('')
+                    logger.debug(strException)
+                    logger.debug(excInfo)
+                    pass
         except:
             strException = str(sys.exc_info()[1])
             excInfo = logger.prepareJythonStackTrace('')

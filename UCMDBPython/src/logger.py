@@ -56,10 +56,10 @@ def debug(msg, *args):
     @param args: additional variables to log
     """
 
-    #if isDebugEnabled():
-    message = join(msg, *args)
-    cat.debug(message)
-    addLog('debug', message)
+    if isDebugEnabled():
+        message = join(msg, *args)
+        cat.debug(message)
+        addLog('debug', message)
 
 
 def info(msg, *args):

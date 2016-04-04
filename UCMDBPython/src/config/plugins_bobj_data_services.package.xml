@@ -10,6 +10,7 @@
             <qualifiers>
                 <qualifier type="application">BO Data Services</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">powershell</qualifier>
                 <qualifier type="protocol">telnet</qualifier>
                 <qualifier type="protocol">ssh</qualifier>

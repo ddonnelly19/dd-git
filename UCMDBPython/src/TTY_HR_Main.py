@@ -4,6 +4,7 @@ from java.lang import Boolean, Exception
 from java.util import Hashtable
 import Dis_TCP
 import NTCMD_HR_REG_Service_Lib
+import HR_Dis_Driver_Lib
 import TTY_HR_CPU_Lib
 import TTY_HR_Disk_Lib
 import TTY_HR_Memory_Lib
@@ -114,6 +115,8 @@ def DiscoveryMain(Framework):
         config = build_config(Framework)
         discoverCPUs = Boolean.parseBoolean(Framework.getParameter('discoverCPUs'))
         discoverDisks = Boolean.parseBoolean(Framework.getParameter('discoverDisks'))
+        discoverDrivers = Boolean.parseBoolean(Framework.getParameter('discoverDrivers'))
+        discoveriSCSIInfo = Boolean.parseBoolean(Framework.getParameter('discoveriSCSIInfo'))
         discoverMemory = Boolean.parseBoolean(Framework.getParameter('discoverMemory'))
         discoverSoftware = Boolean.parseBoolean(Framework.getParameter('discoverInstalledSoftware'))
         discoverUsers = Boolean.parseBoolean(Framework.getParameter('discoverUsers'))
@@ -163,6 +166,20 @@ def DiscoveryMain(Framework):
                     except:
                         errorMessage = 'Failed to discover disks by shell'
                         logWarn(Framework, errorcodes.FAILED_DISCOVERING_RESOURCE_WITH_CLIENT_TYPE, ['disks', protocol], errorMessage)
+
+                if discoveriSCSIInfo and not uname == 'MacOs':
+                    try:
+                        OSHVResult.addAll(TTY_HR_Disk_Lib.disWinOSiSCSIInfo(hostOsh, shell))
+                    except:
+                        errorMessage = 'Failed to discover iSCSI by shell'
+                        logWarn(Framework, errorcodes.FAILED_DISCOVERING_RESOURCE_WITH_CLIENT_TYPE, ['disks', protocol], errorMessage)
+
+                if discoverDrivers and shell.isWinOs():
+                    try:
+                        HR_Dis_Driver_Lib.discoverDriverByWmi(client, OSHVResult, hostOsh)
+                    except:
+                        errorMessage = 'Failed to discover windows device driver by shell'
+                        logWarn(Framework, errorcodes.FAILED_DISCOVERING_RESOURCE_WITH_CLIENT_TYPE, ['windows device driver', protocol], errorMessage)
 
 
                 if discoverMemory and not uname == 'MacOs':

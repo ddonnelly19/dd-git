@@ -10,6 +10,7 @@
                 <qualifier type="protocol">ssh</qualifier>
                 <qualifier type="protocol">telnet</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">powershell</qualifier>
 				<qualifier type="protocol">uda</qualifier> 
             </qualifiers>

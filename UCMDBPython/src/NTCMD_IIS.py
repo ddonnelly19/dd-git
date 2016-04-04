@@ -621,7 +621,11 @@ class WebConfig:
                                 if dataSource.isValidDataSource():
                                     dbDataSources.append(dataSource)
                                 else:
-                                    logger.debug('DB Source did not validate')
+                                    dataSource = DbDataSource(connectionString, provider)
+                                    if dataSource.isValidDataSource():
+                                        dbDataSources.append(dataSource)
+                                    else:
+                                        logger.debug('DB Source did not validate')
             except:
                 logger.warnException('Failed getting connection info.')
         return dbDataSources

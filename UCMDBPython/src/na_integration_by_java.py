@@ -20,6 +20,7 @@ class DestinationProperty:
 class JobParameter:
     QUERY_TOPOLOGY_PER_DEVICE = "queryTopologyPerDevice"
     REPORT_DEVICE_CONFIGS = "reportDeviceConfigs"
+    REPORT_DEVICE_MODULES = "reportDeviceModules"
 
 
 def _getBooleanParameter(parameterName, framework, defaultValue):
@@ -52,8 +53,11 @@ def DiscoveryMain(Framework):
         discovererClass = na_discover.NaDiscovererPerDevice
     
     reportDeviceConfigs = _getBooleanParameter(JobParameter.REPORT_DEVICE_CONFIGS, Framework, False)
-    logger.debug(reportDeviceConfigs)
-    
+    logger.debug('reportDeviceConfigs: ', reportDeviceConfigs)
+
+    reportDeviceModules = _getBooleanParameter(JobParameter.REPORT_DEVICE_MODULES, Framework, False)
+    logger.debug('reportDeviceModules:', reportDeviceModules)
+
     client = None
     try:
         try:
@@ -65,6 +69,7 @@ def DiscoveryMain(Framework):
             discoverer = discovererClass(client, ipAddress, Framework)
             discoverer.setDevicePageSize(500)
             discoverer.setReportDeviceConfigs(reportDeviceConfigs)
+            discoverer.setReportDeviceModules(reportDeviceModules)
 
             discoverResult = discoverer.discover()
             if discoverResult:
@@ -73,6 +78,7 @@ def DiscoveryMain(Framework):
                 reporter = na.NaReporter(Framework)
                 reporter.setBulkThreshold(10000)
                 reporter.setReportDeviceConfigs(reportDeviceConfigs)
+                reporter.setReportDeviceModules(reportDeviceModules)
 
                 reporter.report(devicesById, connectivitiesByDeviceId)
 

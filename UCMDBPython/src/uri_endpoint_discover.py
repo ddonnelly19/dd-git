@@ -63,7 +63,6 @@ def DiscoveryMain(Framework):
         ips = []
         while length > 0:
             node = nodeList.item(nodeList.length - length)
-            logger.debug(node.toprettyxml())
             if node.getElementsByTagName("url"):
                 url = node.getElementsByTagName("url")[0].childNodes[0].nodeValue
                 ips = resolveIpAddress(url)
@@ -72,7 +71,6 @@ def DiscoveryMain(Framework):
             if node.getElementsByTagName("ip-address"):
                 ip_address = node.getElementsByTagName("ip-address")[0].childNodes[0].nodeValue
                 ips.append(IPAddress(ip_address))
-            logger.debug('%s: %s' % (url, type))
             if url and node and type and ips:
                 OSHVResult.addAll(reportCIs(url, type, ips))
             length = length - 1

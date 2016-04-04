@@ -27,7 +27,9 @@ dbMetaParams = {DbTypes.Oracle: (resolveOracleVersion, 'oracle'),
                                  DbTypes.Db2: (resolveDB2Version, 'db2'),
                                  DbTypes.MySql: (str, 'mysql'),
                                  DbTypes.Sybase: (str, 'sybase'),
-                                 DbTypes.PostgreSQL: (str, 'postgresql')}
+                                 DbTypes.PostgreSQL: (str, 'postgresql'),
+                                 DbTypes.MaxDB: (str, 'maxdb'),
+                                 DbTypes.HanaDB: (str, 'hana_instance')}
 
 def createDatabaseOSH(hostOSH, client, sid, dbVersion, appVersion, buildNumber=None, edition=None):
     protType = client.getProtocolDbType().lower()
@@ -212,7 +214,15 @@ def getServices(dbClient):
         res.close()
     except:
         logger.debugException('')
-
+        try:
+            res = dbClient.executeQuery("SELECT NAME from V$SERVICES WHERE NETWORK_NAME IS NOT NULL")
+            while res.next():
+                name = res.getString(1)
+                service = db.OracleServiceName(name)
+                services.append(service)
+            res.close()
+        except:
+            logger.debugException('')
     return services
 
 
@@ -262,7 +272,6 @@ def querySingleRecordFromDB(dbClient, sql, *indexes):
             for index in indexes:
                 result = res.getString(index)
                 final_result[index] = result
-        res.close()
     except:
         logger.debugException('')
     finally:

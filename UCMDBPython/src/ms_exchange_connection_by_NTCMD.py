@@ -8,6 +8,8 @@ import ms_exchange_utils
 
 import errormessages
 
+from msexchange_win_shell import exchange_version_mapping
+
 from java.lang import Exception
 
 from appilog.common.system.types.vectors import ObjectStateHolderVector
@@ -28,16 +30,10 @@ def parseBuildNumber(fullVersion):
 
 ## parse exchange build version
 def parseExchangeVersion(fullVersion):
-    n = re.search("Version\s+(\d+)+(.*)", fullVersion)
+    n = re.search("Version\s+(.*)\s(\(Build\s+(.*))", fullVersion)
     if n:
         return n.group(1)
 
-## exchange server version mapping
-exchange_version_mapping = {
-    "15":"2013",
-    "14":"2010",
-    "8":"2007"
-}
 
 def normalizeGuid(guid):
     if guid:

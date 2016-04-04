@@ -16,7 +16,6 @@ class MySQLVersionShellPlugin(Plugin):
     """
         Plugin set MySQL version by shell, depends on OS type.
     """
-
     def __init__(self):
         Plugin.__init__(self)
         self.__client = None
@@ -48,7 +47,6 @@ class OracleVersionShellPlugin(Plugin):
     """
         Plugin set Oracle version by shell, depends on OS type.
     """
-
     def __init__(self):
         Plugin.__init__(self)
         self.__client = None
@@ -127,6 +125,11 @@ class OracleVersionShellPlugin(Plugin):
 
     def process(self, context):
         applicationOsh = context.application.getOsh()
+        # The application_ip assigned by applications.py is shell ip and it may not be correct
+        # We prefer to get the correct one through ListenerShellPlugin
+        applicationOsh.setAttribute('application_ip',None)
+        applicationOsh.setAttribute('application_port',None)
+
         try:
             if self.__isWinOs:
                 self.getWindowsVersion(applicationOsh)
@@ -136,7 +139,9 @@ class OracleVersionShellPlugin(Plugin):
             errMsg = 'Failed executing command: ' + self.__cmd + '. Exception received: %s' % (sys.exc_info()[1])
             logger.errorException(errMsg)
 
+
 class OracleListenerShellPlugin(Plugin):
+
     def __init__(self):
         Plugin.__init__(self)
         self.__shell = None
@@ -145,6 +150,7 @@ class OracleListenerShellPlugin(Plugin):
         self.__isWinOs = None
         self.__listenerStatus = None
         self.__isRACWin = False
+
     def isApplicable(self, context):
         self.__shell = context.client
         try:
@@ -166,7 +172,11 @@ class OracleListenerShellPlugin(Plugin):
         dir = re.match('(.*)tnslsnr.*$', path, re.IGNORECASE)
         if dir:
             self.setOracleHome(dir.group(1).strip())
-            self.__listenerStatus = self.__shell.execCmd('\"'+dir.group(1).strip()+'lsnrctl\" status')
+            listener_name = ""
+            match = re.match(r'.*tnslsnr\s([^\s]+).*$', self.__processInfo.getProcess().commandLine)
+            if match:
+                listener_name = match.group(1).strip()
+            self.__listenerStatus = self.__shell.execCmd('\"' + dir.group(1).strip() + 'lsnrctl\" status ' + listener_name)
             if self.__listenerStatus and self.__shell.getLastCmdReturnCode() == 0:
                 logger.debug('Status fetched')
                 for line in self.__listenerStatus.split('\n'):
@@ -192,7 +202,7 @@ class OracleListenerShellPlugin(Plugin):
                         try:
                             ips = resolver.resolve_ips(endpoint[0])
                             for ip in ips:
-                                if netutils.isValidIp(ip):
+                                if netutils.isValidIp(str(ip)):
                                     endpoints.append((ip, endpoint[1]))
                         except:
                             logger.debugException('')
@@ -203,11 +213,15 @@ class OracleListenerShellPlugin(Plugin):
         sidlist = []
         if dir:
             self.setOracleHome(dir.group(1).strip())
-            self.__listenerStatus = self.__shell.execCmd('\"' + dir.group(1).strip() + 'lsnrctl\" status')
+            listener_name = ""
+            match = re.match(r'.*tnslsnr\s([^\s]+).*$', self.__processInfo.getProcess().commandLine)
+            if match:
+                listener_name = match.group(1).strip()
+            self.__listenerStatus = self.__shell.execCmd('\"' + dir.group(1).strip() + 'lsnrctl\" status ' + listener_name)
             if self.__listenerStatus and self.__shell.getLastCmdReturnCode() == 0:
                 logger.debug('Status fetched sid')
                 for line in self.__listenerStatus.split('\n'):
-                    sidline = re.search(r"Instance \"(\w*)\", status.*", line)
+                    sidline = re.search(r"Instance \"((\+)*\w*)\", status.*", line)
                     if sidline:
                         sidlist.append(sidline.group(1).strip())
             else:
@@ -242,7 +256,7 @@ class OracleListenerShellPlugin(Plugin):
         if alias:
             listener_alias = alias.group(2)
         else:
-            logger.debug("Failed to parse Liatener Alias.")
+            logger.debug("Failed to parse Listener Alias.")
         return listener_alias
 
     def getListenerIPs(self, listener_status):

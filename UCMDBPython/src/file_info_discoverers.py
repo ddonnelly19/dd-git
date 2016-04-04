@@ -85,10 +85,11 @@ class FileInfoDiscoverer:
             #attr2value <=>
             #        <-- empty line
             attrs = [attr.strip() for attr in fileAttrs.split(_FILE_ATTR_DELIMITER)[:-1]]
-            if len(self._reqAttrs) != len(attrs):
-                raise ValueError('Obtained data is invalid, got inconsistent attribute count: %d != %d \n %s \n %s' % (len(self._reqAttrs), len(attrs), self._reqAttrs, attrs))
-            fileBlock = self.parseFileAttrs(attrs)
-            fileList.append(fileBlock)
+            if len(self._reqAttrs) == len(attrs):
+                fileBlock = self.parseFileAttrs(attrs)
+                fileList.append(fileBlock)
+            else:
+                logger.warn('Obtained data is invalid, got inconsistent attribute count: %d != %d \n %s \n %s' % (len(self._reqAttrs), len(attrs), self._reqAttrs, attrs))
         return fileList
 
 
@@ -446,8 +447,11 @@ class WindowsFileInfoDiscovererByBatch(FileInfoDiscoverer):
             msg = "An error occurred while executing batch script"
             raise BatchDiscoveryFsException(msg)
 
-    def exists(self, path):
-        self._shell.execCmd('dir /b %s' % path)
+    def exists(self, path, includeAll=0):
+        if includeAll != 0:
+            self._shell.execCmd('dir /a /b %s' % path)
+        else:
+            self._shell.execCmd('dir /b %s' % path)
         return not self._shell.getLastCmdReturnCode()
 
     def cd(self, path):
@@ -487,6 +491,18 @@ class WindowsFileInfoDiscovererByBatch(FileInfoDiscoverer):
         if files:
             return files[0]
         raise BatchDiscoveryFsException('Got empty collection: %s' % files)
+
+class PowerShellFileInfoDiscovererByBatch(WindowsFileInfoDiscovererByBatch):
+    def __init__(self, shell, reqAttrs=None):
+        WindowsFileInfoDiscovererByBatch.__init__(self, shell, reqAttrs)
+
+
+    def exists(self, path, includeAll=0):
+        if includeAll != 0:
+            self._shell.execCmd('cmd.exe /c "dir /a /b %s"' % path)
+        else:
+            self._shell.execCmd('cmd.exe /c "dir /b %s"' % path)
+        return not self._shell.getLastCmdReturnCode()
 
 
 def __getLinuxScript():

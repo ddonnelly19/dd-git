@@ -90,6 +90,7 @@ databaseDataNames = {
                 'sybase': 'Sybase DB',
                 'maxdb': 'SAP MaxDB',
                 'hana_database': 'SAP HanaDB',
+                'hana_instance': 'SAP HanaDB',
                 'mysql': 'MySQL DB',
                 'postgresql': 'PostgreSQL'
                 }
@@ -102,6 +103,13 @@ STORAGE_ID_TO_STORAGE_TYPE = {
                             4: NETWORK_DISK_STORAGE_TYPE,
                             5: COMPACT_DISK_STORAGE_TYPE,
                             6: RAM_STORAGE_TYPE}
+
+SCANNER_DISK_TYPE_TO_STORAGE_TYPE = {
+    'Local hard disk': FIXED_DISK_STORAGE_TYPE,
+    'Network': NETWORK_DISK_STORAGE_TYPE,
+    'Removable hard disk': REMOVABLE_DISK_STORAGE_TYPE,
+    'CD-ROM': COMPACT_DISK_STORAGE_TYPE,
+    'Floppy': FLOPPY_DISK_STORAGE_TYPE}
 
 applicationNameToProductNameMap = {
         #DB servers
@@ -729,16 +737,22 @@ def createDiskOSH(containerHost, dataName, type,  # @ReservedAssignment
         @param fileSystemType: The type of a File system (such as FAT, NTFS,NFS etc..)
         @deprecated: use createFileSystemOSH instead
     """
-    if type == UNKNOWN_STORAGE_TYPE:
-        type = None   # @ReservedAssignment
-    elif not isAllowedStorageType(type):
+    # Map the scanner disk type to storage type
+    # If there is no corresponding type, then just use the disk type
+    storageType = SCANNER_DISK_TYPE_TO_STORAGE_TYPE.get(type)
+    if storageType == None:
+        storageType = type
+
+    if storageType == UNKNOWN_STORAGE_TYPE:
+        storageType = None
+    elif not isAllowedStorageType(storageType):
         return None
 
     diskOSH = ObjectStateHolder(ciType)
     diskOSH.setContainer(containerHost)
     diskOSH.setAttribute('data_name', dataName)
-    if type:
-        diskOSH.setAttribute('disk_type', type)
+    if storageType:
+        diskOSH.setAttribute('disk_type', storageType)
 
     if size and size != '-':
         size = _toFloatOrNone(size)
@@ -785,17 +799,23 @@ def createFileSystemOSH(containerHostOSH, mountPoint, diskType,
                          could not be honored due to not enough storage.
         @param fileSystemType: The type of a File system (such as FAT, NTFS,NFS etc..)
     """
-    if diskType == UNKNOWN_STORAGE_TYPE:
-        diskType = None
-    elif not isAllowedStorageType(diskType):
+    # Map the scanner disk type to storage type
+    # If there is no corresponding type, then just use the disk type
+    storageType = SCANNER_DISK_TYPE_TO_STORAGE_TYPE.get(diskType)
+    if storageType == None:
+        storageType = diskType
+
+    if storageType == UNKNOWN_STORAGE_TYPE:
+        storageType = None
+    elif not isAllowedStorageType(storageType):
         return None
 
     fileSystemOSH = ObjectStateHolder('file_system')
     fileSystemOSH.setContainer(containerHostOSH)
     fileSystemOSH.setStringAttribute('mount_point', mountPoint)   # id attribute
 
-    if diskType:
-        fileSystemOSH.setAttribute('disk_type', diskType)
+    if storageType:
+        fileSystemOSH.setAttribute('disk_type', storageType)
 
     if labelName and labelName.strip():
         fileSystemOSH.setStringAttribute('name', labelName)
@@ -1061,19 +1081,15 @@ def createIpOSH(ipAddress, netmask=None, dnsname=None, ipProps=None):
         except:
             logger.debugException('')
     else:
-        if not ip_addr.isValidIpAddress(ipAddressString):
+        if not netutils.isValidIp(ipAddressString):
             raise ValueError("Receive IP Address that is invalid: %s" % ipAddress)
-    
-    try:
-        domainName = _getDomainScopeManager().getDomainByIp(ipAddressString)
-        probeName = None
-        if not domainName:
-            domainName = '${DefaultDomain}'
-        else:
-            probeName = _getDomainScopeManager().getProbeName(ipAddressString, domainName)
-    except:
-        domainName = "DefaultDomain"
-        probeName = None
+
+    domainName = _getDomainScopeManager().getDomainByIp(ipAddressString)
+    probeName = None
+    if not domainName:
+        domainName = '${DefaultDomain}'
+    else:
+        probeName = _getDomainScopeManager().getProbeName(ipAddressString, domainName)
 
     ipOsh = ObjectStateHolder("ip")
     ipOsh.setStringAttribute("ip_address", ipAddressString)
@@ -1153,33 +1169,10 @@ def addHostAttributes(uh_obj, osName=None, machineName=None, machineBootDate=Non
     setHostOsName(uh_obj, osName)
 
     if machineName:
-        if isValidFQDN(machineName):
-            uh_obj.setAttribute("primary_dns_name", machineName)
-            names= machineName.split('.', 1)
-            uh_obj.setAttribute("host_hostname", names[0])
-            if len(names)>1:
-                uh_obj.setAttribute("domain_name", names[1])
-        else:
-            uh_obj.setAttribute('host_hostname', machineName)
+        uh_obj.setAttribute('host_hostname', machineName)
 
     if machineBootDate:
         uh_obj.setDateAttribute('host_last_boot_time', machineBootDate)
-        
-def isValidFQDN(hostname):
-    try:        
-        if not hostname:
-            return False
-        if ip_addr.isValidIpAddress(hostname):
-            return False
-        if hostname.find(".") <= -1:
-            return False
-        else:
-            return True
-        #if re.match(ur'(?=^.{1,254}$)(^(?:(?!\d+\.|-)[a-zA-Z0-9_\-]{1,63}(?<!-)\.?)+(?:[a-zA-Z]{2,})$)', hostname, re.IGNORECASE | re.MULTILINE):
-            #return True
-        #return False
-    except:
-        return False
 
 
 def createHostOSH(ipAddress, hostClassName="node", osName=None,
@@ -1201,11 +1194,7 @@ def createHostOSH(ipAddress, hostClassName="node", osName=None,
         ipType = _getDomainScopeManager().getRangeTypeByIp(ipAddress)
         if ipType and ipType.equals(RangeType.CLIENT):
             return None
-    
-    try:
-        domainName = _getDomainScopeManager().getDomainByIp(ipAddress.strip())
-    except:
-        domainName = "DefaultDomain"
+    domainName = _getDomainScopeManager().getDomainByIp(ipAddress.strip())
 
     host = ObjectStateHolder(hostClassName)
     host.setAttribute("host_key", '%s %s' % (ipAddress, domainName))
@@ -1772,8 +1761,6 @@ def createServiceAddressOsh(hostOSH, ip, portNumber, portType,
         protocolType = netutils.ProtocolType.TCP_PROTOCOL
     elif portType == SERVICEADDRESS_TYPE_UDP:
         protocolType = netutils.ProtocolType.UDP_PROTOCOL
-    else:
-        protocolType = netutils.ProtocolType.TCP_PROTOCOL
     serviceName = None
     if portName:
         serviceName = netutils._PortType(portName)
@@ -1782,11 +1769,6 @@ def createServiceAddressOsh(hostOSH, ip, portNumber, portType,
     builder = netutils.ServiceEndpointBuilder()
     reporter = netutils.EndpointReporter(builder)
     ipServerOSH = reporter.reportEndpoint(endpoint, hostOSH)
-    
-    if portName:
-        ipServerOSH.setStringAttribute('ip_service_name', portName)
-        ipServerOSH.addAttributeToList('service_names', portName)
-    
     return ipServerOSH
 
 
@@ -1836,7 +1818,7 @@ def createDatabaseOSH(dbType, dbName, dbPort, ip, hostOSH, credentialsID=None,
     elif dbType in ('maxdb', 'MAXDB'):
         databaseDbType = 'maxdb'
         databaseVendor = 'sap_ag'
-    elif dbType == 'HDB':
+    elif dbType in ('HDB' 'hana_instance'):
         databaseDbType = 'sap_hdb'
         databaseVendor = 'sap_ag'
 
@@ -2348,11 +2330,7 @@ class CmdbClassModel:
                 and cmdbAttr.getQualifierByName('ID_ATTRIBUTE') is not None)
 
     def getConfigFileManager(self):
-        try:
-            return ConfigFilesManagerImpl.getInstance()
-        except:
-            ConfigFilesManagerImpl.init("config", None, None)
-            return ConfigFilesManagerImpl.getInstance()
+        return ConfigFilesManagerImpl.getInstance()
 
     def getAttributeDefinition(self, citName, attributeName):
         '''
@@ -2430,7 +2408,8 @@ def setHostSerialNumberAttribute(hostOsh, serialNumber):
     if serialNumber:
         serialNumber = serialNumber.strip()
         if (re.match(SERIAL_EXCLUDE_PATTERN, serialNumber,
-                     re.IGNORECASE) or (serialNumber.lower() == 'none')):
+                     re.IGNORECASE) or (serialNumber.lower() == 'none') or
+                re.match('^\.+$', serialNumber, re.IGNORECASE)):
             logger.warn('Serial number %s was ignored as invalid and set to empty value' % serialNumber)
             serialNumber = ''
         hostOsh.setAttribute('host_serialnumber', serialNumber)

@@ -143,16 +143,16 @@ class Db2Plugin(Plugin):
 
                     remote_instance = DatabaseServer(address, port)
 
-                    remote_inst_osh, _, _, vector = reporter.reportServerAndDatabases(remote_instance, host_osh)
+                    remote_inst_osh, endpoint_osh, _, vector = reporter.reportServerAndDatabases(remote_instance, host_osh)
                     if instance_name_:
                         SoftwareBuilder.updateName(remote_inst_osh, instance_name_)
+                        context.resultsVector.addAll(vector)
+                        _, oshs = reporter.reportRemoteDatabases(remote_dbs, local_dbserver_osh, remote_inst_osh)
+                        context.resultsVector.addAll(oshs)
                     else:
                         logger.debug('No instance name')
-                    context.resultsVector.addAll(vector)
-
-                    _, oshs = reporter.reportRemoteDatabases(remote_dbs, local_dbserver_osh, remote_inst_osh)
-                    context.resultsVector.addAll(oshs)
-
+                        if endpoint_osh:
+                            context.resultsVector.add(endpoint_osh)
                 else:
                     logger.debug('Host is not resolved %s' % node.hostname)
             else:

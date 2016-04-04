@@ -12,6 +12,7 @@ import TTY_HR_Disk_Lib
 import TTY_HR_Memory_Lib
 import TTY_HR_Software_Lib
 import NTCMD_HR_REG_Service_Lib
+import HR_Dis_Driver_Lib
 import process
 import process_discoverer
 import applications
@@ -39,6 +40,15 @@ def _discoverSharedResources(powershell, hostOsh):
     vector = ObjectStateHolderVector()
     for resource in discoverer.getSharedResources():
         shared_resources_util.createSharedResourceOsh(resource, hostOsh, vector)
+    return vector
+
+
+def _discoverWindowsDeviceDriver(powershell, hostOsh):
+    '''PowerShell, osh -> vector
+    @raise Exception: failed getting windows driver by WMI
+    '''
+    vector = ObjectStateHolderVector()
+    HR_Dis_Driver_Lib.discoverDriverByWmi(powershell, vector, hostOsh)
     return vector
 
 
@@ -101,6 +111,8 @@ def DiscoveryMain(Framework):
             # discovery
             discoverCPUs = Boolean.parseBoolean(Framework.getParameter('discoverCPUs'))
             discoverDisks = Boolean.parseBoolean(Framework.getParameter('discoverDisks'))
+            discoveriSCSIInfo = Boolean.parseBoolean(Framework.getParameter('discoveriSCSIInfo'))
+            discoverDrivers = Boolean.parseBoolean(Framework.getParameter('discoverDrivers'))
             discoverMemory = Boolean.parseBoolean(Framework.getParameter('discoverMemory'))
             discoverSoftware = Boolean.parseBoolean(Framework.getParameter('discoverInstalledSoftware'))
             discoverUsers = Boolean.parseBoolean(Framework.getParameter('discoverUsers'))
@@ -132,6 +144,20 @@ def DiscoveryMain(Framework):
                     except:
                         errorMessage = 'Failed to discover disks'
                         _logWarn(errorcodes.FAILED_DISCOVERING_RESOURCE_WITH_CLIENT_TYPE, ['disks', protocol], errorMessage)
+
+                if discoverDrivers and shell.isWinOs():
+                    try:
+                        vector.addAll(_discoverWindowsDeviceDriver(shell, hostOsh))
+                    except:
+                        errorMessage = 'Failed to discover windows device driver by powershell'
+                        _logWarn(errorcodes.FAILED_DISCOVERING_RESOURCE_WITH_CLIENT_TYPE, ['windows device driver', protocol], errorMessage)
+
+                if discoveriSCSIInfo:
+                    try:
+                        vector.addAll(TTY_HR_Disk_Lib.disWinOSiSCSIInfo(hostOsh, shell))
+                    except:
+                        errorMessage = 'Failed to discover iSCSI info'
+                        _logWarn(errorcodes.FAILED_DISCOVERING_RESOURCE_WITH_CLIENT_TYPE, ['iSCSI', protocol], errorMessage)
 
                 if discoverMemory:
                     try:
@@ -227,8 +253,5 @@ def DiscoveryMain(Framework):
                 exInfo = logger.prepareJythonStackTrace('')
                 errormessages.resolveAndReport(exInfo, protocol, Framework)
     finally:
-        try:
-            shell and shell.closeClient()
-        except:
-            logger.warnException("Error closing shell")
+        shell and shell.closeClient()
     return vector

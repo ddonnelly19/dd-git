@@ -100,11 +100,6 @@ class SocketDnsResolver(object):
         @raise ResolveException: Failed to resolve
         '''
         return self.__resolve_ips_by_local_dns(hostname)
-    
-    def resolve_fqdn(self, ip_string):
-        hostnames = self.resolve_hostnames(ip_string)
-        if hostnames:
-            return hostnames[0]
 
     def resolve_hostnames(self, ip_string):
         '''
@@ -164,10 +159,6 @@ class NsLookupDnsResolver(object):
         self.__shell = shell
         self.__dns_server = dns_server or ''
 
-    def __str__(self, *args, **kwargs):
-        return 'NsLookupDnsResolver: %s' %  self.__dns_server
-
-
     def resolve_ips(self, hostname):
         '''
         @types: str -> [str]
@@ -200,22 +191,27 @@ class NsLookupDnsResolver(object):
 
     def __resolve_ips_by_nslookup(self, hostname):
         def _get_ip(buffer, hostname):
-            matchPat = "Name:\s+%s(?:\.[\w\.-]+)?\s*Address(?:es)?:\s*([\d\.:a-z\,\s]+)" % re.escape(hostname)
-            matched = re.search(matchPat, buffer, re.I)
-            if matched:
-                rawAddr = matched.group(1).strip()
-                addrs = re.split('[,\s]+', rawAddr)
-                for addr in addrs:
-                    addr = addr.strip()
-                    if addr:
-                        try:
-                            ip_obj = ip_addr.IPAddress(addr)
-                            valid = (not ip_obj.is_unspecified and
-                                     not ip_obj.is_loopback)
-                            if valid:
-                                ipAddressList.append(ip_obj)
-                        except ValueError:
-                            pass
+            if buffer is not None:
+                matchPat = "Name:\s+%s(?:\.[\w\.-]+)?\s*Address(?:es)?:\s*([\d\.:a-z\,\s]+)" % re.escape(hostname)
+                matched = re.search(matchPat, buffer, re.I)
+                if not matched:
+                    logger.debug('No name based match found. Checking Alias based match.')
+                    matchPat = "Address(?:es)?:\s*([\d\.:a-z\,\s]+)Aliases:.+%s(?:\.[\w\.-]+)?\s*" % re.escape(hostname)
+                    matched = re.search(matchPat, buffer, re.I | re.DOTALL)
+                if matched:
+                    rawAddr = matched.group(1).strip()
+                    addrs = re.split('[,\s]+', rawAddr)
+                    for addr in addrs:
+                        addr = addr.strip()
+                        if addr:
+                            try:
+                                ip_obj = ip_addr.IPAddress(addr)
+                                valid = (not ip_obj.is_unspecified and
+                                         not ip_obj.is_loopback)
+                                if valid:
+                                    ipAddressList.append(ip_obj)
+                            except ValueError:
+                                pass
             return ipAddressList
 
         ipAddressList = []
@@ -330,25 +326,13 @@ class FallbackResolver(object):
         '''
         for resolver in self.__resolvers:
             try:
-                logger.debug("resolve_hostnames: %s using %s" % (ip_string, resolver))
                 hostnames = resolver.resolve_hostnames(ip_string)
                 if hostnames:
                     return hostnames
-            except Exception, re:
+            except ResolveException, re:
                 logger.warn(str(re))
         raise _HOSTNAME_RESOLVE_EXCEPTION
-    
-    def resolve_fqdn(self, ip_string):
-        for resolver in self.__resolvers:
-            try:
-                logger.debug("resolve_fqdn: %s using %s" % (ip_string, resolver))
-                hostname = resolver.resolve_fqdn(ip_string)
-                if hostname and hostname != ip_string:
-                    return hostname
-            except Exception, re:
-                logger.warn(str(re))
-        raise _HOSTNAME_RESOLVE_EXCEPTION
-    
+
     def resolve_ips(self, hostname):
         '''
         tries to resolve ips using each resolver
@@ -357,13 +341,12 @@ class FallbackResolver(object):
         '''
         for resolver in self.__resolvers:
             try:
-                logger.debug("resolve_ips: %s using %s" % (hostname, resolver))
                 ips = resolver.resolve_ips(hostname)
                 if ips:
                     return ips
                 logger.warn("Failed to resolve '%s' with %s" % (hostname,
                                                               resolver))
-            except Exception, re:
+            except ResolveException, re:
                 logger.warn(str(re))
         raise _IP_RESOLVE_EXCEPTION
 

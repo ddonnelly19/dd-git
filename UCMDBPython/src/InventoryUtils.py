@@ -1,6 +1,7 @@
 # coding=utf-8
 import sys
 import os
+import shutil
 import modeling
 
 import re
@@ -17,7 +18,8 @@ import shellutils
 import netutils
 
 import LockUtils
-
+import file_system
+import file_topology
 import ConnectedOSCredentialFinder
 
 from appilog.common.system.types import ObjectStateHolder
@@ -33,6 +35,7 @@ from com.hp.ucmdb.discovery.library.clients.agents import BaseAgent
 from com.hp.ucmdb.discovery.probe.agents.probemgr.workflow.state import WorkflowStepStatus
 from com.hp.ucmdb.discovery.library.clients.ddmagent import AgentSessionException
 from appilog.common.utils import Protocol
+from file_topology import FileAttrs
 
 
 AGENT_OPTION_BASEDIR = 'BASEDIR'
@@ -1068,20 +1071,57 @@ def deleteFile(Framework, remoteFilePath):
         logger.debug('Failed to delete file ' + remoteFilePath)
         return 0
     logger.debug('Remote file ', remoteFilePath, ' deleted.')
-
     return 1
+
+def getRemoteFileSystem(client):
+    shell = shellutils.ShellUtils(client, skip_set_session_locale=True)
+    return file_system.createFileSystem(shell)
+
+def compareFileSizeForCopy(filesys, localPath, remotePath):
+    fo = filesys.getFile(remotePath, [FileAttrs.SIZE], 1)
+    remoteSize = fo.sizeInBytes()
+    localSize = os.path.getsize(localPath)
+    if localSize == remoteSize:
+        return True
+    else:
+        logger.debug('The file sizes do not match, local file size: ', localSize, ' remote file size: ', remoteSize)
+        return False
+
+def isDDMiMigrate(Framework):
+    isDDMiMigrate = Framework.getProperty(STATE_PROPERTY_IS_MIGRATE)
+    return (isDDMiMigrate is not None) and (isDDMiMigrate == 'true')
+
+def buildTempFilePath(path):
+    # Files like agentinstall.sh could be matched by privileged command pattern .*agentinstall.sh
+    # This causes that some command will be wrongly prefixed with /usr/bin/sudo
+    # To avoid such match, remove the last char of original path and append _tmp to get a temp path
+    return path[:-1] + '_tmp'
 
 def copyLocalFileToRemote(Framework, localPath, remotePath, reportError=1):
     logger.debug('Copy local ', localPath, " to remote ", remotePath)
+    remotePathTmp = buildTempFilePath(remotePath)
+    # While migrating, we can't use shell, so ignore size comparing
+    if isDDMiMigrate(Framework):
+        remotePathTmp = remotePath
     client = Framework.getConnectedClient()
-    if client.uploadFile(localPath, remotePath, 1):
-        logger.debug('Failed to upload ' + localPath + ' to remote ' + remotePath)
+    if client.uploadFile(localPath, remotePathTmp, 1):
+        logger.debug('Failed to upload ' + localPath + ' to remote ' + remotePathTmp)
         if reportError:
-            Framework.reportError(inventoryerrorcodes.INVENTORY_DISCOVERY_FAILED_UPLOAD, [localPath, remotePath])
+            Framework.reportError(inventoryerrorcodes.INVENTORY_DISCOVERY_FAILED_UPLOAD, [localPath, remotePathTmp])
         else:
-            Framework.reportWarning(inventoryerrorcodes.INVENTORY_DISCOVERY_FAILED_UPLOAD, [localPath, remotePath])
+            Framework.reportWarning(inventoryerrorcodes.INVENTORY_DISCOVERY_FAILED_UPLOAD, [localPath, remotePathTmp])
         return 0
-    return 1
+    if isDDMiMigrate(Framework):
+        return 1
+    fs = getRemoteFileSystem(client)
+    # Compare the file sizes to check if the copy is successful
+    if compareFileSizeForCopy(fs, localPath, remotePathTmp):
+        fs.moveFile(remotePathTmp, remotePath)
+        return 1
+    # Copy failed, need to remove the temp file
+    if fs.exists(remotePathTmp):
+        fs.removeFile(remotePathTmp)
+    return 0
 
 def copyRemoteFileToLocal(Framework, remotePath, localPath, reportError=1, reportWarning=0):
     logger.debug('Copy remote ', remotePath, " to local ", localPath)
@@ -1182,7 +1222,6 @@ def resolveBaseDir(Framework, shell, isDDMiMigrate=None):
                 resolvedBaseDirStr = resolvedBaseDirStr.substring(0, resolvedBaseDirStr.length() - 1)
 
         Framework.setProperty(STATE_PROPERTY_ORIGINAL_BASEDIR, originalBaseDirStr)
-        Framework.setProperty(STATE_PROPERTY_RESOLVED_CONFIGURED_BASEDIR, resolvedBaseDirStr)
         Framework.setProperty(STATE_PROPERTY_RESOLVED_BASEDIR, resolvedBaseDirStr)
         Framework.setProperty(STATE_PROPERTY_RESOLVED_CONFIGURED_BASEDIR, resolvedBaseDirStr)
 

@@ -18,9 +18,12 @@ def _obtainParams(framework):
     zoneNameList = filter(isNonEmptyString,
                           map(string.strip, splitRegexp.split(zoneNameList)))
 
+    from java.lang import Boolean
     includeOutscopeIPs = framework.getParameter('includeOutscopeIPs')
-    reportBrokenAliases = framework.getParameter('reportBrokenAliases')
+    includeOutscopeIPs = Boolean.valueOf(includeOutscopeIPs)
 
+    reportBrokenAliases = framework.getParameter('reportBrokenAliases')
+    reportBrokenAliases = Boolean.valueOf(reportBrokenAliases)
     return zoneNameList, includeOutscopeIPs, reportBrokenAliases
 
 
@@ -32,7 +35,7 @@ def DiscoveryMain(framework):
         shell = None
         try:
             shell = shellutils.ShellUtils(client)
-            dnsDiscoverer = dns_discoverer.createDiscovererByShell(shell, None)
+            dnsDiscoverer = dns_discoverer.createDiscovererByShell(shell)
             params = _obtainParams(framework)
             zoneNameList, includeOutscopeIPs, reportBrokenAliases = params
             zoneTopologies = dns_discoverer.discoverDnsZoneTopologies(dnsDiscoverer, zoneNameList, protocol)

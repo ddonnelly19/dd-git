@@ -10,6 +10,7 @@
                 <qualifier type="application">SAP Message Server</qualifier>
 
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">wmi</qualifier>
                 <qualifier type="protocol">snmp</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
@@ -43,6 +44,7 @@
                 <qualifier type="application">SAP Enqueue Server</qualifier>
 
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">wmi</qualifier>
                 <qualifier type="protocol">snmp</qualifier>
                 <qualifier type="protocol">ssh</qualifier>

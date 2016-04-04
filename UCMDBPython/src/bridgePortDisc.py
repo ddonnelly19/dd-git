@@ -364,7 +364,7 @@ class SwitchPort:
             if vlan_id:
                 md5_obj.update(vlan_id)
             filename = md5_obj.hexdigest()
-            filepath = CollectorsParameters.HOME_DIR + 'runtime/l2process/'
+            filepath = os.path.join(CollectorsParameters.HOME_DIR, 'runtime/l2process/')
             try:
                 if os.path.exists(filepath+filename):
                     os.remove(filepath+filename)
@@ -408,7 +408,7 @@ class SwitchPort:
                 md5_obj.update(updateValue)
                 
                 filename = md5_obj.hexdigest()
-                filepath = CollectorsParameters.HOME_DIR + 'runtime/l2reported/'
+                filepath = os.path.join(CollectorsParameters.HOME_DIR, 'runtime/l2reported/')
                 if not os.path.exists(filepath):
                     try:
                         os.mkdir(filepath)
@@ -466,7 +466,7 @@ class Concentrator:
         if vlan_id:
             md5_obj.update(vlan_id)
         filename = md5_obj.hexdigest()
-        filepath = CollectorsParameters.HOME_DIR + 'runtime/l2process/'
+        filepath = os.path.join(CollectorsParameters.HOME_DIR, 'runtime/l2process/')
         if not os.path.exists(filepath):
             try:
                 os.mkdir(filepath)

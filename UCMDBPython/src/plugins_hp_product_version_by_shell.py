@@ -192,9 +192,11 @@ class PpmVersionShellPlugin(ConfigBasedPlugin):
         params = process.argumentLine
         match = re.search(regexp, params)
         if match:
-            self.processPath = match.group(1) + '/'
-            logger.debug('-Djboss.home.dir=%s' % self.processPath)
-            return self.LOOP_STOP
+            self.processPath = match.group(1)
+            if self.processPath:
+                self.processPath = self.processPath + '/'
+                logger.debug('-Djboss.home.dir=%s' % self.processPath)
+                return self.LOOP_STOP
 
     def setApplicationVersion(self, appOsh, version, versionDescription=None):
         #as version in PPM is split by commas, replace them by points

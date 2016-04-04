@@ -13,6 +13,7 @@
                 <qualifier type="application">SAP ABAP Application Server (Dialog)</qualifier>
                 <qualifier type="application">SAP ABAP Application Server</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">wmi</qualifier>
                 <qualifier type="protocol">snmp</qualifier>
                 <qualifier type="protocol">ssh</qualifier>

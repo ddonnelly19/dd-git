@@ -25,6 +25,7 @@ class MSClusterInformationPluginByNTCMD(Plugin):
         self.bin_path = None
         self.__crgMap = None
         self.applicationOsh = None
+        self.cmdlets_prefix = ""
 
     def isApplicable(self, context):
         self.__shell = context.client
@@ -36,13 +37,20 @@ class MSClusterInformationPluginByNTCMD(Plugin):
         return isinstance(self.__shell, shellutils.PowerShell)
 
     def isUsingPowerShellCmdlet(self):
-        self.bin_path = '%SystemRoot%\\sysnative\\'
         fs = file_system.createFileSystem(self.__shell)
-        if (not (fs.exists(self.bin_path + "cluster.exe"))):
-            self.bin_path = "%SystemRoot%\\system32\\"
-            if (not (fs.exists(self.bin_path + "cluster.exe"))):
-                return True
-        return self.isPowerShellClient()
+        is64bit = self.__shell.is64BitMachine()
+        if is64bit and fs.exists( '%SystemRoot%\\sysnative\\cluster.exe' ):
+            self.bin_path = '%SystemRoot%\\sysnative\\'
+        elif not is64bit and fs.exists( '%SystemRoot%\\system32\\cluster.exe' ):
+            self.bin_path = '%SystemRoot%\\system32\\'
+        if self.bin_path:
+            return False
+        else:
+            output = self.__shell.execCmd('CLUSTER /VER')
+            if output and output.strip() and self.__shell.getLastCmdReturnCode() == 0:
+                self.bin_path = ""
+                return False
+        return True
 
     def __initMethodByProtocol(self):
         if self.isPowerShellClient():
@@ -169,6 +177,10 @@ class MSClusterInformationPluginByNTCMD(Plugin):
         endOfHeader = 0
         getClusterCmd = "Get-Cluster"
         output = self.executeCmdByPowerShell(getClusterCmd)
+        if self.__shell.getLastCmdReturnCode():
+            self.cmdlets_prefix = "Import-Module FailoverClusters;"
+            output = self.executeCmdByPowerShell(getClusterCmd)
+
         for line in output.splitlines():
             if (line.find('----') != -1) and (endOfHeader == 0):
                 endOfHeader = 1
@@ -280,7 +292,7 @@ class MSClusterInformationPluginByNTCMD(Plugin):
 
     def getHostAddressesbyNetinterfaceByPowerShell(self, nodeName):
         ip = None
-        getHostAddressCmd = "Get-ClusterNetworkInterface | Where-Object {$_. Node -match '%s'} | Where-Object {$_. Name -match '%s - Public'} | fl Address" % (nodeName, nodeName)
+        getHostAddressCmd = "Get-ClusterNetworkInterface | Where-Object {$_.Node -match '%s'} | Where-Object {$_.Name -match '%s - Public'} | fl Address" % (nodeName, nodeName)
         output = self.executeCmdByPowerShell(getHostAddressCmd)
         for line in output.strip().splitlines():
             if (line.find(':') != -1):
@@ -304,7 +316,7 @@ class MSClusterInformationPluginByNTCMD(Plugin):
 
     def discoverResourcesByGroupByPowerShell(self, groupName):
         resources = []
-        getResourceCmd = "Get-ClusterResource | Where-Object {$_. OwnerGroup -match '%s'}" % groupName
+        getResourceCmd = "Get-ClusterResource | Where-Object {$_.OwnerGroup -match '%s'}" % groupName
         output = self.executeCmdByPowerShell(getResourceCmd)
         if output:
             resources = self.parseResource(output, groupName)
@@ -335,23 +347,24 @@ class MSClusterInformationPluginByNTCMD(Plugin):
         return resources
 
     def discoverResourcesByTypeByPowerShell(self, typeName):
-        getResourceByTypeCmd = "Get-ClusterResource | Where-Object {$_. ResourceType -match '%s'}" % typeName
+        getResourceByTypeCmd = "Get-ClusterResource | Where-Object {$_.ResourceType -match '%s'}" % typeName
         output = self.executeCmdByPowerShell(getResourceByTypeCmd)
         ipResourceByGroup = {}
-        reg = '((\s?\S+)+)\s+'
+        reg = '([\s\S]*?)(Offline|Online)\s+(.*)\s+%s$' % typeName
         for line in output.splitlines():
             if line and line.find(typeName) != -1:
                 pattern = re.compile(reg)
-                matches = pattern.findall(line.strip())
-                resourceName = matches[0][0]
-                groupName = matches[2][0]
-                if ipResourceByGroup.get(groupName, None):
-                    logger.debug(ipResourceByGroup.get(groupName))
-                    ipResourceByGroup[groupName].append(resourceName)
-                else:
-                    resourceNameList = []
-                    resourceNameList.append(resourceName)
-                    ipResourceByGroup[groupName] = resourceNameList
+                match = pattern.search(line.strip())
+                if match:
+                    resourceName = match.group(1).strip()
+                    groupName = match.group(3).strip()
+                    if ipResourceByGroup.get(groupName, None):
+                        logger.debug(ipResourceByGroup.get(groupName))
+                        ipResourceByGroup[groupName].append(resourceName)
+                    else:
+                        resourceNameList = []
+                        resourceNameList.append(resourceName)
+                        ipResourceByGroup[groupName] = resourceNameList
         return ipResourceByGroup
 
 
@@ -394,8 +407,11 @@ class MSClusterInformationPluginByNTCMD(Plugin):
         match = re.search(pattern, content)
         if match:
             return match.group(1).strip()
+        return content
 
     def executeCmdByPowerShell(self, cmd):
+        cmd = ''.join((self.cmdlets_prefix, cmd))
+        logger.debug("cmdline:", cmd)
         if self.isPowerShellClient():
             return self.__shell.execEncodeCmd(cmd)
         else:

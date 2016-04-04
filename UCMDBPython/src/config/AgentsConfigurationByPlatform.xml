@@ -141,7 +141,7 @@
             </agent-is-install-cmd>
 
             <agent-install-cmd>
-                <executable>nohup VAR{basedir}agentinstall.sh --async --logfile VAR{basedir}VAR{install-log-file-name} --sleep 15 VAR{basedir}VAR{agent-remote-installation-name} --port VAR{agent-install-port-placeholder} VAR{agent-install-url0-placeholder} VAR{agent-install-url1-placeholder} VAR{agent-install-url2-placeholder} VAR{agent-install-callhome-timeout-placeholder} VAR{agent-install-sw-utilization-placeholder} VAR{agent-install-sw-utilization-period-placeholder} VAR{agent-install-data-folder-placeholder} VAR{agent-install-temp-folder-placeholder} VAR{agent-install-username-placeholder} VAR{agent-install-group-id-placeholder} --cert VAR{basedir}. --home VAR{basedir}..VAR{file-separator} VAR{agent-fips-placeholder}; sleep 5; echo ''</executable>
+                <executable>nohup VAR{basedir}agentinstall.sh --async --logfile VAR{basedir}VAR{install-log-file-name} --sleep 15 VAR{basedir}VAR{agent-remote-installation-name} --port VAR{agent-install-port-placeholder} VAR{agent-install-url0-placeholder} VAR{agent-install-url1-placeholder} VAR{agent-install-url2-placeholder} VAR{agent-install-callhome-timeout-placeholder} VAR{agent-install-sw-utilization-placeholder} VAR{agent-install-sw-utilization-period-placeholder} --home VAR{basedir}..VAR{file-separator} VAR{agent-install-data-folder-placeholder} VAR{agent-install-temp-folder-placeholder} VAR{agent-install-username-placeholder} VAR{agent-install-group-id-placeholder} --cert VAR{basedir}. VAR{agent-fips-placeholder}; sleep 5; echo ''</executable>
             </agent-install-cmd>
             <install-log-file-name>
                 <executable>agent-install.log</executable>
@@ -181,7 +181,7 @@
         </agent-uninstall>
         <agent-upgrade>
             <agent-upgrade-cmd>
-                <executable>nohup VAR{basedir}agentinstall.sh --async --logfile VAR{basedir}VAR{upgrade-log-file-name} --sleep 15 --upgrade VAR{basedir}VAR{agent-remote-installation-name} --port VAR{agent-install-port-placeholder} VAR{agent-install-url0-placeholder} VAR{agent-install-url1-placeholder} VAR{agent-install-url2-placeholder} VAR{agent-install-callhome-timeout-placeholder} VAR{agent-install-sw-utilization-placeholder} VAR{agent-install-sw-utilization-period-placeholder} VAR{agent-install-data-folder-placeholder} VAR{agent-install-temp-folder-placeholder} VAR{agent-install-username-placeholder} VAR{agent-install-group-id-placeholder}  --cert VAR{basedir}. --home VAR{basedir}..VAR{file-separator} VAR{agent-fips-placeholder}; sleep 5; echo ''</executable>
+                <executable>nohup VAR{basedir}agentinstall.sh --async --logfile VAR{basedir}VAR{upgrade-log-file-name} --sleep 15 --upgrade VAR{basedir}VAR{agent-remote-installation-name} --port VAR{agent-install-port-placeholder} VAR{agent-install-url0-placeholder} VAR{agent-install-url1-placeholder} VAR{agent-install-url2-placeholder} VAR{agent-install-callhome-timeout-placeholder} VAR{agent-install-sw-utilization-placeholder} VAR{agent-install-sw-utilization-period-placeholder} --home VAR{basedir}..VAR{file-separator} VAR{agent-install-data-folder-placeholder} VAR{agent-install-temp-folder-placeholder} VAR{agent-install-username-placeholder} VAR{agent-install-group-id-placeholder}  --cert VAR{basedir}. VAR{agent-fips-placeholder}; sleep 5; echo ''</executable>
             </agent-upgrade-cmd>
             <upgrade-log-file-name>
                 <executable>agent-upgrade.log</executable>

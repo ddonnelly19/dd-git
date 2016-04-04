@@ -55,7 +55,14 @@
                     <name>EMC_ComputerSystem</name>
                     <min-count>1</min-count>
                 </class>
-            </namespace>                        
+            </namespace>
+            <namespace>
+                <name>root/brocade1</name>
+                <class>
+                    <name>Brocade_Fabric</name>
+                    <min-count>1</min-count>
+                </class>
+            </namespace>
         </namespaces>
     </category>
 </categories>

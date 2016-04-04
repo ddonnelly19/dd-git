@@ -118,8 +118,8 @@ def getServerAndDomain(framework, shellClient, config):
 
 
 def _getDnsDetails(shellClient, protocol):
-    output = ' '
-    try:          
+    output = None
+    try:            
         if protocol in ('telnet', 'ssh'):
             output = shellClient.executeCmdWithTimeOut('nslookup -')#@@CMD_PERMISION shell protocol execution
             shellClient.executeCmdWithTimeOut('exit')#@@CMD_PERMISION shell protocol execution

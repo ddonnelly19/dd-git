@@ -88,7 +88,8 @@ DATABASE_FILES=String("SELECT sysfiles.name, sysfiles.filename, sysfiles.[size] 
 
 MASTER_FILES=String("select sysfiles.name, sysfiles.physical_name, sysfiles.[size] as size, sysfiles.max_size, sysfiles.growth, sysdatabases.[name] as dbname from sys.master_files as sysfiles INNER JOIN master..sysdatabases as sysdatabases ON sysfiles.database_id=sysdatabases.dbid  ")
 
-DATABASE_USERS="SELECT name FROM [??]..sysusers WHERE (islogin = 1) AND (hasdbaccess = 1)"
+DATABASE_USERS_DBNAME="SELECT name FROM [??]..sysusers WHERE (islogin = 1) AND (hasdbaccess = 1)"
+DATABASE_USERS="SELECT name FROM sysusers WHERE (islogin = 1) AND (hasdbaccess = 1)"
 ##################### JOBS ####################
 GET_PLANS="SELECT * FROM msdb.dbo.sysdbmaintplans where plan_id > cast (0 as varbinary)"
 GET_PLANS_V2005=String("SELECT msdb.dbo.sysdtspackages90.id as plan_id, msdb.dbo.sysdtspackages90.name as plan_name, suser_sname(ownersid) as owner FROM msdb.dbo.sysdtspackages90 "+

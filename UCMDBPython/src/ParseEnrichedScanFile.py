@@ -224,11 +224,17 @@ def domParse(_input, Framework, isManual, reportWarning, filePath):
         #create PrinterDriver osh
         createPrinterDriverOSH(OSHVResult, rootNode, nodeOSH)
         logger.debug("Printer DriverOSH created!")
+        # create iSCSI OSH
+        physicalVolumeOshMap = createiSCSIOSH(OSHVResult, rootNode, nodeOSH)
+        logger.debug("iSCSI OSH created!")
         # create DiskDevice osh
         createDiskOSH(OSHVResult, rootNode, nodeOSH)
         logger.debug("DiskDevice OSH created!")
+        # create WindowsDeviceDriver OSH
+        createWindiwsDeviceDriverOSH(OSHVResult, rootNode, nodeOSH)
+        logger.debug("Windows Device Driver OSH created!")
         # create FileSystem OSH
-        createFsOSH(OSHVResult, rootNode, nodeOSH)
+        createFsOSH(OSHVResult, rootNode, nodeOSH, physicalVolumeOshMap)
         logger.debug("FileSystem OSH created!")
         # create MemoryUnit osh
         createMMUOSH(OSHVResult, rootNode, nodeOSH)
@@ -390,13 +396,13 @@ def createNodeOSH(oshvresults, root):
         model = getNodeValues("hwBiosMachineModel", root)[0]
     model = model.strip()
     if len(model):
-        nodeOsh.setStringAttribute("discovered_model", model)
+        modeling.setHostModelAttribute(nodeOsh, model)
     manufacturer = getNodeValues("hwsmbiosSystemManufacturer", root)[0]
     if not len(manufacturer):
         manufacturer = getNodeValues("hwBiosManufacturer", root)[0]
     manufacturer = manufacturer.strip()
     if len(manufacturer):
-        nodeOsh.setStringAttribute("discovered_vendor", manufacturer)
+        modeling.setHostManufacturerAttribute(nodeOsh, manufacturer)
     if isWindows(root):
         mapStringAttribute(nodeOsh, "net_bios_name", "hwLocalMachineID", root)
     mapStringAttribute(nodeOsh, "domain_name", "hwIPDomain", root)
@@ -439,7 +445,7 @@ def createNodeOSH(oshvresults, root):
 
     sn = sn.strip()
     if len(sn):
-        nodeOsh.setStringAttribute("serial_number", sn)  # ddm_id_attribute
+        modeling.setHostSerialNumberAttribute(nodeOsh, sn)  # ddm_id_attribute
     nodeOsh.setListAttribute("dns_servers", getDnsServers(root))
     processorFamily = mapProcessorFamily(root)
     if processorFamily:
@@ -476,8 +482,11 @@ def createCpuOSH(oshvresults, root, hostOsh):
         return
     coreCount = int(getNodeValues("hwCPUCoreCount", root, ['0'])[0])
     logicalCpuCount = int(getNodeValues("hwCPUCount", root, ['0'])[0])
-    coreNoPerPhysicalCpu = coreCount / physicalCpuCount
-    logicalCpuNoPerPhysicalCpu = logicalCpuCount / physicalCpuCount
+    coreNoPerPhysicalCpu = 0
+    logicalCpuNoPerPhysicalCpu = 0
+    if physicalCpuCount != 0:
+        coreNoPerPhysicalCpu = coreCount / physicalCpuCount
+        logicalCpuNoPerPhysicalCpu = logicalCpuCount / physicalCpuCount
     cpus = root.getElementsByTagName("hwCPUs_value")
     cpusArray = nodeListToArray(cpus)
     cpuIndex = {}
@@ -499,10 +508,26 @@ def createCpuOSH(oshvresults, root, hostOsh):
 
     # If we are creating CPUs based on cpuIndex
     # then we need to calculate the core per physical CPU based on it too.
-    coreNoPerPhysicalCpu = coreCount / len(cpuIndex)
-    logicalCpuNoPerPhysicalCpu = logicalCpuCount / len(cpuIndex)
-    
+    if len(cpuIndex) > 0:
+        coreNoPerPhysicalCpu = coreCount / len(cpuIndex)
+        logicalCpuNoPerPhysicalCpu = logicalCpuCount / len(cpuIndex)
+
+    # QCCR1H104788 CPU Mismatch in UD discovery
+    # Server1 has 10 CPUs but in UCMDB discovery shows there are 3 sockets, each has 3 cores, totally = 9 CPU in UI
+    nRemainCoreCount = coreCount - coreNoPerPhysicalCpu * len(cpuIndex)
+    nRemainLogicalCpuCount = logicalCpuCount - logicalCpuNoPerPhysicalCpu * len(cpuIndex)
+
     for cpuId, idx in cpuIndex.iteritems():
+        nRemainCore = 0
+        nRemainLogicalCpu = 0
+        if nRemainCoreCount > 0:
+            nRemainCore += 1
+            nRemainCoreCount -= 1
+
+        if nRemainLogicalCpuCount > 0:
+            nRemainLogicalCpu += 1
+            nRemainLogicalCpuCount -= 1
+
         cpu = cpusArray[idx]
         cpuId = "CPU" + cpuId
         cpuSpeed = getNodeValues("hwCPUSpeed", cpu, ['0'])[0]
@@ -511,9 +536,9 @@ def createCpuOSH(oshvresults, root, hostOsh):
         if not cpuName:
             cpuName = getNodeValues("hwCPUType", cpu)[0]
         # todo the following line works on all the platforms except solaris
-        cpuOsh = modeling.createCpuOsh(cpuId, hostOsh, cpuSpeed, coreNoPerPhysicalCpu, cpuVendor, None, cpuName)
+        cpuOsh = modeling.createCpuOsh(cpuId, hostOsh, cpuSpeed,  coreNoPerPhysicalCpu + nRemainCore, cpuVendor, None, cpuName)
         cpuOsh.setEnumAttribute("cpu_specifier", int(getNodeEnumAttribute(cpu, "hwCPUType", '0')))
-        cpuOsh.setIntegerAttribute("logical_cpu_count", logicalCpuNoPerPhysicalCpu)
+        cpuOsh.setIntegerAttribute("logical_cpu_count",  logicalCpuNoPerPhysicalCpu + nRemainLogicalCpu)
         oshvresults.add(cpuOsh)
         mapScanFile(oshvresults, root, hostOsh, cpuOsh, cpu, idx)
 
@@ -590,6 +615,40 @@ def createOSVM(oshvresults, root, hostOsh):
             logger.debug("ibm_lpar_profile OSH created!")
 
 
+# create windows device driver OSH
+def createWindiwsDeviceDriverOSH(oshvresults, root, hostOsh):
+    deviceDrivers = root.getElementsByTagName("hwOSDeviceDriverData_value")
+    deviceDriverArray = nodeListToArray(deviceDrivers)
+    propertyArray = {'hwOSDeviceDriverDataCompatID':'compat_id',
+                    'hwOSDeviceDriverDataDescription':'description',
+                    'hwOSDeviceDriverDataDeviceClass':'device_class',
+                    'hwOSDeviceDriverDataDeviceID':'device_id',
+                    'hwOSDeviceDriverDataDeviceName':'device_name',
+                    'hwOSDeviceDriverDataDevLoader':'dev_loader',
+                    'hwOSDeviceDriverDataDriverDate':'driver_date',
+                    'hwOSDeviceDriverDataDriverName':'driver_name',
+                    'hwOSDeviceDriverDataDriverProviderName':'driver_provider_name',
+                    'hwOSDeviceDriverDataDriverVersion':'driver_version',
+                    'hwOSDeviceDriverDataFriendlyName':'friendly_name',
+                    'hwOSDeviceDriverDataHardWareID':'hardware_id',
+                    'hwOSDeviceDriverDataInfName':'inf_name',
+                    'hwOSDeviceDriverDataInstallDate':'install_date',
+                    'hwOSDeviceDriverDataIsSigned':'is_signed',
+                    'hwOSDeviceDriverDataLocation':'location',
+                    'hwOSDeviceDriverDataManufacturer':'manufacturer',
+                    'hwOSDeviceDriverDataName':'name',
+                    'hwOSDeviceDriverDataPDO':'pdo',
+                    'hwOSDeviceDriverDataSigner':'signer'}
+    for deviceDriver in deviceDriverArray:
+        deviceDriverOsh = ObjectStateHolder("windows_device_driver")
+        for propertyName in propertyArray.keys():
+            driverAttribute = getNodeValues(propertyName, deviceDriver)[0]
+            if len(driverAttribute):
+                deviceDriverOsh.setStringAttribute(propertyArray[propertyName], driverAttribute)
+        deviceDriverOsh.setContainer(hostOsh)
+        oshvresults.add(deviceDriverOsh)
+
+
 # create disk device OSH
 def createDiskOSH(oshvresults, root, hostOsh):
     scsiDevices = root.getElementsByTagName("hwPhysicalDiskData_value")
@@ -599,10 +658,10 @@ def createDiskOSH(oshvresults, root, hostOsh):
         diskOsh = ObjectStateHolder("disk_device")
         deviceName = getNodeValues("hwPhysicalDiskID", device)[0]
         if len(deviceName):
-            diskOsh.setStringAttribute("name", deviceName)  # id attribute
+            diskOsh.setStringAttribute("name", deviceName.upper())  # id attribute
             #mapStringAttribute(diskOsh, "model_name", "hwSCSIDeviceName", device)
             #mapStringAttribute(diskOsh, "vendor", "hwSCSIDeviceVendor", device)
-            #mapStringAttribute(diskOsh, "serial_number", "hwSCSIDeviceSerial", device)
+            mapStringAttribute(diskOsh, "serial_number", "hwPhysicalDiskSerialNumber", device)
             diskOsh.setStringAttribute("disk_type", InventoryUtils.DISK_TYPE_MAPPING.get(getNodeEnumAttribute(device, "hwPhysicalDiskType")))
             diskOsh.setIntegerAttribute("disk_size", int(getNodeValues("hwPhysicalDiskSize", device, ['0'])[0]))
             diskOsh.setContainer(hostOsh)
@@ -631,9 +690,72 @@ def _createFsOSH(hostOsh, mountedTo, diskType,
                                    size=diskSize, usedSize=usedSize, failures=None)
     return fsOsh
 
+def createiSCSIOSH(oshvResults, root, hostOsh):
+    phyVolumeOshMap = {}
+    iScsiInitiatorOsh = None
+    initiator = getNodeValues("hwiSCSIInitiator", root)[0]
+    if len(initiator):
+        iScsiInitiatorOsh = ObjectStateHolder("iscsi_adapter")
+        iScsiInitiatorOsh.setStringAttribute("iqn", initiator)
+        iScsiInitiatorOsh.setContainer(hostOsh)
+        oshvResults.add(iScsiInitiatorOsh)
+        mapScanFile(oshvResults, root, hostOsh, iScsiInitiatorOsh)
+
+    if iScsiInitiatorOsh is None:
+        return phyVolumeOshMap
+
+    idx = 0
+    targets = root.getElementsByTagName("hwiSCSITargetData_value")
+    targetsArray = nodeListToArray(targets)
+    for target in targetsArray:
+        targetName = getNodeValues("hwiSCSIIQN", target)[0]
+        iScsiTargetOsh = ObjectStateHolder("iscsi_adapter")
+        iScsiTargetOsh.setStringAttribute("iqn", targetName)
+        oshvResults.add(iScsiTargetOsh)
+        mapScanFile(oshvResults, root, None, iScsiTargetOsh, idx)
+        usageOsh = modeling.createLinkOSH('usage' , iScsiInitiatorOsh, iScsiTargetOsh)
+        oshvResults.add(usageOsh)
+
+        portals = target.getElementsByTagName("hwiSCSIPortals_value")
+        portalArray = nodeListToArray(portals)
+        targetHostOsh = None
+        for portal in portalArray:
+            portalAddress = getNodeValues("hwiSCSIPortalAddress", portal)[0]
+            portalAddress = portalAddress.strip(' []')
+            ipAddr = getValidIP(portalAddress)
+            if targetHostOsh is None and ipAddr:
+                ipAddrStr = getValidIPInString(portalAddress)
+                if ipAddrStr:
+                    targetHostOsh = modeling.createHostOSH(ipAddrStr)
+                    oshvResults.add(targetHostOsh)
+                    iScsiTargetOsh.setContainer(targetHostOsh)
+                    mapScanFile(oshvResults, root, hostOsh, targetHostOsh, idx)
+
+            if targetHostOsh and ipAddr:
+                ipOsh = modeling.createIpOSH(ipAddr)
+                oshvResults.add(modeling.createLinkOSH('contained', targetHostOsh, ipOsh))
+                mapScanFile(oshvResults, root, targetHostOsh, ipOsh, idx)
+
+        devices = target.getElementsByTagName("hwiSCSIDevices_value")
+        devicesArray = nodeListToArray(devices)
+        for device in devicesArray:
+            deviceLegacyName = getNodeValues("hwiSCSIDeviceLegacyName", device)[0]
+            interfaceName = getNodeValues("hwiSCSIDeviceInterfaceName", device)[0]
+            diskNumber = getNodeValues("hwBoundPhysicalDiskNumber", device)[0]
+            phyVolumeOsh = ObjectStateHolder("physicalvolume")
+            phyVolumeOsh.setStringAttribute("name", deviceLegacyName)
+            phyVolumeOsh.setStringAttribute("volume_id", interfaceName)
+            phyVolumeOsh.setContainer(hostOsh)
+            oshvResults.add(phyVolumeOsh)
+            mapScanFile(oshvResults, root, hostOsh, phyVolumeOsh, idx)
+            phyVolumeOshMap[diskNumber] = phyVolumeOsh
+            oshvResults.add(modeling.createLinkOSH('dependency', phyVolumeOsh, iScsiTargetOsh))
+        idx += 1
+
+    return phyVolumeOshMap
 
 # create file system OSH
-def createFsOSH(oshvresults, root, hostOsh):
+def createFsOSH(oshvresults, root, hostOsh, physicalVolumeOshMap = {}):
     fss = root.getElementsByTagName("hwMountPoints_value")
     fssArray = nodeListToArray(fss)
     idx = 0
@@ -652,6 +774,7 @@ def createFsOSH(oshvresults, root, hostOsh):
             labelName = getNodeValues("hwMountPointVolumeLabel",fs)[0]
             filesystemType = getNodeValues("hwMountPointVolumeType", fs)[0]
             filesystemDevice = getNodeValues("hwMountPointVolumeDevice", fs)[0]
+            boundPhysicalDiskNumber = getNodeValues("hwMountPointVolumePhysicalDiskNumber", fs)[0]
             fsOsh = _createFsOSH(hostOsh, mountedTo, diskType,
                                  labelName, filesystemDevice, filesystemType,
                                  diskSize, freeSpace)
@@ -673,6 +796,10 @@ def createFsOSH(oshvresults, root, hostOsh):
                     oshvresults.add(logicalVolOsh)
                     oshvresults.add(modeling.createLinkOSH("dependency", fsOsh, logicalVolOsh))
                     mapScanFile(oshvresults, root, hostOsh, logicalVolOsh, fs, idx)
+                    phyVolumeOsh = physicalVolumeOshMap.get(boundPhysicalDiskNumber)
+                    if phyVolumeOsh:
+                        oshvresults.add(modeling.createLinkOSH("usage", logicalVolOsh, phyVolumeOsh))
+
                 mapScanFile(oshvresults, root, hostOsh, fsOsh, fs, idx)
         idx += 1
 
@@ -2223,6 +2350,11 @@ def getValidIP(ip):
         pass
     return None
 
+def getValidIPInString(rawIP):
+    ipObject = getValidIP(rawIP)
+    if ipObject:
+        return str(ipObject)
+    return None
 
 def isVirtualMachine(root):
     if getNodeValues("hwVirtualMachineType", root)[0] == '':

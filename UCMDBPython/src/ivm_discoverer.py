@@ -92,37 +92,37 @@ def __isCommandUnrecognized(output):
 class IvmBaseDiscoverer:
     def __init__(self, shell):
         self._shell = shell
-        
+
     def getCommandOutput(self, command, timeout=0, path = "/usr/sbin/"):
         return getCommandOutput(command, self._shell, timeout, path)
-    
+
 class IvmHypervisorDiscoverer(IvmBaseDiscoverer):
     '''
     Discovers hypervisor related data
     '''
     HPVMINFO_PATH = '/opt/hpvm/bin/hpvminfo'
-    
+
     def __init__(self, shell):
         IvmBaseDiscoverer.__init__(self, shell)
-    
+
     def _parseVersion(self, output):
         if not output:
             raise ValueError('Version buffer is empty')
-        
+
         match = re.search(r"Version\s*(.*)", output, re.I)
         if match:
             version = match.group(1)
             return Hypervisor(version = match.group(1).strip())
         raise ValueError('Failed to parse IVM version.')
-    
+
     def _getHypervisor(self):
         output = self.getCommandOutput(IvmHypervisorDiscoverer.HPVMINFO_PATH + ' -v')
         return self._parseVersion(output)
-    
+
     def discover(self):
         hypervisor = self._getHypervisor()
         return hypervisor
-    
+
     def isIvmSystem(self):
         logger.debug("Checking if hpvminfo is installed")
         output = self._shell.execCmd(IvmHypervisorDiscoverer.HPVMINFO_PATH)
@@ -131,7 +131,7 @@ class IvmHypervisorDiscoverer(IvmBaseDiscoverer):
                 raise ValueError("Failed to determine if discovering IVM system")
         if self._shell.getLastCmdReturnCode() == 0:
             return True
-        
+
 
 class VirtualServerDiscoverer(IvmBaseDiscoverer):
     '''
@@ -141,7 +141,7 @@ class VirtualServerDiscoverer(IvmBaseDiscoverer):
     DISCOVERED_OS_MAP = {'HPUX' : 'HP-UX',}
     def __init__(self, shell):
         IvmBaseDiscoverer.__init__(self, shell)
-    
+
     def _buildPropertiesDict(self, buffer):
         result = {}
         for line in re.split('[\r\n]+', buffer):
@@ -149,24 +149,24 @@ class VirtualServerDiscoverer(IvmBaseDiscoverer):
             if m:
                 result[m.group(1).strip()] = m.group(2).strip()
         return result
-    
+
     def _parseVm(self, buffer):
-        
+
         properties = self._buildPropertiesDict(buffer)
         name = properties.get('Virtual Machine Name')
         vm_number = properties.get('Virtual Machine ID')
         if not (name or vm_number):
             return None
-        
+
         state = properties.get('State')
         if state and state.lower() =='off':
-            logger.debug('Scipping VM %s, since it is down' % name)
+            logger.debug('Skipping VM %s, since it is down' % name)
             return None
-        
+
         uuid = properties.get('Virtual Machine UUID')
         serial_number = properties.get("VM's Serial Number")
         devs_number = properties.get('Number of devices')
-        
+
         nets_number = properties.get('Number of networks')
         os_type = properties.get('Operating System')
         machine_type = properties.get('Virtual Machine Type')
@@ -174,7 +174,7 @@ class VirtualServerDiscoverer(IvmBaseDiscoverer):
         start_type = properties.get('Start type')
         vcpus_number = properties.get('Number of virtual CPUs')
         config_version = properties.get("VM's Config Version")
-        
+
         memory = properties.get('Memory')
         m = re.match('([\d\.]+)\s+(MB|GB)', memory, re.I)
         if m:
@@ -182,35 +182,35 @@ class VirtualServerDiscoverer(IvmBaseDiscoverer):
                 memory = convertGbStringToMb(m.group(1))
             else:
                 memory = m.group(1)
-                
-        return VirtualServerConfig(name, vm_number, devs_number, nets_number, 
+
+        return VirtualServerConfig(name, vm_number, devs_number, nets_number,
                                    os_type, state, vcpus_number, uuid,
                                    machine_type, start_type, config_version, memory, serial_number, discovered_os_name)
-        
+
     def _parseVms(self, output):
         if not output:
             raise ValueError('VM configuration command output appeared to be empty')
-        
+
         match = re.search('\[Virtual Machines\]\s+(.+)', output, re.DOTALL)
         if match:
-            elements = re.split('\r\n\r\n', match.group(1))
-            vms = [self._parseVm(buffer) for buffer in elements if buffer]
-            return filter(None, vms) 
+            elements = re.split('Virtual Machine Name', match.group(1))
+            vms = [self._parseVm('Virtual Machine Name' + buffer) for buffer in elements if buffer]
+            return filter(None, vms)
         raise ValueError('No information for VMs available.')
-    
+
     def getVms(self):
         output = self.getCommandOutput(VirtualServerDiscoverer.HPVMSTATUS_PATH + ' -V')
         return self._parseVms(output)
-    
+
     def _parseVmInterfaces(self, output):
         if output:
             rawMacs = re.findall(',0x([\da-fA-F]+):', output)
             return [mac for mac in rawMacs if netutils.isValidMac(mac)]
-    
+
     def getVmInterfaces(self, vmName):
-         output = self.getCommandOutput('%s %s "%s"' % (VirtualServerDiscoverer.HPVMSTATUS_PATH, '-d -P ', vmName))
-         return self._parseVmInterfaces(output)
-     
+        output = self.getCommandOutput('%s %s "%s"' % (VirtualServerDiscoverer.HPVMSTATUS_PATH, '-d -P ', vmName))
+        return self._parseVmInterfaces(output)
+
     def discover(self):
         result = []
         vms = self.getVms()
@@ -219,6 +219,6 @@ class VirtualServerDiscoverer(IvmBaseDiscoverer):
             vServer = VirtualServer(vm, macs)
             result.append(vServer)
         return result
-    
+
 def isIvmSystem(shell):
     return IvmHypervisorDiscoverer(shell).isIvmSystem()

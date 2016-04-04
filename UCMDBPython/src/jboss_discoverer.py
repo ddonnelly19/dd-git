@@ -2675,10 +2675,18 @@ class ServerDiscovererByJmxV7(jee_discoverer.HasJmxProvider):
 
     def findServerVersion(self):
         query = jmx.QueryByName('jboss.as:management-root=server')
-        query.addAttributes('releaseVersion')
-        releaseVersionItem = self._getProvider().execute(query)[0]
-        if releaseVersionItem:
-            return releaseVersionItem.releaseVersion
+        query.addAttributes('productVersion')
+        productVersionItem = self._getProvider().execute(query)[0]
+        if productVersionItem and productVersionItem.productVersion:
+            return productVersionItem.productVersion
+        else:
+            query.addAttributes('releaseVersion')
+            releaseVersionItem = self._getProvider().execute(query)[0]
+            if releaseVersionItem and releaseVersionItem.releaseVersion:
+                return releaseVersionItem.releaseVersion
+            else:
+                logger.warn("Failed to discover JBoss version")
+                return None
 
     def findServerInfo(self):
         ''' Find server info by JMX
@@ -2887,7 +2895,7 @@ class ApplicationDiscovererByJmxV34(jee_discoverer.HasJmxProvider, entity.HasPla
                 module.addConfigFile(configFile)
             #discover webservice for this ejb module
             logger.debug("discover webservice for web module:", module.getName())
-            module.addWebservices(self.findWebServices(module.getName()))
+            module.addWebServices(self.findWebServices(module.getName()))
             module.setJndiName(moduleItem.JNDIName)
             modules.append(module)
         return modules
@@ -3491,18 +3499,28 @@ class DatasourceDiscovererByJmxV7(jee_discoverer.HasJmxProvider, entity.HasPlatf
         datasources = []
         try:
             query = jmx.QueryByPattern('jboss.as:subsystem', 'datasources').patternPart('data-source', '*')
-            query.addAttributes('enabled', 'jndiName', 'connectionUrl', 'driverClass', 'userName')
-            for ds in self._getProvider().execute(query):
-                if ds.enabled == 'true':
-                    jndiName = ds.jndiName
-                    jeeDatasource = jee.Datasource(jndiName)
-                    jeeDatasource.setJndiName(jndiName)
-                    jeeDatasource.url = ds.connectionUrl
-                    jeeDatasource.driverClass = ds.driverClass
-                    jeeDatasource.userName = ds.userName
-                    datasources.append(jeeDatasource)
-                else:
-                    logger.warn('Skipped disabled datasource: %s' % ds.jndiName)
+            for ds_obj in self._getProvider().execute(query):
+                ds_name = re.findall('jboss.as:data-source=([^,]+),subsystem=datasources', ds_obj.ObjectName)
+                if ds_name:
+                    logger.info("Find datasource %s" %ds_name[0])
+                    logger.info("Start to query attributes of datasource %s" %ds_name[0])
+                    query = jmx.QueryByName('jboss.as:subsystem=datasources,data-source='+ds_name[0])
+                    query.addAttributes('enabled', 'jndiName', 'connectionUrl', 'driverClass', 'userName')
+                    ds_list = self._getProvider().execute(query)
+                    if ds_list:
+                        ds = ds_list[0]
+                        if ds.enabled == 'true':
+                            jndiName = ds.jndiName
+                            jeeDatasource = jee.Datasource(jndiName)
+                            jeeDatasource.setJndiName(jndiName)
+                            jeeDatasource.url = ds.connectionUrl
+                            jeeDatasource.driverClass = ds.driverClass
+                            jeeDatasource.userName = ds.userName
+                            datasources.append(jeeDatasource)
+                        else:
+                            logger.warn('Skipped disabled datasource: %s' % ds.jndiName)
+                    else:
+                        logger.warn('Failed to query attributes of datasource: %s ' %ds_name[0])
         except (Exception, JException):
             logger.warnException('Failed to discover datasources')
         return datasources

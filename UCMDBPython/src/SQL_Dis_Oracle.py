@@ -677,6 +677,9 @@ def parseDbRoleTableQueryRes(dbRoleTableQueryRes, executor, OSHVResult):
     if dbRoleTableQueryRes and dbRoleTableQueryRes.next():
         database_role = dbRoleTableQueryRes.getString(1)
         logger.debug("database_role:", database_role)
+    oracle_osh = executor.getOracleOsh()
+    if oracle_osh:
+        oracle_osh.setAttribute("database_role", database_role)
     return dbRoleTableQueryRes, database_role
 
 def parseArchiveDestTableQueryRes(archiveDestTableQueryRes, executor, OSHVResult):

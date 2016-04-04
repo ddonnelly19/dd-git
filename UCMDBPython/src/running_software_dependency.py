@@ -1,6 +1,7 @@
 # coding=utf-8
 import logger
 import scp
+import modeling
 
 from appilog.common.system.types import ObjectStateHolder
 from appilog.common.system.types.vectors import ObjectStateHolderVector
@@ -62,6 +63,9 @@ def DiscoveryMain(Framework):
             serverOsh = ObjectStateHolder(serverClass, serverId)
             OSHVResult.add(serverOsh)
             OSHVResult.addAll(scp.createCPLinkByOsh(clientOsh, serverOsh, scpId, reference))
+            if clientClass == 'business_application':
+                containmentLink = modeling.createLinkOSH('containment', clientOsh, serverOsh)
+                OSHVResult.add(containmentLink)
 
     logger.debug("check if there is cp link need to be deleted")
 

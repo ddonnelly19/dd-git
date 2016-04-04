@@ -63,13 +63,14 @@ def createOshFromId(ciDict, id):
     return osh
 
 
-def processObjects(allObjects, ucmdb_version):
+def processObjects(allObjects, ignoredCiTypes, ucmdb_version):
     vector = ObjectStateHolderVector()
     iter = allObjects.iterator()
     #ciList = [[id, type, props]]
     ciList = []
     ciDict = {}
     createCi = 1
+    logger.info("Following CI types will be ignored: %s" % ignoredCiTypes)
     while iter.hasNext():
         #attributes = [name, type, key, value]
         attributes = []
@@ -80,6 +81,9 @@ def processObjects(allObjects, ucmdb_version):
         cit = objectElement.getAttribute('name').getValue()
         ## Skip memory CITs in 9.x
         if cit == 'memory':
+            continue
+        # Skip CIs defined in ignoredCiTypes
+        if cit in ignoredCiTypes:
             continue
         if mamId != None and cit != None:
             # add the attributes...
@@ -315,6 +319,14 @@ def DiscoveryMain(Framework):
         logger.warn('Results XML not found. Perhaps no data was received from SIM or an error occurred in the SIM_Discovery script.')
         return
 
+    ## Read ignored Ci types from integration configuration
+    ignoredCiTypes = []
+    rawIgnoredCiTypes = Framework.getParameter('IgnoredCiTypes')
+    tempIgnoredCiTypes = eval(rawIgnoredCiTypes)
+    if tempIgnoredCiTypes is not None:
+        for item in tempIgnoredCiTypes:
+            item != 'None' and ignoredCiTypes.append(item)
+
     ## Identify UCMDB version
     ucmdbVersion = modeling.CmdbClassModel().version()
 
@@ -327,7 +339,7 @@ def DiscoveryMain(Framework):
                 # Process CIs #
                 info("Start processing CIs to update in the destination server...")
                 allObjects = doc.getRootElement().getChild('data').getChild('objects').getChildren('Object')
-                (objVector, ciDict) = processObjects(allObjects, ucmdbVersion)
+                (objVector, ciDict) = processObjects(allObjects, ignoredCiTypes, ucmdbVersion)
 
                 OSHVResult.addAll(objVector)
                 # Process Relations #

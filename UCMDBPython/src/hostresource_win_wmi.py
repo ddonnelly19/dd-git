@@ -302,7 +302,12 @@ class CpuDiscoverer:
             numberOfCores = processor.NumberOfCores
             if str(numberOfCores).isdigit():
                 cpu.setCoresCount(numberOfCores)
-            if str(processor.MaxClockSpeed).isdigit():
+            # CPU clockSpeed may vary with maxClockSpeed from defaultClockSpeed
+            # Only Intel CPU took cared of here.
+            m = re.match(r'Intel.*CPU.*(\d\.\d*)GHz', processor.Name)
+            if m:
+                cpu.setSpeedInMhz(int(float(m.group(1))*1000))
+            elif str(processor.MaxClockSpeed).isdigit():
                 cpu.setSpeedInMhz(processor.MaxClockSpeed)
             cpu.vendor = processor.Manufacturer
             logger.debug(cpu)

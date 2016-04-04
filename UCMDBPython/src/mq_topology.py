@@ -89,7 +89,7 @@ def fixIP(ip, localIp):
         elif not netutils.isValidIp(ip):
             return None
         else:
-            return  ip
+            return ip
     except:
         excInfo = logger.prepareJythonStackTrace('')
         logger.warn('[' + SCRIPT_NAME + ':fixIP] Exception: <%s>' % excInfo)
@@ -311,7 +311,7 @@ def getMqVersion(localShell):
         mqVerPaths = []
         if isValidString(MQVER_PATH) and MQVER_PATH.find(';') > 0:
             mqVerPaths = string.split(MQVER_PATH, ';')
-        elif not mqVerPaths == None:
+        elif mqVerPaths:
             mqVerPaths = MQVER_PATH.strip()
         else:
             mqVerPaths = [' ']
@@ -378,11 +378,24 @@ def buildWebSphereMqOsh(versionNumber, versionString, ipAddress):
 def getQManagers(shell, ipAddress, localFramework, manager_to_endpoint_dict):
     try:
         returnDict = {}
-        qManagers = shell.execAlternateCmds(SUDO + 'dspmq', 'dspmq')
+        mqVerPaths = []
+        if isValidString(MQVER_PATH) and MQVER_PATH.find(';') > 0:
+            mqVerPaths = string.split(MQVER_PATH, ';')
+        elif not mqVerPaths == None and len(mqVerPaths) > 0:
+            mqVerPaths = MQVER_PATH.strip()
+        else:
+            mqVerPaths = [' ']
+
+        for mqVerPath in mqVerPaths:
+            if not mqVerPath.endswith('/'):
+                mqVerPath += '/'
+            qManagers = shell.execAlternateCmds(SUDO + mqVerPath + 'dspmq', SUDO + 'dspmq', 'dspmq')
+
         if qManagers is None:
             environment = shell_interpreter.Factory().create(shell).getEnvironment()
             environment.setVariable('LD_ASSUME_KERNEL', '2.4.19')
-            qManagers = shell.execAlternateCmds(SUDO + 'dspmq', 'dspmq')
+            for mqVerPath in mqVerPaths:
+                qManagers = shell.execAlternateCmds(SUDO + mqVerPath + 'dspmq', SUDO + 'dspmq', 'dspmq')
         if qManagers.strip().lower().find('is not recognized as an internal or external command') > 0:
             localFramework.reportError('Unable to execute command "dspmq" . Please specify path using the "mqver_path" parameter')
             return None

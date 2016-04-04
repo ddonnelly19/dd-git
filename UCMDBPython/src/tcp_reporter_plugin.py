@@ -6,7 +6,6 @@ Created on 21 April 2011
 '''
 from tcp import Builder, DiscoveryHandler, CanReset
 import modeling
-import logger
 from netutils import (ServiceEndpointBuilder, Endpoint,
                       EndpointReporter, ProtocolType)
 from iteratortools import first
@@ -118,13 +117,12 @@ class NodeDependencyLinkReporter(ReporterPlugin):
 
 
 class IpTrafficLinkReporter(ReporterPlugin, DiscoveryHandler):
-    def __init__(self, maxPorts, reportTrafficDetails, knownPortsConfigFile, acceptorEngine):
+    def __init__(self, maxPorts, reportTrafficDetails, acceptorEngine):
         ReporterPlugin.__init__(self, acceptorEngine)
         self.reportTrafficDetails = reportTrafficDetails
         self.maxPorts = maxPorts
         self.ipToIpConnections = {}
         self.reportedLinks = []
-        self.knownPortsConfigFile = knownPortsConfigFile
 
     def reset(self):
         self.ipToIpConnections = {}
@@ -151,18 +149,11 @@ class IpTrafficLinkReporter(ReporterPlugin, DiscoveryHandler):
                 for connection in connections:
                     octets += connection.octetCount and int(connection.octetCount) or 0
                     packets += connection.packetCount and int(connection.packetCount) or 0
-                    if portsSet.size() < self.maxPorts:                        
+                    if portsSet.size() < self.maxPorts:
                         portsSet.add(str(connection.srcPort))
-                        
-                    if portsSet.size() < self.maxPorts:                        
+                    if portsSet.size() < self.maxPorts:
                         portsSet.add(str(connection.dstPort))
-                
-                #try:        
-                #    for port in portsSet:
-                #        portsSet.add(self.getPortNamesByPortNr(int(port), interaction.srcNode.ip, connection.protocol, self.knownPortsConfigFile))
-                #except Exception, e:
-                #    logger.warn("Error getting port names: ", e)
-                
+
                 ash = AttributeStateHolder('traffic_portlist', portsSet)
                 trafficLinkOSH.addAttributeToList(ash)
                 trafficLinkOSH.setLongAttribute('traffic_octets', octets)
@@ -359,7 +350,7 @@ class IpTrafficLinkReporterBuilder(BaseReporterBuilder):
         self.maxPorts = maxPorts
 
     def build(self, context, acceptorEngine):
-        reporter = IpTrafficLinkReporter(self.maxPorts, self.reportTrafficDetails, context.knownPortsConfigFile, self.buildDefaultAcceptorEngine(acceptorEngine))
+        reporter = IpTrafficLinkReporter(self.maxPorts, self.reportTrafficDetails, self.buildDefaultAcceptorEngine(acceptorEngine))
         context.registerDiscoveryHandlerCallback(reporter)
         return reporter
 

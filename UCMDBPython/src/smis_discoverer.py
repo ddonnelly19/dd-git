@@ -12,6 +12,7 @@ L3PARNAMESPACE = 'root/tpd'
 EVANAMESPACE = 'root/eva'
 LISTARRAY13 = 'root/LsiArray13'
 EMCNAMESPACE='root/emc'
+BROCADENAMESPACE='root/brocade1'
 
 def stringClean(value):
     '''
@@ -71,6 +72,150 @@ class BaseSmisDiscoverer:
         instances = client.getInstances(self.className)
         return self.parse(instances)
 
+class StorageFabricBrocadeDiscoverer(BaseSmisDiscoverer):
+    def __init__(self):
+        BaseSmisDiscoverer.__init__(self)
+        self.className = 'Brocade_Fabric'
+
+    def discover(self, client):
+        if not self.className:
+            raise ValueError('CIM class name must be set in order to perform query.')
+        logger.debug('Queuing class "%s"' % self.className)
+        instances = client.getInstances(self.className)
+        return self.parse(instances)
+
+    def parse(self, instances):
+        result = []
+        for instance in instances:
+            name = stringClean(instance.getProperty('Name').getValue())
+            wwn = name
+            fabric = smis.StorageFabric(name,wwn)
+            result.append(fabric)
+        return result
+
+def getStorageFabricDiscoverer(namespace = DEFAULTNAMESPACE):
+    discover = None
+    if namespace == BROCADENAMESPACE:
+        discover = StorageFabricBrocadeDiscoverer()
+    return  discover
+
+class SwitchComputerSystemBrocadeDiscoverer(BaseSmisDiscoverer):
+    def __init__(self):
+        BaseSmisDiscoverer.__init__(self)
+        self.className = 'CIM_ComputerSystem'
+
+    def discover(self, client):
+        if not self.className:
+            raise ValueError('CIM class name must be set in order to perform query.')
+        logger.debug('Queuing class "%s"' % self.className)
+        instances = client.getInstances(self.className)
+        return self.parse(instances)
+
+    def parse(self, instances):
+        switches = []
+        hosts = []
+        for instance in instances:
+            className = stringClean(instance.getProperty('CreationClassName').getValue())
+            name = stringClean(instance.getProperty('ElementName').getValue())
+            if className == 'Brocade_Switch':
+                wwn = stringClean(instance.getProperty('Name').getValue())
+                domainId = None
+                vfId = None
+                detailType = None
+                identList = instance.getProperty('IdentifyingDescriptions').getValue()
+                identValue = instance.getProperty('OtherIdentifyingInfo').getValue()
+                try:
+                    domainIdIndex = identList.index('DomainID')
+                    domainId = identValue[domainIdIndex]
+                    detailTypeIndex = identList.index('SNIA:DetailedType')
+                    detailType = identValue[detailTypeIndex]
+                    vfIdIndex = identList.index('SNIA:VF_ID')
+                    vfId = identValue[vfIdIndex]
+                except:
+                    logger.debug('Failed to get switch domain id, vf id and type')
+                switch = smis.FCSwtich(name,wwn,domainId,detailType,vfId)
+                switches.append(switch)
+            else:
+                id = stringClean(instance.getProperty('Name').getValue())
+                hostObj = smis.Host(id,name=name)
+                hosts.append(hostObj)
+
+        return switches, hosts
+
+def getSwitchComputerSystemDiscoverer(namespace = DEFAULTNAMESPACE):
+    discover = None
+    if namespace == BROCADENAMESPACE:
+        discover = SwitchComputerSystemBrocadeDiscoverer()
+    return  discover
+
+class BrocadeSwitch2FabricLinksDiscover(BaseSmisDiscoverer):
+
+    def __init__(self):
+        BaseSmisDiscoverer.__init__(self)
+        self.className = 'Brocade_SwitchInFabric'
+
+    def discover(self, client):
+        links = []
+        if not self.className:
+            raise ValueError('CIM class name must be set in order to perform query.')
+        logger.debug('Queuing class "%s"' % self.className)
+        links = client.getInstances(self.className)
+        return self.parse(links)
+
+    def parse(self, links):
+        result = {}
+        for link in links:
+            try:
+                fabricRef = link.getProperty('GroupComponent').getValue()
+                fabricId = stringClean(fabricRef.getKey('Name').getValue())
+
+                switchRef = link.getProperty('PartComponent').getValue()
+                switchId = stringClean(switchRef.getKey('Name').getValue())
+                result[switchId] = fabricId
+            except:
+                logger.debugException('cannot find the switch to fabric linkages')
+        return result
+
+def getSwitch2FabricLinksDiscoverDiscoverer(namespace = DEFAULTNAMESPACE):
+    discover = None
+    if namespace == BROCADENAMESPACE:
+        discover = BrocadeSwitch2FabricLinksDiscover()
+    return  discover
+
+class BrocadeFCPortConnectionsDiscover(BaseSmisDiscoverer):
+
+    def __init__(self):
+        BaseSmisDiscoverer.__init__(self)
+        self.className = 'CIM_FCActiveConnection'
+
+    def discover(self, client):
+        links = []
+        if not self.className:
+            raise ValueError('CIM class name must be set in order to perform query.')
+        logger.debug('Queuing class "%s"' % self.className)
+        links = client.getInstances(self.className)
+        return self.parse(links)
+
+    def parse(self, links):
+        result = {}
+        for link in links:
+            try:
+                end1Ref = link.getProperty('Antecedent').getValue()
+                end1Id = stringClean(end1Ref.getKey('Name').getValue())
+
+                end2Ref = link.getProperty('Dependent').getValue()
+                end2Id = stringClean(end2Ref.getKey('Name').getValue())
+                result[end1Id] = end2Id
+            except:
+                logger.debugException('cannot find the fc port connections')
+
+        return result
+
+def getFCPortConnectionsDiscover(namespace = DEFAULTNAMESPACE):
+    discover = None
+    if namespace == BROCADENAMESPACE:
+        discover = BrocadeFCPortConnectionsDiscover()
+    return  discover
 
 class StorageProcessorCimv2Discoverer(BaseSmisDiscoverer):
     def __init__(self):
@@ -866,6 +1011,54 @@ class FcPortCimv2Dicoverer(BaseSmisDiscoverer):
                 logger.debugException('')
         return result
 
+class FcPortBrocadeDiscoverer(FcPortCimv2Dicoverer):
+    def __init__(self):
+        BaseSmisDiscoverer.__init__(self)
+        self.className = 'Brocade_SwitchFCPort'
+
+    def discover(self, client):
+        if not self.className:
+            raise ValueError('CIM class name must be set in order to perform query.')
+        logger.debug('Queuing class "%s"' % self.className)
+        result = []
+        instances = client.getInstances(self.className)
+        switchFcs = self.parse(instances)
+        result.extend(switchFcs)
+        className = 'Brocade_NodeFCPort'
+        instances = client.getInstances(className)
+        nodeFcs = self.parse(instances)
+        result.extend(nodeFcs)
+        return result
+
+    def parse(self, instances):
+        result = []
+        for instance in instances:
+            portId = stringClean(instance.getProperty('PortNumber').getValue())
+            portName = stringClean(instance.getProperty('ElementName').getValue())
+            portWwn  = instance.getProperty('PermanentAddress').getValue()
+            deviceId = stringClean(instance.getProperty('DeviceID').getValue())
+            if deviceId and portWwn is None:
+                portWwn = deviceId
+            portIndex = stringClean(instance.getProperty('PortNumber').getValue())
+            portStatus = instance.getProperty('StatusDescriptions').getValue() and ",".join(instance.getProperty('StatusDescriptions').getValue())
+            portState = FcPortCimv2Dicoverer.PORT_STATE_VALUE_MAP.get(stringClean(instance.getProperty('HealthState').getValue()), FcPortCimv2Dicoverer.PORT_STATE_UNKNOWN)
+            speedBps = stringClean(instance.getProperty('Speed').getValue())
+            maxSpeedBps = None
+            property = instance.getProperty('MaxSpeed')
+            if property:
+                maxSpeedBps = stringClean(property.getValue())
+            portType = FcPortCimv2Dicoverer.PORT_TYPE_VALUE_MAP.get(stringClean(instance.getProperty('PortType').getValue()), FcPortCimv2Dicoverer.PORT_TYPE_RESERVED)
+
+            referencedTo = None
+            container = stringClean(instance.getProperty('SystemName').getValue())
+
+            try:
+                fcpObj = smis.FcPort(portId, portIndex, portWwn, portName, container, referencedTo, portStatus, portState, speedBps, container, maxSpeedBps, portType)
+                result.append(fcpObj)
+            except:
+                logger.debugException('')
+        return result
+
 class FcPortTpdDicoverer(FcPortCimv2Dicoverer):
     def __init__(self):
         BaseSmisDiscoverer.__init__(self)
@@ -1000,7 +1193,9 @@ def getFcPortDiscoverer(namespace = DEFAULTNAMESPACE):
     elif namespace == EMCNAMESPACE:
         return FcPortEMCDiscoverer()
     elif namespace == LISTARRAY13:
-        return FcPortLSISSIDiscoverer()        
+        return FcPortLSISSIDiscoverer()
+    elif namespace == BROCADENAMESPACE:
+        return FcPortBrocadeDiscoverer()
 
 class PhysicalVolumeCimv2Discoverer(BaseSmisDiscoverer):
 

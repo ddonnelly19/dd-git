@@ -22,6 +22,7 @@ from java.util import Properties
 from appilog.common.system.types.vectors import ObjectStateHolderVector
 from com.hp.ucmdb.discovery.library.clients.agents import AgentConstants
 import NTCMD_HR_Dis_Disk_Lib
+import HR_Dis_Driver_Lib
 
 from fptools import safeFunc as Sfn
 
@@ -138,11 +139,30 @@ def DiscoveryMain(Framework):
                 try:
                     containerOsh = hostOsh or modeling.createHostOSH(client.getIpAddress())
                     NTCMD_HR_Dis_Disk_Lib.discoverDiskByWmic(client, OSHVResult, containerOsh)
+                    NTCMD_HR_Dis_Disk_Lib.discoverPhysicalDiskByWmi(client, OSHVResult, containerOsh)
 
                 except:
                     errobj = errorobject.createError(errorcodes.FAILED_DISCOVERING_RESOURCE_WITH_CLIENT_TYPE, ['disks', 'wmi'], 'Failed to discover disks by wmi')
                     logger.reportErrorObject(errobj)
                     logger.errorException('Failed to discover disks by wmi')
+
+            discoverDrivers = Boolean.parseBoolean(Framework.getParameter('discoverDrivers'))
+            if discoverDrivers:
+                try:
+                    containerOsh = hostOsh or modeling.createHostOSH(client.getIpAddress())
+                    HR_Dis_Driver_Lib.discoverDriverByWmi(client, OSHVResult, containerOsh)
+
+                except:
+                    errobj = errorobject.createError(errorcodes.FAILED_DISCOVERING_RESOURCE_WITH_CLIENT_TYPE, ['drivers', 'wmi'], 'Failed to discover drivers by wmi')
+                    logger.reportErrorObject(errobj)
+                    logger.errorException('Failed to discover drivers by wmi')
+
+            discoveriSCSIInfo = Boolean.parseBoolean(Framework.getParameter('discoveriSCSIInfo'))
+            if discoveriSCSIInfo:
+                try:
+                    NTCMD_HR_Dis_Disk_Lib.discoveriSCSIInfo(client,OSHVResult, containerOsh)
+                except:
+                    logger.warn('Failed to connect with namespace Root\Microsoft\Windows\Storage')
 
             discoverCPUs = Boolean.parseBoolean(Framework.getParameter('discoverCPUs'))
             if discoverCPUs:

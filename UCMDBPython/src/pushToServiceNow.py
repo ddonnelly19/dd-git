@@ -44,6 +44,7 @@ RETRY_DELAY_SECONDS = 5
 IS_INSERT_MULTIPLE = False
 INSERT_MULTIPLE_BULK_SIZE = 100
 REQUEST_TIMEOUT = 60 #Seconds for each request
+FAIL_BULK = True # Fail whole Bulk when there is inconsistent data
 
 ##############################################
 ##############################################
@@ -239,9 +240,10 @@ def getReferenceFieldSysId(SNConnPropMap, value, dataType):
         debugPrint(3, '[getReferenceFieldSysId] Got SN sys_id <%s> for table <%s>' % (keys[0], table_name))
         return keys[0]
     except Exception, ex:
-        raise Exception('[getReferenceFieldSysId] ' + ex.getMessage())
         excInfo = logger.prepareJythonStackTrace('')
         logger.warn('[getReferenceFieldSysId] Exception: <%s>' % excInfo)
+        if FAIL_BULK is True:
+            raise Exception('[getReferenceFieldSysId] ' + ex.getMessage())
         pass
 
 ##############################################
@@ -708,9 +710,17 @@ def processRelations(allLinkChildren, SNConnPropMap, linkMappings, resultCountMa
                     end1Id = fieldValuesDict['end1Id']
                     parentMamId = fieldValuesDict['DiscoveryID1']
                     parentSysId = mamIdToSysIdMap.get(parentMamId)
+                    if parentSysId is None:
+                          parentSysId = getSysIdForCI(end1Id)
+                    if parentSysId is  None:
+                          logger.warn('[processRelations] Relationship Parent SN ID: childSysId',end1Id)
                     end2Id = fieldValuesDict['end2Id']
                     childMamId = fieldValuesDict['DiscoveryID2']
                     childSysId = mamIdToSysIdMap.get(childMamId)
+                    if childSysId is None:
+                           childSysId = getSysIdForCI(end2Id)
+                    if childSysId is None:
+                        logger.warn('[processRelations] Relationship Child SN ID: childSysId',end2Id)
 
                     debugPrint(3, '[processRelations] Relationship Parent UCMDB ID: <%s>' % end1Id)
                     debugPrint(3, '[processRelations] Relationship Parent MAM ID: <%s>' % parentMamId)
@@ -823,7 +833,9 @@ def DiscoveryMain(Framework):
         insertMultipleBulkSize = Framework.getDestinationAttribute('InsertMultipleBulkSize') or '50'
         retryCount = Framework.getDestinationAttribute('RetryCount') or '3'
         retryDelaySeconds = Framework.getDestinationAttribute('RetryDelaySeconds') or '5'
-        global  IS_INSERT_MULTIPLE, INSERT_MULTIPLE_BULK_SIZE, RETRY_COUNT, RETRY_DELAY_SECONDS
+        global  IS_INSERT_MULTIPLE, INSERT_MULTIPLE_BULK_SIZE, RETRY_COUNT, RETRY_DELAY_SECONDS, FAIL_BULK
+        failBulk = Framework.getDestinationAttribute('FailBulk') or 'true'
+        FAIL_BULK = failBulk == 'true'
         IS_INSERT_MULTIPLE = insertMultiple == 'true'
         INSERT_MULTIPLE_BULK_SIZE = int (insertMultipleBulkSize)
         RETRY_COUNT = int (retryCount)

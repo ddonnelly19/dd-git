@@ -458,6 +458,7 @@ def _parseModule(row):
     module.slotNumber = row.getValue("slotNumber")
     module.hardwareRevision = row.getValue("hardwareRevision")
     module.firmwareVersion = row.getValue("firmwareVersion")
+    module.slotType = row.getValue("slotType")
     
     return module
 
@@ -592,6 +593,7 @@ class BaseNaDiscoverer:
         self.framework = framework
         self._devicePageSize = 500
         self.reportDeviceConfigs = False
+        self.reportDeviceModules = False
         
         self.portsDiscoveryType = PortsDiscoveryType.ALL
     
@@ -602,7 +604,10 @@ class BaseNaDiscoverer:
     
     def setReportDeviceConfigs(self, reportDeviceConfigs):
         self.reportDeviceConfigs = reportDeviceConfigs
-    
+
+    def setReportDeviceModules(self, reportDeviceModules):
+        self.reportDeviceModules = reportDeviceModules
+
     def setPortsDiscoveryType(self, portsDiscoveryType):
         self.portsDiscoveryType = portsDiscoveryType
     
@@ -817,7 +822,7 @@ class NaDiscovererPerDevice(BaseNaDiscoverer):
             
             modules = getModulesByDevice(self.client, device)
             validModules = itertools.ifilter(_isModuleValid, modules)
-            modulesBySlot = fptools.applyMapping(lambda b: b.slotNumber, validModules)
+            modulesBySlot = fptools.applyMapping(lambda b: b.slot, validModules)
             device.modulesBySlot = modulesBySlot
             
             vlansById = self.discoverVlansByDevice(device)
@@ -869,7 +874,7 @@ class SingleRequestsNaDiscoverer(BaseNaDiscoverer):
         for module in validModules:
             device = devicesById.get(module.deviceId)
             if device is not None:
-                device.modulesBySlot[module.slotNumber] = module
+                device.modulesBySlot[module.slot] = module
                 
         for device in devicesById.values():
             vlansById = self.discoverVlansByDevice(device)

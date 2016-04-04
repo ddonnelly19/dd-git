@@ -19,22 +19,20 @@ def getMsDomainNameList (Framework):
 	return MsDomainsList
 
 def DiscoveryMain(Framework):
-	# SV_TYPE_DOMAIN_CTRL = 0x00000008
-	SV_TYPE_DOMAIN_CTRL = 8L
-	#SV_TYPE_DOMAIN_BAKCTRL = 0x00000010
+	SV_TYPE_SERVER          = 0x00000002L
+	SV_TYPE_DOMAIN_CTRL     = 0x00000008L
+	SV_TYPE_DOMAIN_BAKCTRL  = 0x00000010L
+	SV_TYPE_DOMAIN_ENUM     = 0x80000000L
 
-	SV_TYPE_DOMAIN_BAKCTRL = 16L
-
-	#SV_TYPE_DOMAIN_ENUM = 0x80000000
-	SV_TYPE_DOMAIN_ENUM = 2147483648L
 	OSHVResult = ObjectStateHolderVector()
-	
+
 	probe_name	= Framework.getDestinationAttribute('probe_name')
 	try:
 		netUtil = MsNetworkUtil()
 		domainsOutput = netUtil.doNetServerEnum('NULL', SV_TYPE_DOMAIN_ENUM, 'NULL')
 		if domainsOutput != None:
 			MsDomainsList = getMsDomainNameList (Framework)
+			netUtilGetServer = MsNetworkUtil()
 			for domainInfo in domainsOutput:
 				domainName = domainInfo[0]
 				domainType = Long.parseLong(domainInfo[1])
@@ -47,10 +45,11 @@ def DiscoveryMain(Framework):
 					oshMsDomain.setStringAttribute('msdomain_type', 'PDC')
 				elif (domainType & SV_TYPE_DOMAIN_BAKCTRL) != 0:
 					oshMsDomain.setStringAttribute('msdomain_type', 'BDC')
-	
-				
-				oshMsDomain.setStringAttribute('probe_name', probe_name)
-				OSHVResult.add(oshMsDomain)
+
+				hostsOutput = netUtilGetServer.doNetServerEnum('NULL', SV_TYPE_SERVER, domainName)
+				if hostsOutput != None:
+					oshMsDomain.setStringAttribute('probe_name', probe_name)
+					OSHVResult.add(oshMsDomain)
 	except:
 		errorMsg = str(sys.exc_info()[1]).strip()
 		Framework.reportError('Failed to discovery MS Domains :' + errorMsg)

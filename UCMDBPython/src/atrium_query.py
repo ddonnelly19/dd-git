@@ -364,10 +364,12 @@ def getMapping(mappingFileName, bmcNamespace, ucmdbServerIp):
             for parentName in parentHashMap.keySet():
                 parentList.append([parentName, parentHashMap[parentName]])
 
+            nameSpace = integrationObject.getNameSpace() or bmcNamespace
+
             if integrationObject.isLink():
-                relationshipList.append(SourceLinks(integrationObject.getObjectName(), integrationObject.getEnd1Object(), integrationObject.getEnd2Object(), bmcNamespace, None, attList))
+                relationshipList.append(SourceLinks(integrationObject.getObjectName(), integrationObject.getEnd1Object(), integrationObject.getEnd2Object(), nameSpace, integrationObject.getQuery(), attList))
             else:
-                objectTypeList.append(SourceObjects(integrationObject.getObjectName(), bmcNamespace, integrationObject.getQuery(), attList, childList, parentList))
+                objectTypeList.append(SourceObjects(integrationObject.getObjectName(), nameSpace, integrationObject.getQuery(), attList, childList, parentList))
 
         if objectTypeList:
             debugPrint(3, '[' + SCRIPT_NAME + ':getMapping] Got <%s> objects from mapping XML' % len(objectTypeList))

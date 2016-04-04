@@ -205,9 +205,14 @@ def createScpOsh(container, type, ip, port=None, context=None, hostname=None):
 
 
 def createCPLink(clientId, clientClass, serverId, serverClass, scpId, reference=None):
+    OSHVResult = ObjectStateHolderVector()
     clientOsh = ObjectStateHolder(clientClass, CmdbObjectID.Factory.restoreObjectID(clientId))
     serverOsh = ObjectStateHolder(serverClass, CmdbObjectID.Factory.restoreObjectID(serverId))
-    return createCPLinkByOsh(clientOsh, serverOsh, scpId, reference)
+    OSHVResult.addAll(createCPLinkByOsh(clientOsh, serverOsh, scpId, reference))
+    if clientClass == 'business_application':
+        containmentLink = modeling.createLinkOSH('containment', clientOsh, serverOsh)
+        OSHVResult.add(containmentLink)
+    return OSHVResult
 
 
 def createCPLinkByOsh(clientOsh, serverOsh, scpId, reference=None):

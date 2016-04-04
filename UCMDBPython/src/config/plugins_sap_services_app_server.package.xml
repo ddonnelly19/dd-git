@@ -11,6 +11,7 @@
                 <qualifier type="protocol">ssh</qualifier>
                 <qualifier type="protocol">telnet</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
 				<qualifier type="protocol">uda</qualifier>
             </qualifiers>
         </plugin>
@@ -28,6 +29,7 @@
                 <qualifier type="application">SAP ITS Manager</qualifier>
                 <qualifier type="application">SAP Presentation Server (GUI)</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
             </qualifiers>
         </plugin>

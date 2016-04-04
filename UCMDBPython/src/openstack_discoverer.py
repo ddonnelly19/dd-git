@@ -2,6 +2,9 @@ import logger
 import ip_addr
 import openstack
 
+from org.jclouds.openstack.v2_0.options import PaginationOptions
+from com.google.common.collect import ImmutableMultimap
+
 class BaseDiscoverer:
     def __init__(self, api):
         if not api:
@@ -22,8 +25,9 @@ class VmDiscoverer(BaseDiscoverer):
 
     def discover(self):
         vms = []
+        options = PaginationOptions.Builder.queryParameters(ImmutableMultimap.of("all_tenants", "1"))
         serverApi = self.api.getServerApi(self.regionName)
-        for server in serverApi.listInDetail().concat():
+        for server in serverApi.listInDetail(options):
             logger.debug("serverApi.listInDetail().concat():", server)
             vm = self.buildVm(server)
             vm and vms.append(vm)
@@ -179,9 +183,9 @@ class TenantDiscoverer(BaseDiscoverer):
 
     def discover(self):
         tenants = []
-        tenantApi = self.api.getTenantApi()
-        for tenant in tenantApi.get().list().concat():
-            logger.debug("tenantApi.get().list().concat():", tenant)
+        tenantApi = self.api.getServiceApi()
+        for tenant in tenantApi.listTenants():
+            logger.debug("serviceApi.listTenants():", tenant)
             tenants.append(openstack.Tenant(tenant.getName(), tenant.getId()))
         return tenants
 

@@ -15,3 +15,4 @@ def executeWmiQuery(client, OSHVResult, nodeOsh=None):
     '''
     containerOsh = nodeOsh or modeling.createHostOSH(client.getIpAddress())
     NTCMD_HR_Dis_Disk_Lib.discoverDiskByWmic(client, OSHVResult, containerOsh)
+    NTCMD_HR_Dis_Disk_Lib.discoverPhysicalDiskByWmi(client, OSHVResult, containerOsh)

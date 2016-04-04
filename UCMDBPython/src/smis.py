@@ -69,7 +69,39 @@ class FcPort(entity.Immutable):
 
     def __str__(self):
         return self.__repr__()
-    
+
+class StorageFabric(entity.Immutable):
+    '''
+    DO represents logical volume identity with contatiner+id.
+    '''
+    def __init__(self, name, wwn):
+        self.name = name
+        self.wwn = wwn
+
+    def __repr__(self):
+        return "StorageFabric(name='%s', wwn='%s')" %(self.name, self.wwn)
+
+    def __str__(self):
+        return self.__repr__()
+
+class FCSwtich(entity.Immutable):
+    '''
+    DO represents logical volume identity with contatiner+id.
+    '''
+    def __init__(self, name, wwn, domainId=None, type=None, vfId=None):
+        self.name = name
+        self.wwn = wwn
+        self.domainId = domainId
+        self.type = type
+        self.vfId = vfId
+
+    def __repr__(self):
+        return "FCSwtich(name='%s', wwn='%s', domainId='%s', type='%s', vfId='%s')" \
+                %(self.name, self.wwn,self.domainId,self.type,self.vfId)
+
+    def __str__(self):
+        return self.__repr__()
+
 class FcHba(entity.Immutable):
     '''
     DO represents Fibre Channel Host Adapter
@@ -416,10 +448,11 @@ class FibreChannelPortReporter:
         @return: tuple (fcport Osh, OSHV)
         @raise ValueError: Container is missing
         '''
-        if not containerOsh:
-            raise ValueError('Container for fcPort is not specified')
+#        if not containerOsh:
+#            raise ValueError('Container for fcPort is not specified')
         fcPortOsh = self.builder.build(fcPort)
-        fcPortOsh.setContainer(containerOsh)
+        if containerOsh:
+            fcPortOsh.setContainer(containerOsh)
         vector = ObjectStateHolderVector()
         vector.add(fcPortOsh)
         return (fcPortOsh, vector)
@@ -689,6 +722,61 @@ class StorageProcessorReporter:
         vector.add(storageProcessorOsh)
         return (storageProcessorOsh, vector)
 
+class FcSwitchBuilder:
+    '''
+    Storage Processor System builder
+    '''
+    def build(self, switch):
+        if not switch:
+            raise ValueError('Fibre Channel Switch is not specified.')
+
+        switchOsh = ObjectStateHolder('fcswitch')
+        switchOsh.setStringAttribute('name', switch.name)
+
+        if switch.wwn:
+            switchOsh.setStringAttribute('fcswitch_wwn', switch.wwn)
+        if switch.domainId:
+            switchOsh.setStringAttribute('fcswitch_domainid', switch.domainId)
+        return switchOsh
+
+class FcSwitchReporter:
+    def __init__(self, builder):
+        if not builder:
+            raise ValueError('Builder is not passed')
+        self.builder = builder
+
+    def report(self, switch, fabricOsh):
+        vector = ObjectStateHolderVector()
+        switchOsh = self.builder.build(switch)
+        vector.add(switchOsh)
+        if fabricOsh:
+            linkOsh = modeling.createLinkOSH('membership', fabricOsh, switchOsh)
+            vector.add(linkOsh)
+        return (switchOsh, vector)
+
+class StorageFabricBuilder:
+    def build(self, fabric):
+        if not fabric:
+            raise ValueError('Storage Fabric is not specified.')
+
+        fabricOsh = ObjectStateHolder('storagefabric')
+        fabricOsh.setStringAttribute('name', fabric.name)
+
+        if fabric.wwn:
+            fabricOsh.setStringAttribute('storagefabric_wwn', fabric.wwn)
+
+        return fabricOsh
+
+class StorageFabricReporter:
+    def __init__(self, builder):
+        if not builder:
+            raise ValueError('Builder is not passed')
+        self.builder = builder
+
+    def report(self, fabric):
+        fabricOsh = self.builder.build(fabric)
+        return fabricOsh
+
 def buildCompleteHost(name):
     '''
     @param node: host name
@@ -750,6 +838,55 @@ class TopologyBuilder:
         if node.status is not None:
             hostOsh.setStringAttribute('storagearray_status', node.status)
         return hostOsh
+
+    def reportFcSwitchTopolopy(self, fabrics, switches, hosts, fcPorts, switch2FabricLinks={}, portlinks={}):
+        resultVector = ObjectStateHolderVector()
+        fabricOshIdMap = {}
+        switchOshIdMap = {}
+        hostOshIdMap = {}
+        portOshIdMap = {}
+        for fabric in fabrics:
+            fabricBuilder = StorageFabricBuilder()
+            fabricReporter = StorageFabricReporter(fabricBuilder)
+            fabricOsh = fabricReporter.report(fabric)
+            fabricOshIdMap[fabric.name] = fabricOsh
+            resultVector.add(fabricOsh)
+
+        builder = FcSwitchBuilder()
+        reporter = FcSwitchReporter(builder)
+        for switch in switches:
+            fabricId = switch2FabricLinks.get(switch.wwn)
+            fabricOsh = fabricId and fabricOshIdMap.get(fabricId)
+            (switchOsh,vector)  = reporter.report(switch, fabricOsh)
+            switchOshIdMap[switch.wwn] = switchOsh
+            resultVector.addAll(vector)
+
+        for host in hosts:
+            hostOsh = ObjectStateHolder('node')
+            if host.name:
+                hostOsh.setStringAttribute('name', host.name)
+                hostOshIdMap[host.name] = hostOsh
+                resultVector.add(hostOsh)
+
+        portBuilder = FibreChanelPortBuilder()
+        portReporter = FibreChannelPortReporter(portBuilder)
+        for fc in fcPorts:
+            if fc.parentReference:
+                containerOsh = fabricOshIdMap.get(fc.parentReference) or \
+                                switchOshIdMap.get(fc.parentReference) or \
+                                hostOshIdMap.get(fc.parentReference)
+                (portOsh, vector) = portReporter.report(fc, containerOsh)
+                resultVector.addAll(vector)
+                portOshIdMap[fc.wwn] = portOsh
+
+        for link in portlinks.keys():
+            end1Osh = portOshIdMap.get(link)
+            end2Osh = portOshIdMap.get(portlinks.get(link))
+            if end1Osh and end2Osh:
+                linkOsh = modeling.createLinkOSH('fcconnect', end1Osh, end2Osh)
+                resultVector.add(linkOsh)
+
+        return resultVector
 
     def reportTopology(self, storageSystems, ports, pools, lvs, endPoints, fcHbas = None, storageProcessors = None,
                        pvs = None, endpointLinks = None, lunMappings = None, pv2poolLinks = None):

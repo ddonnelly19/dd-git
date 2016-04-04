@@ -21,6 +21,7 @@ class MsClusterClient:
     def __init__(self, shell):
         self.shell = shell
         self.__commandPrefix = self.__getCommandPrefix()
+        self.cmdletsPrefix = ""
 
     def execClusterCmd(self, cmd, timeout = 0, waitForTimeout = 0, useSudo = 1, checkErrCode = 1, useCache = 0):
         return self.shell.execCmd(self.clusterCommand(cmd), timeout, waitForTimeout, useSudo, checkErrCode, useCache)
@@ -39,6 +40,7 @@ class MsClusterClient:
         return isinstance(self.shell, shellutils.PowerShell)
 
     def execClusterCmdByPowerShell(self, cmd):
+        cmd = ''.join((self.cmdletsPrefix, cmd))
         if self.isPowerShellClient():
             return self.shell.execEncodeCmd(cmd, lineWidth=256)
         else:
@@ -63,6 +65,9 @@ class MssqlMsClusterHandler:
             return 1
         else:
             output = self.__cluster_client.execClusterCmdByPowerShell('Get-Cluster')
+            if self.__cluster_client.shell.getLastCmdReturnCode():
+                self.__cluster_client.cmdletsPrefix = "Import-Module FailoverClusters;"
+                output = self.__cluster_client.execClusterCmdByPowerShell('Get-Cluster')
             if output and output.strip() and self.__cluster_client.shell.getLastCmdReturnCode() == 0:
                 self.__isUsingPowerShellCmdlets = True
                 return 1

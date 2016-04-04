@@ -10,6 +10,7 @@
                 <qualifier type="application">Jboss instance on Windows</qualifier>
                 <qualifier type="application">Jboss instance on Unix</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
 				<qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">telnet</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
@@ -26,6 +27,7 @@
                 <qualifier type="application">Jboss standalone instance on Windows</qualifier>
                 <qualifier type="application">Jboss standalone instance on Unix</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">telnet</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
@@ -40,6 +42,7 @@
                 <qualifier type="application">Jboss managed-server instance on Windows</qualifier>
                 <qualifier type="application">Jboss managed-server instance on Unix</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier>
                 <qualifier type="protocol">telnet</qualifier>
                 <qualifier type="protocol">ssh</qualifier>

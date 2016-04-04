@@ -26,7 +26,8 @@
             <class>SapCcmsAgentPlugin</class>
             <qualifiers>
                 <qualifier type="application">SAP CCMS Agent Windows</qualifier>
-                <qualifier type="protocol">ntadmin</qualifier> 
+                <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">uda</qualifier> 
                 <qualifier type="protocol">telnet</qualifier>
                 <qualifier type="protocol">powershell</qualifier>

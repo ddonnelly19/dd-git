@@ -9,6 +9,7 @@
             <qualifiers>
                 <qualifier type="application">MySQL DB</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">ssh</qualifier> 
 				<qualifier type="protocol">uda</qualifier> 
 				<qualifier type="protocol">telnet</qualifier> 
@@ -26,7 +27,9 @@
             <qualifiers>
                 <qualifier type="application">Oracle by oracle.exe process</qualifier>
                 <qualifier type="application">Oracle by oracle process Unix</qualifier>
+                <qualifier type="application">Oracle by secondary processes</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
 				<qualifier type="protocol">uda</qualifier> 
                 <qualifier type="protocol">ssh</qualifier> 
                   <qualifier type="protocol">telnet</qualifier> 
@@ -46,6 +49,7 @@
                 <qualifier type="application">TNS Listener old stile</qualifier>
                 <qualifier type="application">TNS Listener unix</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">ssh</qualifier> 
 				<qualifier type="protocol">uda</qualifier> 
                 <qualifier type="protocol">telnet</qualifier> 

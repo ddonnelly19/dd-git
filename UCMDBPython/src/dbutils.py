@@ -26,7 +26,9 @@ class DbTypes:
     Db2 = 'db2'
     Sybase = 'sybase'
     PostgreSQL = 'postgresql'
-    AllList = (MySql, Oracle, MsSqlServer, MsSqlServerNtlm, MsSqlServerNtlmV2, Db2, Sybase, PostgreSQL)
+    MaxDB = 'maxdb'
+    HanaDB = 'hanadb'
+    AllList = (MySql, Oracle, MsSqlServer, MsSqlServerNtlm, MsSqlServerNtlmV2, Db2, Sybase, PostgreSQL, MaxDB, HanaDB)
 
 emptyVals = (None, '', 'NA', 'na')
 def protocolMatch(Framework, protocol, dbType, sid_or_name = None, port = None):

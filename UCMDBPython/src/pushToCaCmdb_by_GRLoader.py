@@ -126,8 +126,8 @@ def addCIs(rootElement, allObjectChildren):
                     fieldElement = iter2.next()
                     fieldName = fieldElement.getAttributeValue('name')
                     fieldValue = fieldElement.getText()
-                    if fieldValue == None:
-                        fieldValue = ''
+                    if fieldValue == None or fieldValue == '':
+                        fieldValue = 'EMPTY'
                     #print fieldName, ' - ', fieldValue
                     setFieldElement = Element(fieldName)
                     setFieldElement.setText(fieldValue)

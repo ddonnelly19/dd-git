@@ -10,6 +10,7 @@
             <qualifiers>
                 <qualifier type="application">Maxdb on Unix</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">telnet</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                 <qualifier type="protocol">uda</qualifier>
@@ -33,6 +34,7 @@
             <qualifiers>
                 <qualifier type="application">Maxdb on Windows</qualifier>
                 <qualifier type="protocol">ntadmin</qualifier>
+                <qualifier type="protocol">powercmd</qualifier>
                 <qualifier type="protocol">telnet</qualifier>
                 <qualifier type="protocol">ssh</qualifier>
                 <qualifier type="protocol">uda</qualifier>
