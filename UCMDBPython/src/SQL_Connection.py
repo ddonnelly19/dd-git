@@ -149,7 +149,7 @@ def getDbSid(dbClient):
     instanceName = None
     if protType == DbTypes.Sybase:
         #have to be verified; if the query returns the same as client, code have to be removed
-        res = dbClient.executeQuery("select srvnetname from master..sysservers where srvid = 0")#@@CMD_PERMISION sql protocol execution
+        res = dbClient.executeQuery("select srvnetname from main..sysservers where srvid = 0")#@@CMD_PERMISION sql protocol execution
         if res.next():
             instanceName = string.strip(res.getString(1))
     elif protType in (DbTypes.Oracle, DbTypes.MsSqlServer, DbTypes.MsSqlServerNtlm, DbTypes.MsSqlServerNtlmV2):

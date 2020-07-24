@@ -520,7 +520,7 @@ ioscan(1M)                                                    ioscan(1M)
       minor            The device minor number.
 
       class            A device category, defined in the files located in
-                       the directory /usr/conf/master.d and consistent with
+                       the directory /usr/conf/main.d and consistent with
                        the listings output by lsdev (see lsdev(1M)).
                        Examples are disk, printer, and tape.
 

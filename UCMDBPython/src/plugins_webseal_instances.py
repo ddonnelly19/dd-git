@@ -42,12 +42,12 @@ class WebsealInstancesByShell(Plugin):
         
 
             
-    def _parseMasterHostData(self, content):
+    def _parseMainHostData(self, content):
         
         if not content:
             return
         
-        m = re.search('master\-host\s*=\s*([\w\.\-]+)', content, re.DOTALL)
+        m = re.search('main\-host\s*=\s*([\w\.\-]+)', content, re.DOTALL)
         return m and m.group(1)
 
     def buildPolicyServer(self, container_osh):
@@ -75,21 +75,21 @@ class WebsealInstancesByShell(Plugin):
         if not file_content:
             return
         
-        master_host = self._parseMasterHostData(file_content)
-        if not master_host:
+        main_host = self._parseMainHostData(file_content)
+        if not main_host:
             return
         
         ip = None
         
-        if ip_addr.isValidIpAddressNotZero(master_host):
-            ip = master_host
+        if ip_addr.isValidIpAddressNotZero(main_host):
+            ip = main_host
         else:
             try:
                 resolver = dns_resolver.create(shell)
-                ips = resolver.resolve_ips(master_host)
+                ips = resolver.resolve_ips(main_host)
                 ip = ips and ips[0]
             except:
-                logger.debugException('Failed to resolve host name %s' % master_host)
+                logger.debugException('Failed to resolve host name %s' % main_host)
         
         if ip:
             host_osh = modeling.createHostOSH(str(ip))

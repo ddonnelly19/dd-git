@@ -78,7 +78,7 @@ dbUserTableQuery = (
     "FROM DBA_USERS")
 
 dbSnapshotTableQuery = (
-    "SELECT name, owner, table_name, master_link, master "
+    "SELECT name, owner, table_name, main_link, main "
     "FROM DBA_SNAPSHOTS")
 
 dbTablespaceTableQuery = (
@@ -175,7 +175,7 @@ dbsnapshotResourceDbjobtTableQuery = (
 dbLinkobjResourceDbsnapshotTableQuery = (
     "SELECT dba_snapshots.name, dba_db_links.db_link, dba_snapshots.owner "
     "FROM dba_snapshots, dba_db_links "
-    "WHERE dba_snapshots.master_link like "
+    "WHERE dba_snapshots.main_link like "
         "concat('%', concat(substr(dba_db_links.db_link,0, "
                             "instr(db_link,'.',1)),'%'))"
         "AND (dba_snapshots.owner = dba_db_links.owner "

@@ -594,11 +594,11 @@ class LdomTopologyReporter:
         dependencyLink = modeling.createLinkOSH('dependency', virtualDiskOsh, volumeOsh)
         vector.add(dependencyLink)
 
-    def _reportMasterToSlaveDomainDependency(self, masterDomain, slaveDomain, vector):
-        masterNodeOsh = masterDomain.getOsh(LdomTopologyReporter._KEY_HOST)
-        slaveNodeOsh = slaveDomain.getOsh(LdomTopologyReporter._KEY_HOST)
-        if masterNodeOsh is not None and slaveNodeOsh is not None:
-            dependencyLink = modeling.createLinkOSH('dependency', slaveNodeOsh, masterNodeOsh)
+    def _reportMainToSubordinateDomainDependency(self, mainDomain, subordinateDomain, vector):
+        mainNodeOsh = mainDomain.getOsh(LdomTopologyReporter._KEY_HOST)
+        subordinateNodeOsh = subordinateDomain.getOsh(LdomTopologyReporter._KEY_HOST)
+        if mainNodeOsh is not None and subordinateNodeOsh is not None:
+            dependencyLink = modeling.createLinkOSH('dependency', subordinateNodeOsh, mainNodeOsh)
             vector.add(dependencyLink)
             
     def _reportCpus(self, cpus, ldomServerOsh, vector):
@@ -671,13 +671,13 @@ class LdomTopologyReporter:
                     self._reportDomainInterfaceToSwitchConnectivity(switchDomainInterfaceName, controlDomain, switch, topology.networking, vector)
         
         for domain in allDomainsByName.values():
-            if domain.masters:
-                for masterDomainName in domain.masters.keys():
-                    masterDomain = allDomainsByName.get(masterDomainName)
-                    if masterDomain is not None:
-                        self._reportMasterToSlaveDomainDependency(masterDomain, domain, vector)
+            if domain.mains:
+                for mainDomainName in domain.mains.keys():
+                    mainDomain = allDomainsByName.get(mainDomainName)
+                    if mainDomain is not None:
+                        self._reportMainToSubordinateDomainDependency(mainDomain, domain, vector)
                     else:
-                        logger.warn("Cannot find master domain by name '%s' for slave '%s'" % (masterDomainName, domain.getName()))
+                        logger.warn("Cannot find main domain by name '%s' for subordinate '%s'" % (mainDomainName, domain.getName()))
         
         try:
             self._reportCpus(topology.cpus, ldomServerOsh, vector)

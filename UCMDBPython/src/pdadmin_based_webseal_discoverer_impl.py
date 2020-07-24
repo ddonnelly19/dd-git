@@ -126,7 +126,7 @@ class Discoverer(object):
         return tuple(result)
 
     def get_policy_server(self):
-        result = self.http_executor(self.pdadmin.server.show('ivmgrd-master'))
+        result = self.http_executor(self.pdadmin.server.show('ivmgrd-main'))
         policy_server = webseal_model.PolicyServer()
         return policy_server, result.hostname, result.admin_request_port
 
@@ -159,7 +159,7 @@ class Discoverer(object):
         version = active_partition and active_partition.firmware_version
         result = []
         for server_name in server_names:
-            if server_name != 'ivmgrd-master':
+            if server_name != 'ivmgrd-main':
                 server = self.http_executor(self.pdadmin.server.show(server_name))
                 result.append((webseal_model.Server(server.name, version),
                                server.hostname, server.admin_request_port))

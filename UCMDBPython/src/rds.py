@@ -24,13 +24,13 @@ class Engine(entity.HasName):
 
 class Instance(aws.HasId):
     def __init__(self, id_, type_, engineName, status, server,
-                 masterUsername=None):
+                 mainUsername=None):
         r'@types: str, str, str, str, db.DatabaseServer, str'
         aws.HasId.__init__(self, id_)
         self.__type = type_
         self.__status = status
 
         self.engineName = engineName
-        self.masterUsername = masterUsername
+        self.mainUsername = mainUsername
 
         self.server = server

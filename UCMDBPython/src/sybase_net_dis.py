@@ -36,7 +36,7 @@ def DiscoveryMain(Framework):
                 dbversion = dbClient.getDbVersion()
                 
                 logger.debug('Found sybase server of version:', dbversion)
-                res = dbClient.executeQuery("select srvnetname from master..sysservers where srvid = 0")#@@CMD_PERMISION sql protocol execution
+                res = dbClient.executeQuery("select srvnetname from main..sysservers where srvid = 0")#@@CMD_PERMISION sql protocol execution
                 if res.next():
                     dbname=string.strip(res.getString(1))
                     sybasedOSH = modeling.createDatabaseOSH('sybase', dbname, str(dbClient.getPort()),dbClient.getIpAddress(),hostOSH,sqlProtocol,dbClient.getUserName(),None,dbversion)

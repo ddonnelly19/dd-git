@@ -104,9 +104,9 @@ content based on path from the TREXDaemon command line" | warn
 
         isBiaProduct = 0
         versionInfo = None
-#        # master by default, if topology file is not found that means
+#        # main by default, if topology file is not found that means
 #        # that current one is the only instance
-#        isMaster = 1
+#        isMain = 1
 
         trexTopology = None
 
@@ -160,17 +160,17 @@ content based on path from the TREXDaemon command line" | warn
                     configParser = sap_trex_discoverer.TopologyConfigParser()
                     trexTopology = sap_trex_discoverer.TrexTopologyConfig(
                                 configParser.parse(topologyFile.content))
-                    # find instance between master end-points
+                    # find instance between main end-points
 #                    landscapeSnapshot = topology.getGlobals().getLandscapeSnapshot()
-#                    masterEndpoints = landscapeSnapshot.getMasterEndpoints()
-#                    activeMasterEndpoints = landscapeSnapshot.getActiveMasterEndpoints()
+#                    mainEndpoints = landscapeSnapshot.getMainEndpoints()
+#                    activeMainEndpoints = landscapeSnapshot.getActiveMainEndpoints()
 #                    topologyNodes = topology.getHostNodes()
 ##
 #                    isEndpointWithInstanceHostname = (lambda
 #                        ep, hostname = instanceHostname: ep.getAddress() == hostname)
-#                    isMaster = len(filter(isEndpointWithInstanceHostname,
-#                           landscapeSnapshot.getMasterEndpoints()))
-#                    "host role is %s" % (isMaster and "master" or "slave") | info
+#                    isMain = len(filter(isEndpointWithInstanceHostname,
+#                           landscapeSnapshot.getMainEndpoints()))
+#                    "host role is %s" % (isMain and "main" or "subordinate") | info
                 except:
                     logger.warnException("Failed to parse topology configuration")
             else:
@@ -287,19 +287,19 @@ def reportTrexHostNode(hostNode, topology, isBiaProduct):
                    and sap_trex.Product.BIA.instanceProductName
                    or sap_trex.Product.TREX.instanceProductName)
     softwareBuilder.updateDiscoveredProductName(instanceOsh, productName)
-    # x) set name server role (master, slave or 1st master)
+    # x) set name server role (main, subordinate or 1st main)
     nameServerPort = first(endpoints).getPort()
     nameServerEndpoint = netutils.createTcpEndpoint(hostNode.name, nameServerPort)
     topologyGlobals = topology.getGlobals()
-    isMaster = nameServerEndpoint in (
-                    fptools.safeFunc(topologyGlobals.getMasterEndpoints)() or ()
+    isMain = nameServerEndpoint in (
+                    fptools.safeFunc(topologyGlobals.getMainEndpoints)() or ()
     )
-    isActiveMaster = nameServerEndpoint in (
-                    fptools.safeFunc(topologyGlobals.getActiveMasterEndpoints)() or ()
+    isActiveMain = nameServerEndpoint in (
+                    fptools.safeFunc(topologyGlobals.getActiveMainEndpoints)() or ()
     )
     trexBuilder.updateNameServerMode( instanceOsh,
-                (isMaster
-                 and (isActiveMaster
+                (isMain
+                 and (isActiveMain
                       and sap_trex.NameServerMode.FIRST_MASTER
                       or  sap_trex.NameServerMode.MASTER)
                  or sap_trex.NameServerMode.SLAVE))

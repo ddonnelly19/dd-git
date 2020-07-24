@@ -399,12 +399,12 @@ def _createDomain(domainEntry, entriesMapByDomain):
 
     dependencyEntry = entriesMapByDomain.get(KEYWORD_DEPENDENCY) and entriesMapByDomain.get(KEYWORD_DEPENDENCY)[0]
     dependencyAttrEntry = dependencyEntry and dependencyEntry.attributes and dependencyEntry.attributes[0]
-    mastersString = dependencyAttrEntry and dependencyAttrEntry.attributes.get("master")
-    if mastersString:
-        masters = re.split(",", mastersString)
-        for master in masters:
-            if master:
-                domain.masters[master] = None
+    mainsString = dependencyAttrEntry and dependencyAttrEntry.attributes.get("main")
+    if mainsString:
+        mains = re.split(",", mainsString)
+        for main in mains:
+            if main:
+                domain.mains[main] = None
 
     #parse serial number from nvramrc block
     variableEntry = entriesMapByDomain.get(KEYWORD_VARIABLES) and entriesMapByDomain.get(KEYWORD_VARIABLES)[0]

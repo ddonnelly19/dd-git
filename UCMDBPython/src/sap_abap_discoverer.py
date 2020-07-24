@@ -146,8 +146,8 @@ class SoftwareComponentDiscovererByJco(HasJco):
             ))
         return versions
 
-    def discoveryMasterComponentVersionDescription(self):
-        r''' Get English description of version for master component
+    def discoveryMainComponentVersionDescription(self):
+        r''' Get English description of version for main component
         @types: -> str or None
         '''
         isEnglish = lambda version: isEnglishVersion(version.language)

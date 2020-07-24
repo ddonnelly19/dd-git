@@ -292,7 +292,7 @@ class ExchangeDiscoverer(BaseExchangeDiscoverer):
                 mdbList.append(mailDatabase)
                 self.dagNameToMdbListMap[dagName] = mdbList
                 continue
-            serverName = mailDatabase.getMasterServer()
+            serverName = mailDatabase.getMainServer()
             if serverName:
                 mdbList = self.serverNameToMdbListMap.get(serverName, [])
                 mdbList.append(mailDatabase)
@@ -482,10 +482,10 @@ class ExchangeAdminGroupDiscoverer(BaseExchangeDiscoverer):
 
     def enrichServersWithRoutingGroups(self):
         for routingGroup in self.routingGroupsByDn.values():
-            masterDn = routingGroup.getMasterDn()
-            if masterDn and self.serversByDn.has_key(masterDn):
-                masterServer = self.serversByDn[masterDn]
-                masterServer.setIsMaster(1)
+            mainDn = routingGroup.getMainDn()
+            if mainDn and self.serversByDn.has_key(mainDn):
+                mainServer = self.serversByDn[mainDn]
+                mainServer.setIsMain(1)
 
     def createOsh(self):
         self.adminGroupOsh = ObjectStateHolder('exchange_administrative_group')
@@ -554,7 +554,7 @@ class ExchangeRoutingGroupDiscoverer(BaseExchangeDiscoverer):
 
         self.parentAdminGroupDiscoverer = parentAdminGroupDiscoverer
 
-        self.routingGroupMasterDn = None
+        self.routingGroupMainDn = None
 
         self.smtpConnectorsByDn = {}
         self.routingGroupConnectorsByDn = {}
@@ -579,11 +579,11 @@ class ExchangeRoutingGroupDiscoverer(BaseExchangeDiscoverer):
                 self.routingGroupConnectorsByDn[connector.distinguishedName] = connector
                 logger.debug("Found Routing Group Connector '%s' in Routing Group '%s'" % (connector.name, self.name))
 
-    def setMasterDn(self, routingGroupMasterDn):
-        self.routingGroupMasterDn = routingGroupMasterDn
+    def setMainDn(self, routingGroupMainDn):
+        self.routingGroupMainDn = routingGroupMainDn
 
-    def getMasterDn(self):
-        return self.routingGroupMasterDn
+    def getMainDn(self):
+        return self.routingGroupMainDn
 
     def createOsh(self):
         self.routingGroupOsh = ObjectStateHolder('routing_group')
@@ -608,7 +608,7 @@ class ExchangeRoutingGroupDiscoverer(BaseExchangeDiscoverer):
 
 class ExchangeRoutingGroupDiscovererDao(BaseExchangeDiscovererDao):
 
-    PROPERTY_ROUTING_GROUP_MASTER = "msExchRoutingMasterDN"
+    PROPERTY_ROUTING_GROUP_MASTER = "msExchRoutingMainDN"
 
     def __init__(self, client, framework, daoService):
         BaseExchangeDiscovererDao.__init__(self, client, framework, daoService)
@@ -635,9 +635,9 @@ class ExchangeRoutingGroupDiscovererDao(BaseExchangeDiscovererDao):
     def setDiscovererPropertiesFromRow(self, discoverer, resultSet):
         BaseExchangeDiscovererDao.setDiscovererPropertiesFromRow(self, discoverer, resultSet)
 
-        routingGroupMasterDn = resultSet.getString(ExchangeRoutingGroupDiscovererDao.PROPERTY_ROUTING_GROUP_MASTER)
-        if routingGroupMasterDn:
-            discoverer.setMasterDn(routingGroupMasterDn)
+        routingGroupMainDn = resultSet.getString(ExchangeRoutingGroupDiscovererDao.PROPERTY_ROUTING_GROUP_MASTER)
+        if routingGroupMainDn:
+            discoverer.setMainDn(routingGroupMainDn)
 
 
 class ExchangeServerDiscoverer(BaseExchangeDiscoverer):
@@ -665,7 +665,7 @@ class ExchangeServerDiscoverer(BaseExchangeDiscoverer):
         self.mtaDatabasePath = None
         self.messageTrackingEnabled = None
         self.creationDate = None
-        self.isMaster = 0
+        self.isMain = 0
 
         self.hostOsh = None
         self.ipAddressOsh = None
@@ -743,8 +743,8 @@ class ExchangeServerDiscoverer(BaseExchangeDiscoverer):
     def setCreationDate(self, creationDate):
         self.creationDate = creationDate
 
-    def setIsMaster(self, isMaster):
-        self.isMaster = isMaster
+    def setIsMain(self, isMain):
+        self.isMain = isMain
 
     def setRoleNames(self, activeRolesMask):
         for [roleName, mapOffset] in EXCHANGE_ROLE_TO_BIT_MAP_DICT.items():
@@ -767,8 +767,8 @@ class ExchangeServerDiscoverer(BaseExchangeDiscoverer):
             self.serverOsh.setBoolAttribute('message_tracking_enabled', self.messageTrackingEnabled)
         if self.creationDate:
             self.serverOsh.setDateAttribute('creation_date', self.creationDate)
-        if self.isMaster is not None:
-            self.serverOsh.setBoolAttribute('is_master', self.isMaster)
+        if self.isMain is not None:
+            self.serverOsh.setBoolAttribute('is_main', self.isMain)
         self.serverOsh.setContainer(self.hostOsh)
 
     def createRoles(self):
@@ -959,7 +959,7 @@ class ExchangeMailDatabaseToPotentialServersDiscoverer(BaseExchangeDiscoverer):
 
 
 class ExchangeMailDatabaseDiscovererDao(BaseExchangeDiscovererDao):
-    PROPERTY_MDB_MASTER_SERVER_OR_DAG = "msExchMasterServerOrAvailabilityGroup"
+    PROPERTY_MDB_MASTER_SERVER_OR_DAG = "msExchMainServerOrAvailabilityGroup"
     PROPERTY_MDB_OWNING_SERVER = "msExchOwningServer"
     PROPERTY_MDB_DATA_FILE = "msExchEDBFile"
     PROPERTY_MDB_GUID = "objectGUID"
@@ -997,16 +997,16 @@ class ExchangeMailDatabaseDiscovererDao(BaseExchangeDiscovererDao):
     def setDiscovererPropertiesFromRow(self, discoverer, resultSet):
         BaseExchangeDiscovererDao.setDiscovererPropertiesFromRow(self, discoverer, resultSet)
 
-        masterServer = resultSet.getString(ExchangeMailDatabaseDiscovererDao.PROPERTY_MDB_MASTER_SERVER_OR_DAG)
-        logger.debug('Found master server DN: %s' % masterServer)
-        if masterServer:
-            match = re.match('CN=(.*?),CN=Database Availability Groups,', masterServer)
+        mainServer = resultSet.getString(ExchangeMailDatabaseDiscovererDao.PROPERTY_MDB_MASTER_SERVER_OR_DAG)
+        logger.debug('Found main server DN: %s' % mainServer)
+        if mainServer:
+            match = re.match('CN=(.*?),CN=Database Availability Groups,', mainServer)
             if match:
                 discoverer.setDagName(match.group(1).strip())
             else:
-                match = re.match('CN=(.*?),', masterServer)
+                match = re.match('CN=(.*?),', mainServer)
                 if match:
-                    discoverer.setMasterServer(match.group(1).strip())
+                    discoverer.setMainServer(match.group(1).strip())
 
         owningServer = resultSet.getString(ExchangeMailDatabaseDiscovererDao.PROPERTY_MDB_OWNING_SERVER)
         if owningServer:
@@ -1043,7 +1043,7 @@ class ExchangeMailDatabaseDiscoverer(BaseExchangeDiscoverer):
             BaseExchangeDiscoverer.__init__(self, client, framework, daoService)
             self.parentAdminGroupDiscoverer = parentAdminGroupDiscoverer
             self.osh = None
-            self.masterServer = None
+            self.mainServer = None
             self.dagName = None
             self.owningServer = None
             self.dataFile = None
@@ -1086,11 +1086,11 @@ class ExchangeMailDatabaseDiscoverer(BaseExchangeDiscoverer):
     def getDagName(self):
         return self.dagName
 
-    def setMasterServer(self, masterServer):
-        self.masterServer = masterServer
+    def setMainServer(self, mainServer):
+        self.mainServer = mainServer
 
-    def getMasterServer(self):
-        return self.masterServer
+    def getMainServer(self):
+        return self.mainServer
 
     def setOwningServer(self, owningServer):
         self.owningServer = owningServer

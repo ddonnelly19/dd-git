@@ -188,10 +188,10 @@ def mainFunction(resBuffer, cfPath, shUtils, OSHVResult, protocol, Framework, la
     for match in matches:
 
         depended = match[0].strip()
-        master  = match[1].strip()
+        main  = match[1].strip()
 
         # link each resource with the resource it depends on
-        dependOSH = modeling.createLinkOSH('depend', resourceNameToOSH[depended], resourceNameToOSH[master])
+        dependOSH = modeling.createLinkOSH('depend', resourceNameToOSH[depended], resourceNameToOSH[main])
         OSHVResult.add(dependOSH)
 
 

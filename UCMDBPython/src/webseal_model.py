@@ -25,7 +25,7 @@ class Junction(collections.namedtuple('Junction', ('name', 'type'))):
 class PolicyServer(collections.namedtuple('PolicyServer', ('name', ))):
 
     @validate(not_none, basestring)
-    def __new__(cls, name='ivmgrd-master'):
+    def __new__(cls, name='ivmgrd-main'):
         return super(PolicyServer, cls).__new__(cls, name)
 
 

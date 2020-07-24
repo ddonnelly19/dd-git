@@ -17,10 +17,10 @@ DATABASE_CONFIG_FILE = String("SELECT name, DATABASEPROPERTYEX(name, 'Collation'
 #          Compatibility level
 "cmptlevel  as _cmptlevel,"+
 #          IsReadOnly
-"DATABASEPROPERTYEX(name, 'IsAutoClose') as _IsAutoClose from master..sysdatabases where name in (??)")
+"DATABASEPROPERTYEX(name, 'IsAutoClose') as _IsAutoClose from main..sysdatabases where name in (??)")
 
 DATABASE_BACKUP=String("select d.name, max(backup_start_date) as backupDate"+
-" from master..sysdatabases d left outer join msdb..backupset b on d.name = b.database_name"+
+" from main..sysdatabases d left outer join msdb..backupset b on d.name = b.database_name"+
 " where d.name in (??) group by d.name order by d.name")
 
 DATABASE_BACKUP_FILES=String("Select b.database_name name, f.physical_device_name as path, f.logical_device_name as logicalPath,  b.backup_finish_date "+ 
@@ -33,7 +33,7 @@ DATABASE_BACKUP_FILES=String("Select b.database_name name, f.physical_device_nam
 "where b.database_name in (??) "+
 "and b.media_set_id = f.media_set_id")
 ################################### db server configuraion ######################4
-DBSERVER_CONFIG_FILE=String("select v.name, c.value from master.dbo.spt_values v ,master.dbo.sysconfigures c"
+DBSERVER_CONFIG_FILE=String("select v.name, c.value from main.dbo.spt_values v ,main.dbo.sysconfigures c"
 " where v.type = 'C' and v.number = c.config"+
 " and (  v.name like ('%affinity mask%') or v.name like ('%allow updates%')"+
 " or v.name like ('%awe enabled%') or v.name like ('%c2 audit mode%')"
@@ -52,28 +52,28 @@ DBSERVER_CONFIG_FILE=String("select v.name, c.value from master.dbo.spt_values v
 " or v.name like ('%show advanced options%') or v.name like ('%user connections%')"+
 " or v.name like ('%user options%'))")
 
-PROTOCOL_LIST_CALL="exec master..xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\MSSQLServer\SuperSocketNetLib' , N'ProtocolList'"
-PORT_LIST_CALL="exec master..xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\MSSQLServer\SuperSocketNetLib\Tcp', N'TcpPort'"
-TCP_FLAGS_CALL="exec master..xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\MSSQLServer\SuperSocketNetLib\Tcp', N'TcpHideFlag'"
+PROTOCOL_LIST_CALL="exec main..xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\MSSQLServer\SuperSocketNetLib' , N'ProtocolList'"
+PORT_LIST_CALL="exec main..xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\MSSQLServer\SuperSocketNetLib\Tcp', N'TcpPort'"
+TCP_FLAGS_CALL="exec main..xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\MSSQLServer\SuperSocketNetLib\Tcp', N'TcpHideFlag'"
 SERVER_PROPS="SELECT   SERVERPROPERTY('Collation') as _Collation,SERVERPROPERTY('IsClustered') as _IsClustered,SERVERPROPERTY('LicenseType') as _LicenseType,SERVERPROPERTY(N'IsFulltextInstalled') as _IsFulltextInstalled"
 SERVER_PROPS_VALUES=['Collation','IsClustered','LicenseType','IsFulltextInstalled']
-SERVER_STARTUP_CALL="exec master..xp_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\MSSQLServer\Parameters', 'SQLArg??'"
+SERVER_STARTUP_CALL="exec main..xp_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\MSSQLServer\Parameters', 'SQLArg??'"
 STARTUP_SP="select name from sysobjects where xtype = 'P' and OBJECTPROPERTY(id, 'ExecIsStartup') = 1"
 SERVER_OSH_PROPS=String("SELECT   SERVERPROPERTY('ProductVersion') as _database_dbversion"+
 " ,SERVERPROPERTY('InstanceName') as _instanceName"+
 " ,SERVERPROPERTY('Edition') as _data_description"+
 " ,SERVERPROPERTY('ProductLevel') as _application_version")# --All digits after the last dot are the minor product version
-SERVER_MAIL_CALL="exec master..xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\MSSQLServer', N'MailAccountName'"
-SERVER_MAIL_SERVER="select name, crdate from master..sysobjects where OBJECTPROPERTY(id, N'IsExtendedProc') = 1 and name like '%xp_smtp_sendmail%'"
-SERVER_USERS='select loginname,status,createdate, sysadmin, securityadmin, serveradmin, setupadmin, processadmin , diskadmin, dbcreator from master..syslogins order by loginname'
+SERVER_MAIL_CALL="exec main..xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\MSSQLServer', N'MailAccountName'"
+SERVER_MAIL_SERVER="select name, crdate from main..sysobjects where OBJECTPROPERTY(id, N'IsExtendedProc') = 1 and name like '%xp_smtp_sendmail%'"
+SERVER_USERS='select loginname,status,createdate, sysadmin, securityadmin, serveradmin, setupadmin, processadmin , diskadmin, dbcreator from main..syslogins order by loginname'
 ##################################jobs and clustering #############################
 SERVER_JOBS='select job_id,name, description, date_created, date_modified, enabled from msdb..sysjobs'
 
-SERVER_REPLICATION_INSTALL_CALL="exec master..xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\Replication', N'IsInstalled'"
+SERVER_REPLICATION_INSTALL_CALL="exec main..xp_instance_regread N'HKEY_LOCAL_MACHINE', N'SOFTWARE\Microsoft\MSSQLServer\Replication', N'IsInstalled'"
 
 SERVER_DIST_CALL="exec sp_helpdistributor"
 
-SERVER_PUBLISHED_DBS="select name, DATABASEPROPERTYEX(name, 'IsPublished') as _isPublished, DATABASEPROPERTYEX(name, 'IsMergePublished') as _IsMergePublished from master..sysdatabases"
+SERVER_PUBLISHED_DBS="select name, DATABASEPROPERTYEX(name, 'IsPublished') as _isPublished, DATABASEPROPERTYEX(name, 'IsMergePublished') as _IsMergePublished from main..sysdatabases"
 
 PUBLICATION_FROM_DISTRIBUTOR = "exec sp_MShelp_publication N'??'"
 
@@ -86,7 +86,7 @@ DATABASE_FILES=String("SELECT sysfiles.name, sysfiles.filename, sysfiles.[size] 
 " FROM [??]..sysfiles sysfiles LEFT OUTER JOIN"+
 " [??]..sysfilegroups sysfilegroups ON sysfiles.groupid = sysfilegroups.groupid")
 
-MASTER_FILES=String("select sysfiles.name, sysfiles.physical_name, sysfiles.[size] as size, sysfiles.max_size, sysfiles.growth, sysdatabases.[name] as dbname from sys.master_files as sysfiles INNER JOIN master..sysdatabases as sysdatabases ON sysfiles.database_id=sysdatabases.dbid  ")
+MASTER_FILES=String("select sysfiles.name, sysfiles.physical_name, sysfiles.[size] as size, sysfiles.max_size, sysfiles.growth, sysdatabases.[name] as dbname from sys.main_files as sysfiles INNER JOIN main..sysdatabases as sysdatabases ON sysfiles.database_id=sysdatabases.dbid  ")
 
 DATABASE_USERS_DBNAME="SELECT name FROM [??]..sysusers WHERE (islogin = 1) AND (hasdbaccess = 1)"
 DATABASE_USERS="SELECT name FROM sysusers WHERE (islogin = 1) AND (hasdbaccess = 1)"

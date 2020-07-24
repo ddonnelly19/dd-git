@@ -389,8 +389,8 @@ class VMAppliance(BaseEntity, Nameable, GetAll):
 class Pool(BaseEntity, Nameable, GetAll):
     CLASS = 'pool'
 
-    def getMaster(self):
-        return Host(self.session, self['master'])
+    def getMain(self):
+        return Host(self.session, self['main'])
 
     def getVSwitchControllerAddress(self):
         return self['vswitch_controller']

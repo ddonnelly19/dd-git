@@ -40,7 +40,7 @@ from java.lang import Exception as JException
 from hana_sql_command import HdbDeploymentHostsCmd, HdbInstanceNumberCmd,\
     HdbVersionCmd, HdbStartTimeCmd, HdbSqlPortsByHostCmd, MHostInformationCmd,\
     GetPrimaryHostsCmd, GetSecondaryHostsCmd, MDatabaseCmd,\
-    GetDefaultMasterHostname, HdbSidCmd, GetSecondaryPortFromMServiceReplication,\
+    GetDefaultMainHostname, HdbSidCmd, GetSecondaryPortFromMServiceReplication,\
     GetPortFromMServiceReplication, GetMServiceReplicationRecordCount,\
     HdbConfigFileNamesCmd, HdbConfigFileContentCmd, HdbServicesCmd,\
     HdbSchemasCmd, HdbUsersCmd, HdbDataFilesCmd, HdbLogFilesCmd,\
@@ -188,8 +188,8 @@ class Discoverer(entity.Immutable):
 
     def getCurrentDatabaseReplicationRole(self):
         r'@types: -> _ReplicationRole'
-        master_hostname = self.getDefaultMasterHost()
-        return self.getReplicationRoleByHostname(master_hostname)
+        main_hostname = self.getDefaultMainHost()
+        return self.getReplicationRoleByHostname(main_hostname)
 
     def getReplicationHostnames(self):
         r'types: -> list[str]'
@@ -209,9 +209,9 @@ class Discoverer(entity.Immutable):
         return [hana_host.parse_from_address(address, resolve_ips_fn)
                 for address in self.getReplicationHostnames()]
 
-    def getDefaultMasterHost(self):
+    def getDefaultMainHost(self):
         r'types: -> str'
-        return GetDefaultMasterHostname() | self._executor
+        return GetDefaultMainHostname() | self._executor
 
     def getReplicationDatabaseServer(self):
         r'types: -> hana.ReplicationDatabaseServer'

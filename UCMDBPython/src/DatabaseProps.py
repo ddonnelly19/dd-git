@@ -47,7 +47,7 @@ class SqlDbProps:
         result = ObjectStateHolderVector()
         if not self.discoveryOptions.discoverProcedures:
             return result
-        # if we working with master table need to ignore MSSQL internal storage procedure
+        # if we working with main table need to ignore MSSQL internal storage procedure
         additionalFilter = ""
         if filterInternal:
             additionalFilter = self.__genAdditionalFilter()
@@ -79,7 +79,7 @@ class SqlDbProps:
             return result
         for dbName in databases.keySet():
             if dbName:
-                filterInternal = not self.discoveryOptions.discoverInternalProcedures and (dbName in  ['master', 'msdb'])
+                filterInternal = not self.discoveryOptions.discoverInternalProcedures and (dbName in  ['main', 'msdb'])
                 result.addAll(self.getStoredProcedureFromDB(dbName, databases.get(dbName), filterInternal))
         return result
 

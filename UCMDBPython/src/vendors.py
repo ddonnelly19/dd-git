@@ -326,7 +326,7 @@ __vendor_id_to_vendor_name_str = '''
 0x0E11    Compaq Computer Corp.
 0x129D    CompCore Multimedia Inc.
 0x120D    Compression Labs Inc.
-0x15A0    Compumaster SRL
+0x15A0    Compumain SRL
 0x1307    ComputerBoards
 0x12BD    Computerm Corp.
 0x1130    Computervision
@@ -867,7 +867,7 @@ __vendor_id_to_vendor_name_str = '''
 0x11AB    Marvell Semiconductor
 0x1148    Marvell Semiconductor Germany GmbH
 0x1062    Maspar Computer Corp.
-0x003D    master
+0x003D    main
 0x151E    Matrix Corp.
 0x102B    Matrox Electronic Systems Ltd.
 0x10F7    Matsushita Electric Industrial Corp.

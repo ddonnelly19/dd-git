@@ -215,7 +215,7 @@ def DiscoveryMain(Framework):
         #    org.jboss.as.standalone, - standalone jboss server
         #    org.jboss.as.server, - jboss server instance in j2ee domain
         #    org.jboss.as.process-controller, - responsible for managing and starting/restarting processes
-        #    org.jboss.as.host-controller - one host controller is the domain controller, the rest are slaves,
+        #    org.jboss.as.host-controller - one host controller is the domain controller, the rest are subordinates,
         #                                    responsible for pushing out configuration changes over the domain
         jbossV4to6CommandLinePattern = 'org.jboss.Main'
         jbossV7StandaloneCommandLinePattern = 'org.jboss.as.standalone'
