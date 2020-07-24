@@ -775,16 +775,16 @@ def _discover_sap_system(sapUtils, systemName):
     sapReporter = sap.Reporter(systemBuilder)
     systemOsh = sapReporter.reportSystem(sapSystem)
 
-    # x) sap system version is represented by master component version
+    # x) sap system version is represented by main component version
     discoverer = sap_abap_discoverer.SoftwareComponentDiscovererByJco(sapUtils)
     try:
-        masterCmpVersion = discoverer.discoveryMasterComponentVersionDescription()
+        mainCmpVersion = discoverer.discoveryMainComponentVersionDescription()
     except:
-        logger.reportWarning('Failed to discover master component version')
+        logger.reportWarning('Failed to discover main component version')
     else:
-        # x) report SAP master component version
-        if masterCmpVersion:
-            systemOsh = sapReporter.reportSystemMasterComponentVersion(systemOsh, masterCmpVersion)
+        # x) report SAP main component version
+        if mainCmpVersion:
+            systemOsh = sapReporter.reportSystemMainComponentVersion(systemOsh, mainCmpVersion)
     return systemOsh
 
 

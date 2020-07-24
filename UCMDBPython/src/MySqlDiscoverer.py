@@ -97,7 +97,7 @@ class MySqlDiscoverer:
                 myCnfContent = content.split('\n')
                 self.cnfContent = []
                 for line in myCnfContent:
-                    if not line.startswith('master-password'):
+                    if not line.startswith('main-password'):
                         self.cnfContent.append(line)                      
                 size = len(content) - len(myCnfContent) + 1
                 if self.shell.isWinOs():
@@ -192,7 +192,7 @@ class MySqlDiscoverer:
             configVars.has_option(self.DEFAULT_SECTION, property):
                 return filter_list(configVars.get(self.DEFAULT_SECTION, property))
     
-    INT_ARGS = ['server_id', 'database_max_connections', 'master_connect_retry']
+    INT_ARGS = ['server_id', 'database_max_connections', 'main_connect_retry']
     def setAttribute(self, osh, attribute, mapping):
         """
         Sets value of OSH related to mysql
@@ -211,40 +211,40 @@ class MySqlDiscoverer:
         else:
             logger.warn('The value for attribute %s not found.' % attribute)
     
-    REPL_ARGS_MAPPING = {'master_user'          : 'master-user',
-                         'master_connect_retry' : 'master-connect-retry'}
+    REPL_ARGS_MAPPING = {'main_user'          : 'main-user',
+                         'main_connect_retry' : 'main-connect-retry'}
     def discoverReplication(self, mysqlOsh):
         """
         Tries to find config variables related to mysql replication 
         @param ObjectStateHolder mysqlOsh mysql osh
         @return list list of OSHs
         """
-        masterHostIp = self.getProperty('master-host')
-        if not masterHostIp:
+        mainHostIp = self.getProperty('main-host')
+        if not mainHostIp:
             return 
-        if not netutils.isValidIp(masterHostIp):
+        if not netutils.isValidIp(mainHostIp):
             try:
                 resolver = netutils.DnsResolverByShell(self.shell)
-                masterHostIp = resolver.resolveIpsByHostname(masterHostIp)[0]
+                mainHostIp = resolver.resolveIpsByHostname(mainHostIp)[0]
             except netutils.ResolveException:
-                logger.warn('Failed to resolve Master Host into IP')
+                logger.warn('Failed to resolve Main Host into IP')
                 return
-        masterPort = self.getProperty('master-port')
+        mainPort = self.getProperty('main-port')
         mysqlReplicationOsh = ObjectStateHolder('mysql_replication')
         mysqlReplicationOsh.setAttribute('data_name', 'MySQL Replication')
         mysqlReplicationOsh.setContainer(mysqlOsh)
-        self.setAttribute(mysqlReplicationOsh, 'master_user', self.REPL_ARGS_MAPPING)
-        self.setAttribute(mysqlReplicationOsh, 'master_connect_retry', self.REPL_ARGS_MAPPING)
-        masterHostOsh = modeling.createHostOSH(masterHostIp)
-        serviceAddressOsh = modeling.createServiceAddressOsh(masterHostOsh, masterHostIp, masterPort, modeling.SERVICEADDRESS_TYPE_TCP)
+        self.setAttribute(mysqlReplicationOsh, 'main_user', self.REPL_ARGS_MAPPING)
+        self.setAttribute(mysqlReplicationOsh, 'main_connect_retry', self.REPL_ARGS_MAPPING)
+        mainHostOsh = modeling.createHostOSH(mainHostIp)
+        serviceAddressOsh = modeling.createServiceAddressOsh(mainHostOsh, mainHostIp, mainPort, modeling.SERVICEADDRESS_TYPE_TCP)
         clientServerLink = modeling.createLinkOSH('client_server', mysqlReplicationOsh, serviceAddressOsh)
         clientServerLink.setStringAttribute('clientserver_protocol', 'TCP')
-        clientServerLink.setLongAttribute('clientserver_destport', int(masterPort))
-#        masterMysqlOsh = modeling.createDatabaseOSH('mysql', 'MySQL. Port ' + masterPort, masterPort, masterHostIp, masterHostOsh)
-#        useLink = modeling.createLinkOSH('use', masterHostOsh, serviceAddressOsh)
-        return [masterHostOsh, serviceAddressOsh, clientServerLink, mysqlReplicationOsh]
+        clientServerLink.setLongAttribute('clientserver_destport', int(mainPort))
+#        mainMysqlOsh = modeling.createDatabaseOSH('mysql', 'MySQL. Port ' + mainPort, mainPort, mainHostIp, mainHostOsh)
+#        useLink = modeling.createLinkOSH('use', mainHostOsh, serviceAddressOsh)
+        return [mainHostOsh, serviceAddressOsh, clientServerLink, mysqlReplicationOsh]
 
-    PROCESS_ARGS = [DEFAULTS_FILE_OPT_NAME + '=', 'master-host=', 'master-user=', 'server-id=', 'datadir=', 'max_connections=', 'default-storage-engine=', 'master-connect-retry=']
+    PROCESS_ARGS = [DEFAULTS_FILE_OPT_NAME + '=', 'main-host=', 'main-user=', 'server-id=', 'datadir=', 'max_connections=', 'default-storage-engine=', 'main-connect-retry=']
     def parseOpts(self, processParams):
         paramGroupsList = re.findall('\s*("[^"]+")|([^"]\S*="[^"]+")|([^"]\w*)', processParams)
         paramList = []

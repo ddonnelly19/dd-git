@@ -277,8 +277,8 @@ class Domain(_HasName, _HasMac, _HasOshMap):
 
         self.failurePolicy = None
         
-        #set of master names
-        self.masters = {}
+        #set of main names
+        self.mains = {}
         
         # -- relationships
         self.switchesByName = {}

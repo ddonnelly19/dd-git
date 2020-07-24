@@ -19,8 +19,8 @@ Flow based on processes
         5.2) Queue server (1)
         5.3) Index server (1..*)
             roles:
-                a) master
-                b) slave
+                a) main
+                b) subordinate
                 c) backup
         5.3) Name server (1)
 '''
@@ -173,14 +173,14 @@ class TrexTopologyConfig:
         def __init__(self, globalsNode):
             self.__globalsNodes = globalsNode
 
-        def getMasterEndpoints(self):
+        def getMainEndpoints(self):
             r'@types: -> list[netutils.Endpoint]'
-            node = getUnderlyingNodeByName( self.__globalsNodes, 'all_masters')
+            node = getUnderlyingNodeByName( self.__globalsNodes, 'all_mains')
             return map(self._parseEndpoint, node.attributes.get('value', '').split())
 
-        def getActiveMasterEndpoints(self):
+        def getActiveMainEndpoints(self):
             r'@types: -> list[netutils.Endpoint]'
-            node = getUnderlyingNodeByName( self.__globalsNodes, 'active_master')
+            node = getUnderlyingNodeByName( self.__globalsNodes, 'active_main')
             return map(self._parseEndpoint, node.attributes.get('value', '').split())
 
         def _parseEndpoint(self, endpointStr):

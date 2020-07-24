@@ -802,14 +802,14 @@ class Reporter:
             raise ValueError("SystemPdo is not specified")
         return self.__builder.builSapSystemPdo(pdo)
 
-    def reportSystemMasterComponentVersion(self, systemOsh, version):
-        r'''Update value of master_component_version attribute
+    def reportSystemMainComponentVersion(self, systemOsh, version):
+        r'''Update value of main_component_version attribute
         in sap_system CIT which is treated as system version
 
         @types: ObjectStateHolder[sap_system], str -> ObjectStateHolder
         '''
         assert systemOsh and version
-        systemOsh.setStringAttribute('master_component_version', version)
+        systemOsh.setStringAttribute('main_component_version', version)
         return systemOsh
 
 
@@ -1126,16 +1126,16 @@ class LinkReporter(_HasBuilder):
         assert osh1 and osh2
         return self._getBuilder().buildLink('deployed', osh1, osh2)
 
-    def reportDependency(self, slave, master):
+    def reportDependency(self, subordinate, main):
         r'''@types: ObjectStateHolder, ObjectStateHolder -> ObjectStateHolder[dependency]
         @raise ValueError: System OSH is not specified
         @raise ValueError: Instance OSH is not specified
         '''
-        if not slave:
-            raise ValueError("Slave OSH is not specified")
-        if not master:
-            raise ValueError("Master OSH is not specified")
-        return self._getBuilder().buildLink('dependency', slave, master)
+        if not subordinate:
+            raise ValueError("Subordinate OSH is not specified")
+        if not main:
+            raise ValueError("Main OSH is not specified")
+        return self._getBuilder().buildLink('dependency', subordinate, main)
 
     def reportUsage(self, who, whom):
         r'''@types: ObjectStateHolder, ObjectStateHolder -> ObjectStateHolder[usage]

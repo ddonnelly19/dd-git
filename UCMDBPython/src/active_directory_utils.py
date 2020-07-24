@@ -717,24 +717,24 @@ class AdServerDao(Dao):
         domainDn = rootDseRs.getString("defaultNamingContext")
         return self.__hasRole(domainDn, serverDto)
 
-    def isRidMasterRoleOwner(self, serverDto):
+    def isRidMainRoleOwner(self, serverDto):
         rootDseRs = self._client.getRootDseResultSet()
         domainDn = rootDseRs.getString("defaultNamingContext")
         ridManagerDn = 'CN=RID Manager$,CN=System,%s' % domainDn
         return self.__hasRole(ridManagerDn, serverDto)
 
-    def isSchemaMasterRoleOwner(self, serverDto):
+    def isSchemaMainRoleOwner(self, serverDto):
         rootDseRs = self._client.getRootDseResultSet()
         schemaDn = rootDseRs.getString("schemaNamingContext")
         return self.__hasRole(schemaDn, serverDto)
 
-    def isInfrastructureMasterRoleOwner(self, serverDto):
+    def isInfrastructureMainRoleOwner(self, serverDto):
         rootDseRs = self._client.getRootDseResultSet()
         domainDn = rootDseRs.getString("defaultNamingContext")
         infrastructureDn = 'cn=Infrastructure,%s' % domainDn
         return self.__hasRole(infrastructureDn, serverDto)
 
-    def isDomainNameMasterRoleOwner(self, serverDto):
+    def isDomainNameMainRoleOwner(self, serverDto):
         rootDseRs = self._client.getRootDseResultSet()
         configDn = rootDseRs.getString("configurationNamingContext")
         partitionsDn = 'cn=Partitions,%s' % configDn
@@ -934,12 +934,12 @@ class AdOrganizationalUnitConfigDiscoverer(DaoDiscoverer):
 
 
 class AdControllerRoleDiscoverer(DaoDiscoverer):
-    RELATIVE_ID_MASTER_ROLE = "Relative Identity Master"
-    SCHEMA_MASTER_ROLE = "Schema Master"
-    INFRASTRUCTURE_MASTER_ROLE = "Infrastructure Master"
-    DOMAIN_NAMING_MASTER_ROLE = "Domain Naming Master"
+    RELATIVE_ID_MASTER_ROLE = "Relative Identity Main"
+    SCHEMA_MASTER_ROLE = "Schema Main"
+    INFRASTRUCTURE_MASTER_ROLE = "Infrastructure Main"
+    DOMAIN_NAMING_MASTER_ROLE = "Domain Naming Main"
     GLOBAL_CATALOG_SERVER_ROLE = "Global Catalog"
-    PRIMARY_DOMAIN_CONTROLLER_MASTER_ROLE = "Primary Domain Controller Master"
+    PRIMARY_DOMAIN_CONTROLLER_MASTER_ROLE = "Primary Domain Controller Main"
     BRIDGE_HEAD_SERVER_ROLE = "Bridge Head Server"
 
     def _discover(self, serverDto=None):
@@ -952,20 +952,20 @@ class AdControllerRoleDiscoverer(DaoDiscoverer):
         if serverDto is None:
             serverDto = serverdao.obtainSelfServer()
 
-        if serverdao.isRidMasterRoleOwner(serverDto):
-            dtoToOshMap[self.RELATIVE_ID_MASTER_ROLE] = self.createOsh('relativeidmaster',
+        if serverdao.isRidMainRoleOwner(serverDto):
+            dtoToOshMap[self.RELATIVE_ID_MASTER_ROLE] = self.createOsh('relativeidmain',
                                                                        self._containerOsh, self.RELATIVE_ID_MASTER_ROLE)
 
-        if serverdao.isSchemaMasterRoleOwner(serverDto):
-            dtoToOshMap[self.SCHEMA_MASTER_ROLE] = self.createOsh('schemamaster',
+        if serverdao.isSchemaMainRoleOwner(serverDto):
+            dtoToOshMap[self.SCHEMA_MASTER_ROLE] = self.createOsh('schemamain',
                                                                   self._containerOsh, self.SCHEMA_MASTER_ROLE)
 
-        if serverdao.isInfrastructureMasterRoleOwner(serverDto):
-            dtoToOshMap[self.INFRASTRUCTURE_MASTER_ROLE] = self.createOsh('infrastructuremaster',
+        if serverdao.isInfrastructureMainRoleOwner(serverDto):
+            dtoToOshMap[self.INFRASTRUCTURE_MASTER_ROLE] = self.createOsh('infrastructuremain',
                                                                           self._containerOsh, self.INFRASTRUCTURE_MASTER_ROLE)
 
-        if serverdao.isDomainNameMasterRoleOwner(serverDto):
-            dtoToOshMap[self.DOMAIN_NAMING_MASTER_ROLE] = self.createOsh('domainnamingmaster',
+        if serverdao.isDomainNameMainRoleOwner(serverDto):
+            dtoToOshMap[self.DOMAIN_NAMING_MASTER_ROLE] = self.createOsh('domainnamingmain',
                                                                          self._containerOsh, self.DOMAIN_NAMING_MASTER_ROLE)
 
         if serverdao.isGlobalCatalogRoleOwner(serverDto):
@@ -973,7 +973,7 @@ class AdControllerRoleDiscoverer(DaoDiscoverer):
                                                                           self._containerOsh, self.GLOBAL_CATALOG_SERVER_ROLE)
 
         if serverdao.isPdcEmulatorRoleOwner(serverDto):
-            dtoToOshMap[self.PRIMARY_DOMAIN_CONTROLLER_MASTER_ROLE] = self.createOsh('primarydomaincontrollermaster',
+            dtoToOshMap[self.PRIMARY_DOMAIN_CONTROLLER_MASTER_ROLE] = self.createOsh('primarydomaincontrollermain',
                                                                                      self._containerOsh, self.PRIMARY_DOMAIN_CONTROLLER_MASTER_ROLE)
 
         if serverdao.isBridgeHeadRoleOwner(serverDto):

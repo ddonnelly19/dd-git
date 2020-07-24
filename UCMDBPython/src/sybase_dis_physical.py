@@ -341,7 +341,7 @@ class Discoverer:
         return self.__client
 
     def discoverSybaseServer(self, serverId, host=None, client=None, protocol=None):
-        query = 'select srvnetname from master..sysservers where srvid = 0'
+        query = 'select srvnetname from main..sysservers where srvid = 0'
         sybaseServer = None
         try:
             resultSet = self._getClient().executeQuery(query)
@@ -356,7 +356,7 @@ class Discoverer:
         return sybaseServer
 
     def discoverDatabases(self):
-        query = 'select name, crdate from master..sysdatabases'
+        query = 'select name, crdate from main..sysdatabases'
         databases = []
         try:
             resultSet = self._getClient().executeQuery(query)
@@ -410,7 +410,7 @@ class Discoverer:
         return segments
 
     def discoverDevices(self, databaseByName):
-        query = 'select name, phyname, vdevno from master..sysdevices where cntrltype = 0'
+        query = 'select name, phyname, vdevno from main..sysdevices where cntrltype = 0'
         devices = []
         try:
             resultSet = self._getClient().executeQuery(query)
@@ -437,7 +437,7 @@ class Discoverer:
         return devices
 
     def discoverDeviceDatabases(self, deviceName, databaseByName):
-        query = ''.join(("select db.name from master..sysusages us, master..sysdevices dv, master..sysdatabases db where us.dbid = db.dbid and us.vdevno = dv.vdevno and dv.name = '", deviceName, "'"))
+        query = ''.join(("select db.name from main..sysusages us, main..sysdevices dv, main..sysdatabases db where us.dbid = db.dbid and us.vdevno = dv.vdevno and dv.name = '", deviceName, "'"))
         databases = []
         try:
             resultSet = self._getClient().executeQuery(query)
@@ -461,7 +461,7 @@ class Discoverer:
         return databases
 
     def discoverLogins(self):
-        query = 'select name from master..syslogins'
+        query = 'select name from main..syslogins'
         logins = []
         try:
             resultSet = self._getClient().executeQuery(query)
@@ -484,7 +484,7 @@ class Discoverer:
         return logins
 
     def discoverDBClients(self, databaseName):
-        query = "SELECT b.name,hostname,program_name,count(*) connection_count FROM master..sysprocesses a,master..syslogins b,master..sysdatabases c WHERE a.suid = b.suid and a.dbid = c.dbid and hostname is not null and hostname != '' and program_name is not null and program_name != '' and c.name = '" + databaseName + "' group by b.name,hostname,program_name"
+        query = "SELECT b.name,hostname,program_name,count(*) connection_count FROM main..sysprocesses a,main..syslogins b,main..sysdatabases c WHERE a.suid = b.suid and a.dbid = c.dbid and hostname is not null and hostname != '' and program_name is not null and program_name != '' and c.name = '" + databaseName + "' group by b.name,hostname,program_name"
         sessions = []
         try:
             resultSet = self._getClient().executeQuery(query)

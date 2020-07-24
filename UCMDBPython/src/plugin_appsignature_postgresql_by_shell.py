@@ -31,7 +31,7 @@ class PostgreSQLVersionShellPlugin(Plugin):
             return match.group(1)
     
     def process(self, context):
-        process = context.application.getProcess('postmaster')
+        process = context.application.getProcess('postmain')
         if not process:
             process = context.application.getProcess('postgres')
         path = process.executablePath

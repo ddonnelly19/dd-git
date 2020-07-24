@@ -51,7 +51,7 @@ class SqlServer:
 
     def getDatabases(self,root):
         result = LinkedHashMap()
-        rs = self.connection.getTable("SELECT name,crdate as createDate FROM master..sysdatabases")
+        rs = self.connection.getTable("SELECT name,crdate as createDate FROM main..sysdatabases")
         logger.debug('in get databases for root: ', root.toString())
         while rs.next():
             database = ObjectStateHolder("sqldatabase")
@@ -89,7 +89,7 @@ class SqlServer:
         oshv = ObjectStateHolderVector()
         try:
             logger.debug('get db processes')
-            rs = self.connection.getTable("SELECT name as dbname,hostname,program_name,count(*) connection_count,sum(blocked) blocked_sum,net_address,net_library,loginame,nt_username,nt_domain FROM master..sysprocesses a, master..sysdatabases b WHERE a.dbid = b.dbid and hostname is not null and hostname != '' and program_name is not null and program_name != '' group by name,hostname,program_name,net_address,net_library,loginame,nt_username,nt_domain order by dbname, hostname, program_name")
+            rs = self.connection.getTable("SELECT name as dbname,hostname,program_name,count(*) connection_count,sum(blocked) blocked_sum,net_address,net_library,loginame,nt_username,nt_domain FROM main..sysprocesses a, main..sysdatabases b WHERE a.dbid = b.dbid and hostname is not null and hostname != '' and program_name is not null and program_name != '' group by name,hostname,program_name,net_address,net_library,loginame,nt_username,nt_domain order by dbname, hostname, program_name")
 
             currentDbOSH = ''
             currentDatabase = ''

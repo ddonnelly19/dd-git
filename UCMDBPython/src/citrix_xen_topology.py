@@ -67,13 +67,13 @@ class Discover(object):
         pool_osh = None
         if pool:
             pool_osh = self.builder.build_pool(pool)
-            master = pool.getMaster()
+            main = pool.getMain()
             vector.add(pool_osh)
-            if current_host == master:
-                master_osh = xen_server_osh
+            if current_host == main:
+                main_osh = xen_server_osh
             else:
-                master_osh = self.builder.build_xen_server(master)
-            pool_osh.setContainer(master_osh)
+                main_osh = self.builder.build_xen_server(main)
+            pool_osh.setContainer(main_osh)
 
         for host in hosts:
             host_osh = self.builder.build_xen_server(host)

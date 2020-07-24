@@ -565,9 +565,9 @@ class TopologyReporter:
                                                             container)
             vector.addAll(vector_)
 
-        for slave in dependants or ():
-            for master in database_oshs or (server_osh,):
-                link = modeling.createLinkOSH("dependency", slave, master)
+        for subordinate in dependants or ():
+            for main in database_oshs or (server_osh,):
+                link = modeling.createLinkOSH("dependency", subordinate, main)
                 vector.add(link)
 
         return server_osh, ipseOsh, database_oshs, list(vector)
@@ -703,9 +703,9 @@ class HanaTopologyReporter(TopologyReporter):
                                                             container)
             oshs.extend(oshs_)
 
-        for slave in dependants or ():
-            for master in (server_osh,):
-                link = modeling.createLinkOSH("dependency", slave, master)
+        for subordinate in dependants or ():
+            for main in (server_osh,):
+                link = modeling.createLinkOSH("dependency", subordinate, main)
                 oshs.append(link)
 
         return server_osh, ipseOsh, instance_osh, oshs

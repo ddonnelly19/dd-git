@@ -50,9 +50,9 @@ class DefaultProfile(sap.DefaultProfile):
 
 
 class NameServerModeEnum:
-    FIRST_MASTER = '1st master'
-    MASTER = 'master'
-    SLAVE = 'slave'
+    FIRST_MASTER = '1st main'
+    MASTER = 'main'
+    SLAVE = 'subordinate'
 
     def values(self):
         return (self.FIRST_MASTER, self.MASTER, self.SLAVE)

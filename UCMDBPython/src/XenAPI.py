@@ -172,7 +172,7 @@ class Session(xmlrpclib.ServerProxy):
 
     def _logout(self):
         try:
-            if self.last_login_method.startswith("slave_local"):
+            if self.last_login_method.startswith("subordinate_local"):
                 return _parse_result(self.session.local_logout(self._session))
             else:
                 return _parse_result(self.session.logout(self._session))
@@ -184,7 +184,7 @@ class Session(xmlrpclib.ServerProxy):
 
     def _get_api_version(self):
         pool = self.xenapi.pool.get_all()[0]
-        host = self.xenapi.pool.get_master(pool)
+        host = self.xenapi.pool.get_main(pool)
         major = self.xenapi.host.get_API_version_major(host)
         minor = self.xenapi.host.get_API_version_minor(host)
         return "%s.%s"%(major,minor)
@@ -194,7 +194,7 @@ class Session(xmlrpclib.ServerProxy):
             return self._session
         elif name == 'xenapi':
             return _Dispatcher(self.API_version, self.xenapi_request, None)
-        elif name.startswith('login') or name.startswith('slave_local'):
+        elif name.startswith('login') or name.startswith('subordinate_local'):
             return lambda *params: self._login(name, params)
         else:
             return xmlrpclib.ServerProxy.__getattr__(self, name)

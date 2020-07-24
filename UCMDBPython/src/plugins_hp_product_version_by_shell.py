@@ -401,7 +401,7 @@ class SiteScopeServerPlugin(ConfigBasedPlugin):
         self.allowedProcesses = ['SiteScope.exe', 'SiteScope', 'java.exe',
                                  'java', 'javaw.exe']
         self.configPathAndVersionPattern = {
-                '../../groups/master.config': r'_version=(.+?)\s'}
+                '../../groups/main.config': r'_version=(.+?)\s'}
         self.setVersionDescription = 0
 
 

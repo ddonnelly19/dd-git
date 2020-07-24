@@ -203,16 +203,16 @@ class LinkReporter:
         '''
         return self.reportLink('replicated', who, whom)
 
-    def reportDependency(self, slave, master):
+    def reportDependency(self, subordinate, main):
         r'''@types: ObjectStateHolder[cit], ObjectStateHolder[cit] -> ObjectStateHolder[dependency]
         @raise ValueError: System OSH is not specified
         @raise ValueError: Instance OSH is not specified
         '''
-        if not slave:
-            raise ValueError("Slave OSH is not specified")
-        if not master:
-            raise ValueError("Master OSH is not specified")
-        return self.reportLink('dependency', slave, master)
+        if not subordinate:
+            raise ValueError("Subordinate OSH is not specified")
+        if not main:
+            raise ValueError("Main OSH is not specified")
+        return self.reportLink('dependency', subordinate, main)
 
 
 class DatabaseTopologyReporter(db.HanaTopologyReporter):

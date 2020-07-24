@@ -19,7 +19,7 @@ class SqlDatabase:
             if self.discoveryOptions and self.discoveryOptions.discoverSqlFile:
                 self.getSqlFiles(oshv, dbmap, hostId, users)
         except:
-            logger.debugException('failed to get master file')
+            logger.debugException('failed to get main file')
         return oshv
 
     def attachToUsers(self, db, users, oshv, dbName=None):
@@ -45,10 +45,10 @@ class SqlDatabase:
 
     def getSqlFiles(self, oshv, dbmap, hostId, users):
         try:
-            self.getSqlFilesFromMaster(oshv, dbmap, hostId, users)
+            self.getSqlFilesFromMain(oshv, dbmap, hostId, users)
         except:
             exInfo = logger.prepareJythonStackTrace('')
-            logger.debug("Failed to get sql file from master. ", exInfo)
+            logger.debug("Failed to get sql file from main. ", exInfo)
             logger.debug("Collecting the details from each user databases.")
             itr = dbmap.entrySet().iterator()
             while(itr.hasNext()):
@@ -80,7 +80,7 @@ class SqlDatabase:
             oshv.add(modeling.createLinkOSH('depend', osh, disk))
         rs.close()
 
-    def getSqlFilesFromMaster(self, oshv, dbmap, hostId, users):
+    def getSqlFilesFromMain(self, oshv, dbmap, hostId, users):
         rs = self.connection.getTable(Queries.MASTER_FILES)
         while rs.next():
             path = Util.replaceFileSeparator(rs.getString('physical_name'))

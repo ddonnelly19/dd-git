@@ -1371,8 +1371,8 @@ class SystemProperties(UserDict.UserDict):
             elif optionName == '--mcast_port': systemPropertyName = 'jboss.partition.udpPort'
             elif optionName == '--hostname': systemPropertyName = 'jboss.host.name'
             elif optionName == '--nodename': systemPropertyName = 'jboss.node.name'
-            elif optionName == '--master-address': systemPropertyName = 'jboss.domain.master.address'
-            elif optionName == '--master-port': systemPropertyName = 'jboss.domain.master.port'
+            elif optionName == '--main-address': systemPropertyName = 'jboss.domain.main.address'
+            elif optionName == '--main-port': systemPropertyName = 'jboss.domain.main.port'
             elif optionName == '--host': systemPropertyName = 'jboss.bind.address'
         # short options definition
         elif optionName.startswith('-'):
@@ -1431,12 +1431,12 @@ class ServerConfigDescriptorV7:
 
         def getRemoteHost(self):
             r'''@types: -> str
-            May be ip, hostname or config-expression like: host="${jboss.domain.master.address}" '''
+            May be ip, hostname or config-expression like: host="${jboss.domain.main.address}" '''
             return self.__remoteHost
 
         def getRemotePort(self):
             r'''@types: -> str
-            May be digit or config expression like: port="${jboss.domain.master.port:9999}" '''
+            May be digit or config expression like: port="${jboss.domain.main.port:9999}" '''
             return self.__remotePort
 
     class Interface(entity.HasName):
